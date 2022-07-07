@@ -32,13 +32,13 @@ public class ChatManager {
     }
 
     private static void parseChatMessage(Component message) {
-        // this is a real chat message, or wynntils stuff like
+        // this is a real chat message, or wynncraft stuff like
         // " [Info] Link your Wynncraft forum account with "/forum" and get a stylish white username in chat! Visit
         // wynncraft.com/forumlink for more!"
     }
 
     private static void parseSystemMessage(Component message) {
-        // this is a wynntils response, e.g.
+        // this is a wynncraft response, e.g.
         // "/toggle
         // [swears/blood/insults/autojoin/music/vet/war/guildjoin/attacksound/rpwarning/100/sb/autotracking/pouchmsg/combatbar/ghosts/popups/guildpopups/friendpopups/beacon/outlines/bombbell/pouchpickup/queststartbeacon]"
     }

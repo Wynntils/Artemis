@@ -4,6 +4,7 @@
  */
 package com.wynntils.core;
 
+import com.wynntils.core.chat.ChatManager;
 import com.wynntils.core.commands.ClientCommandManager;
 import com.wynntils.core.config.ConfigManager;
 import com.wynntils.core.features.FeatureRegistry;
@@ -87,6 +88,7 @@ public class WynntilsMod {
         KeyManager.init();
         CompassManager.init();
         ScoreboardManager.init();
+        ChatManager.init();
         ModelLoader.init();
         OverlayManager.init();
         FeatureRegistry.init();

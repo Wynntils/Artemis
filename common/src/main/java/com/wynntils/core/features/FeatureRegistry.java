@@ -21,6 +21,7 @@ import com.wynntils.features.user.DurabilityArcFeature;
 import com.wynntils.features.user.EmeraldPouchHotkeyFeature;
 import com.wynntils.features.user.GammabrightFeature;
 import com.wynntils.features.user.HealthPotionBlockerFeature;
+import com.wynntils.features.user.HudReplacementFeature;
 import com.wynntils.features.user.IngredientPouchHotkeyFeature;
 import com.wynntils.features.user.ItemGuessFeature;
 import com.wynntils.features.user.ItemHighlightFeature;
@@ -156,6 +157,7 @@ public class FeatureRegistry {
         registerFeature(new QuestInfoOverlayFeature());
         registerFeature(new WynncraftPauseScreenFeature());
         registerFeature(new ItemLockFeature());
+        registerFeature(new HudReplacementFeature());
 
         // save/create config file after loading all features' options
         ConfigManager.saveConfig();

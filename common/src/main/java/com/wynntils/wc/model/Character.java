@@ -5,12 +5,14 @@
 package com.wynntils.wc.model;
 
 import com.wynntils.core.WynntilsMod;
+import com.wynntils.core.chat.InfoBarUpdateEvent;
 import com.wynntils.mc.event.ContainerClickEvent;
 import com.wynntils.mc.event.MenuEvent.MenuClosedEvent;
 import com.wynntils.mc.event.MenuEvent.MenuOpenedEvent;
 import com.wynntils.mc.utils.ComponentUtils;
 import com.wynntils.mc.utils.ItemUtils;
 import com.wynntils.wc.Model;
+import com.wynntils.wc.event.CharacterStateEvent;
 import com.wynntils.wc.event.WorldStateEvent;
 import com.wynntils.wc.objects.ClassType;
 import java.util.List;
@@ -27,6 +29,10 @@ public class Character implements Model {
     private static final Pattern LEVEL_PATTERN = Pattern.compile("§e- §r§7Level: §r§f(\\d+)");
 
     private CharacterInfo currentCharacter;
+    private int currentHealth = -1;
+    private int maxHealth = -1;
+    private int currentMana = -1;
+    private int maxMana = -1;
     private boolean inCharacterSelection;
 
     public boolean hasCharacter() {
@@ -35,6 +41,22 @@ public class Character implements Model {
 
     public CharacterInfo getCharacterInfo() {
         return currentCharacter;
+    }
+
+    public int getCurrentHealth() {
+        return currentHealth;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    public int getCurrentMana() {
+        return currentMana;
+    }
+
+    public int getMaxMana() {
+        return maxMana;
     }
 
     @SubscribeEvent
@@ -55,13 +77,21 @@ public class Character implements Model {
     public void onWorldStateChanged(WorldStateEvent e) {
         // Whenever we're leaving a world, clear the current character
         if (e.getOldState() == WorldState.State.WORLD) {
-            currentCharacter = null;
-            // This should not be needed, but have it as a safe-guard
-            inCharacterSelection = false;
+            onWorldLeave();
         }
         if (e.getNewState() == WorldState.State.CHARACTER_SELECTION) {
             WynntilsMod.info("Preparing for character selection");
         }
+    }
+
+    private void onWorldLeave() {
+        currentCharacter = null;
+        // This should not be needed, but have it as a safe-guard
+        inCharacterSelection = false;
+        currentHealth = -1;
+        maxHealth = -1;
+        currentMana = -1;
+        maxMana = -1;
     }
 
     @SubscribeEvent
@@ -70,6 +100,31 @@ public class Character implements Model {
             if (e.getItemStack().getItem() == Items.AIR) return;
             currentCharacter = CharacterInfo.parseCharacter(e.getItemStack(), e.getSlotNum());
             WynntilsMod.info("Selected character " + currentCharacter);
+        }
+    }
+
+    @SubscribeEvent
+    public void onInfoBarUpdate(InfoBarUpdateEvent e) {
+        // If statements are placeholders for sending events if
+        // values change
+        if (e.getCurrentHealth() != currentHealth) {
+            int oldHealth = currentHealth;
+            currentHealth = e.getCurrentHealth();
+            WynntilsMod.getEventBus().post(new CharacterStateEvent.HealthUpdateEvent(currentHealth, oldHealth));
+        }
+        if (e.getMaxHealth() != maxHealth) {
+            int oldMaxHealth = maxHealth;
+            maxHealth = e.getMaxHealth();
+            WynntilsMod.getEventBus().post(new CharacterStateEvent.MaxHealthUpdateEvent(maxHealth, oldMaxHealth));
+        }
+        if (e.getCurrentMana() != currentMana) {
+            int oldMana = currentMana;
+            currentMana = e.getCurrentMana();
+            WynntilsMod.getEventBus().post(new CharacterStateEvent.ManaUpdateEvent(currentMana, oldMana));
+        }
+        if (e.getMaxMana() != maxMana) {
+            // Max mana is not supposed to change; send no event
+            maxMana = e.getMaxMana();
         }
     }
 

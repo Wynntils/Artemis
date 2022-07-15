@@ -24,6 +24,10 @@ To set up the workspace, just import the project as a gradle project into your I
 
 The code format is checked by spotless. To make sure your commits pass the spotless check, you can install a git pre-commit hook. The hook is optional to use. If you want to use it, you must tell git to pick up hooks from the directory containing the hook. To do this, run this from your repo root: `git config core.hooksPath utils/git-hooks`.
 
+Using the Hotswap Agent is recommended if you want to do live code editing. See [Hotswap Agent installation instructions](http://hotswapagent.org/mydoc_quickstart-jdk17.html),
+but bear in mind that the instructions are incorrect (!). Don't "unpack" `hotswap-agent.jar`, instead
+rename the downloaded jar file to `hotswap-agent.jar`.
+
 <i>TODO Run Configurations and Authenticating</i>
 
 License

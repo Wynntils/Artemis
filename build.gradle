@@ -8,6 +8,8 @@ architectury {
     minecraft = rootProject.minecraft_version
 }
 
+def usingHotswapAgent = true
+
 subprojects {
     apply plugin: "dev.architectury.loom"
 
@@ -23,6 +25,10 @@ subprojects {
         runs {
             client {
                 property("devauth.configDir", getRootProject().file(".devauth").absolutePath)
+                if (usingHotswapAgent) {
+                    vmArgs "-XX:+AllowEnhancedClassRedefinition"
+                    vmArgs "-XX:HotswapAgent=fatjar"
+                }
                 client()
             }
         }

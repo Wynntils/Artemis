@@ -20,6 +20,7 @@ import net.minecraft.network.chat.TextComponent;
 import org.jetbrains.annotations.Nullable;
 
 public class ComponentUtils {
+    // Text with formatting codes "§cTest §1Text"
     public static String getFormatted(Component component) {
         StringBuilder result = new StringBuilder();
 
@@ -42,8 +43,9 @@ public class ComponentUtils {
         return result.toString();
     }
 
+    // Text without formatting codes "Test text"
     public static String getUnformatted(Component component) {
-        return component.getString();
+        return ChatFormatting.stripFormatting(component.getString());
     }
 
     @Nullable

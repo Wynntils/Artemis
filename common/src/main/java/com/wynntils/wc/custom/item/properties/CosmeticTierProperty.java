@@ -4,7 +4,7 @@
  */
 package com.wynntils.wc.custom.item.properties;
 
-import com.wynntils.features.user.ItemHighlightFeature;
+import com.wynntils.features.user.inventory.ItemHighlightFeature;
 import com.wynntils.utils.objects.CustomColor;
 import com.wynntils.wc.custom.item.WynnItemStack;
 import com.wynntils.wc.custom.item.properties.type.HighlightProperty;

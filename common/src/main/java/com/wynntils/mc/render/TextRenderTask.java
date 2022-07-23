@@ -21,12 +21,14 @@ public final class TextRenderTask {
         return setting;
     }
 
-    public void setSetting(TextRenderSetting setting) {
+    public TextRenderTask setSetting(TextRenderSetting setting) {
         this.setting = setting;
+        return this;
     }
 
-    public void setText(String text) {
+    public TextRenderTask setText(String text) {
         this.text = text;
+        return this;
     }
 
     @Override

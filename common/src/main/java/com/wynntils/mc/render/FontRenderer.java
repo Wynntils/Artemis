@@ -7,9 +7,12 @@ package com.wynntils.mc.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.wynntils.mc.mixin.accessors.MinecraftAccessor;
 import com.wynntils.mc.utils.McUtils;
+import com.wynntils.utils.StringUtils;
+import com.wynntils.utils.objects.CommonColors;
 import com.wynntils.utils.objects.CustomColor;
 import java.util.Arrays;
 import java.util.List;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 
 public class FontRenderer {
@@ -17,7 +20,7 @@ public class FontRenderer {
     private final Font font;
 
     private static final int NEWLINE_OFFSET = 10;
-    private static final int SHADOW_COLOR = 0;
+    private static final CustomColor SHADOW_COLOR = CommonColors.BLACK;
 
     public FontRenderer() {
         this.font = ((MinecraftAccessor) McUtils.mc()).getFont();
@@ -57,7 +60,12 @@ public class FontRenderer {
                     case OUTLINE:
                         for (int i = -1; i <= 1; i++) {
                             for (int j = -1; j <= 1; j++) {
-                                font.draw(poseStack, text, x + i, y + j, SHADOW_COLOR);
+                                font.draw(
+                                        poseStack,
+                                        ChatFormatting.stripFormatting(text),
+                                        x + i,
+                                        y + j,
+                                        SHADOW_COLOR.withAlpha(customColor.a).asInt());
                             }
                         }
                         return font.draw(poseStack, text, x, y, customColor.asInt());
@@ -85,22 +93,12 @@ public class FontRenderer {
             return;
         }
 
-        List<String> parts = Arrays.stream(text.split(" ")).toList();
-
-        int line = 0;
-        int partBegin = 0;
-
-        // Loop backwards to find the biggest text part we can fit in maxWidth
-        // if found, render it and reset the loop to try to do the same with
-        // the remaining parts
-        for (int i = parts.size() - 1; i >= 0 && partBegin < parts.size(); i--) {
-            String shortened = String.join(" ", parts.subList(partBegin, i + 1));
-            if (font.width(shortened) < maxWidth) {
-                renderText(poseStack, shortened, x, y + (line * NEWLINE_OFFSET), customColor, alignment, shadow);
-                line++;
-                partBegin = i + 1;
-                i = parts.size();
-            }
+        List<String> parts = Arrays.stream(StringUtils.wrapTextBySize(text, (int) maxWidth))
+                .filter(s -> !s.isBlank())
+                .toList();
+        for (int i = 0; i < parts.size(); i++) {
+            String part = parts.get(i);
+            renderText(poseStack, part, x, y + (i * NEWLINE_OFFSET), customColor, alignment, shadow);
         }
     }
 
@@ -117,8 +115,9 @@ public class FontRenderer {
     }
 
     public void renderTexts(PoseStack poseStack, float x, float y, List<TextRenderTask> lines) {
-        for (int i = 0; i < lines.size(); i++) {
-            renderText(poseStack, x, y + (NEWLINE_OFFSET * i), lines.get(i));
+        for (TextRenderTask line : lines) {
+            renderText(poseStack, x, y, line);
+            y += calculateRenderHeight(List.of(line));
         }
     }
 
@@ -155,22 +154,13 @@ public class FontRenderer {
             if (textRenderTask.getSetting().maxWidth() == 0) {
                 height += font.lineHeight + NEWLINE_OFFSET;
             } else {
-                List<String> parts =
-                        Arrays.stream(textRenderTask.getText().split(" ")).toList();
-
-                int lines = 0;
-                int partBegin = 0;
-
-                // Loop backwards to find the biggest text part we can fit in maxWidth
-                // if found, render it and reset the loop to try to do the same with
-                // the remaining parts
-                for (int i = parts.size() - 1; i >= 0 && partBegin < parts.size(); i--) {
-                    String shortened = String.join(" ", parts.subList(partBegin, i + 1));
-                    if (font.width(shortened) < textRenderTask.getSetting().maxWidth()) {
-                        lines++;
-                        partBegin = i + 1;
-                        i = parts.size();
-                    }
+                int lines = 1;
+                if (textRenderTask.getText().contains(" ")) {
+                    lines = Arrays.stream(StringUtils.wrapTextBySize(textRenderTask.getText(), (int)
+                                    textRenderTask.getSetting().maxWidth()))
+                            .filter(s -> !s.isBlank())
+                            .toList()
+                            .size();
                 }
 
                 height += lines * (font.lineHeight + NEWLINE_OFFSET);

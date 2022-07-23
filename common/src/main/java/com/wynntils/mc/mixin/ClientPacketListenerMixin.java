@@ -126,16 +126,22 @@ public abstract class ClientPacketListenerMixin {
 
     @Inject(
             method = "setTitleText(Lnet/minecraft/network/protocol/game/ClientboundSetTitleTextPacket;)V",
-            at = @At("RETURN"))
-    private void setTitleTextPost(ClientboundSetTitleTextPacket packet, CallbackInfo ci) {
-        EventFactory.onTitleSetText(packet);
+            at = @At("HEAD"),
+            cancellable = true)
+    private void setTitleTextPre(ClientboundSetTitleTextPacket packet, CallbackInfo ci) {
+        if (EventFactory.onTitleSetText(packet).isCanceled()) {
+            ci.cancel();
+        }
     }
 
     @Inject(
             method = "setSubtitleText(Lnet/minecraft/network/protocol/game/ClientboundSetSubtitleTextPacket;)V",
-            at = @At("RETURN"))
-    private void setSubtitleTextPost(ClientboundSetSubtitleTextPacket packet, CallbackInfo ci) {
-        EventFactory.onSubtitleSetText(packet);
+            at = @At("HEAD"),
+            cancellable = true)
+    private void setSubtitleTextPre(ClientboundSetSubtitleTextPacket packet, CallbackInfo ci) {
+        if (EventFactory.onSubtitleSetText(packet).isCanceled()) {
+            ci.cancel();
+        }
     }
 
     @Redirect(

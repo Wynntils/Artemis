@@ -330,12 +330,12 @@ public class EventFactory {
     // endregion
 
     // region Title Events
-    public static void onTitleSetText(ClientboundSetTitleTextPacket packet) {
-        post(new TitleSetTextEvent(packet.getText()));
+    public static Event onTitleSetText(ClientboundSetTitleTextPacket packet) {
+        return post(new TitleSetTextEvent(packet.getText()));
     }
 
-    public static void onSubtitleSetText(ClientboundSetSubtitleTextPacket packet) {
-        post(new SubtitleSetTextEvent(packet.getText()));
+    public static Event onSubtitleSetText(ClientboundSetSubtitleTextPacket packet) {
+        return post(new SubtitleSetTextEvent(packet.getText()));
     }
 
     // endregion

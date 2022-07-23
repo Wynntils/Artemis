@@ -56,12 +56,14 @@ public abstract class Feature implements Translatable, Configurable {
     public final void initOverlays() {
         Field[] overlayFields = FieldUtils.getFieldsWithAnnotation(this.getClass(), OverlayInfo.class);
         for (Field overlayField : overlayFields) {
-            if (overlayField.getType() != Overlay.class) {
-                throw new RuntimeException("A non-Overlay class was marked with OverlayInfo annotation.");
-            }
 
             try {
-                Overlay overlay = (Overlay) FieldUtils.readField(overlayField, this, true);
+                Object fieldValue = FieldUtils.readField(overlayField, this, true);
+
+                if (!(fieldValue instanceof Overlay overlay)) {
+                    throw new RuntimeException("A non-Overlay class was marked with OverlayInfo annotation.");
+                }
+
                 OverlayInfo annotation = overlayField.getAnnotation(OverlayInfo.class);
                 OverlayManager.registerOverlay(overlay, annotation);
                 overlays.add(overlay);

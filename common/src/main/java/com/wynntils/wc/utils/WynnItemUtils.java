@@ -7,7 +7,7 @@ package com.wynntils.wc.utils;
 import com.wynntils.core.webapi.profiles.item.IdentificationModifier;
 import com.wynntils.core.webapi.profiles.item.IdentificationProfile;
 import com.wynntils.core.webapi.profiles.item.ItemProfile;
-import com.wynntils.features.user.ItemStatInfoFeature;
+import com.wynntils.features.user.tooltips.ItemStatInfoFeature;
 import com.wynntils.utils.MathUtils;
 import com.wynntils.utils.Utils;
 import com.wynntils.wc.objects.ItemIdentificationContainer;

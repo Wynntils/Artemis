@@ -10,7 +10,7 @@ import com.wynntils.core.webapi.profiles.ItemGuessProfile;
 import com.wynntils.core.webapi.profiles.item.ItemProfile;
 import com.wynntils.core.webapi.profiles.item.ItemTier;
 import com.wynntils.core.webapi.profiles.item.ItemType;
-import com.wynntils.features.user.ItemGuessFeature;
+import com.wynntils.features.user.tooltips.ItemGuessFeature;
 import com.wynntils.utils.reference.EmeraldSymbols;
 import com.wynntils.wc.utils.WynnUtils;
 import java.util.List;

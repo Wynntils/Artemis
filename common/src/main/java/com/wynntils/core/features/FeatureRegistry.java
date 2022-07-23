@@ -17,25 +17,27 @@ import com.wynntils.features.internal.FixSpellOverwriteFeature;
 import com.wynntils.features.internal.ItemStackTransformerFeature;
 import com.wynntils.features.internal.LootrunFeature;
 import com.wynntils.features.user.DialogueOptionOverrideFeature;
-import com.wynntils.features.user.DurabilityArcFeature;
 import com.wynntils.features.user.EmeraldPouchHotkeyFeature;
 import com.wynntils.features.user.GammabrightFeature;
 import com.wynntils.features.user.HealthPotionBlockerFeature;
 import com.wynntils.features.user.IngredientPouchHotkeyFeature;
-import com.wynntils.features.user.ItemGuessFeature;
-import com.wynntils.features.user.ItemHighlightFeature;
 import com.wynntils.features.user.ItemLockFeature;
 import com.wynntils.features.user.ItemScreenshotFeature;
-import com.wynntils.features.user.ItemStatInfoFeature;
-import com.wynntils.features.user.ItemTextOverlayFeature;
 import com.wynntils.features.user.MountHorseHotkeyFeature;
 import com.wynntils.features.user.MythicBlockerFeature;
-import com.wynntils.features.user.PlayerGhostTransparencyFeature;
-import com.wynntils.features.user.QuestInfoOverlayFeature;
 import com.wynntils.features.user.SoulPointTimerFeature;
-import com.wynntils.features.user.TooltipFittingFeature;
 import com.wynntils.features.user.WynncraftButtonFeature;
 import com.wynntils.features.user.WynncraftPauseScreenFeature;
+import com.wynntils.features.user.inventory.DurabilityArcFeature;
+import com.wynntils.features.user.inventory.ItemHighlightFeature;
+import com.wynntils.features.user.inventory.ItemTextOverlayFeature;
+import com.wynntils.features.user.overlays.GameUpdateOverlayFeature;
+import com.wynntils.features.user.overlays.QuestInfoOverlayFeature;
+import com.wynntils.features.user.players.PlayerGhostTransparencyFeature;
+import com.wynntils.features.user.redirects.PouchRedirectFeature;
+import com.wynntils.features.user.tooltips.ItemGuessFeature;
+import com.wynntils.features.user.tooltips.ItemStatInfoFeature;
+import com.wynntils.features.user.tooltips.TooltipFittingFeature;
 import com.wynntils.mc.utils.CrashReportManager;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ public class FeatureRegistry {
 
         // instance field
         try {
-            Field instanceField = FieldUtils.getDeclaredField(featureClass, "INSTANCE");
+            Field instanceField = FieldUtils.getDeclaredField(featureClass, "INSTANCE", true);
             if (instanceField != null) instanceField.set(null, feature);
         } catch (Exception e) {
             WynntilsMod.error("Failed to create instance object in " + featureClass.getName());
@@ -158,6 +160,8 @@ public class FeatureRegistry {
         registerFeature(new WynncraftPauseScreenFeature());
         registerFeature(new ItemLockFeature());
         registerFeature(new ItemTextOverlayFeature());
+        registerFeature(new GameUpdateOverlayFeature());
+        registerFeature(new PouchRedirectFeature());
 
         // save/create config file after loading all features' options
         ConfigManager.saveConfig();

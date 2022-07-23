@@ -9,7 +9,7 @@ import com.wynntils.core.webapi.profiles.item.DamageType;
 import com.wynntils.core.webapi.profiles.item.ItemProfile;
 import com.wynntils.core.webapi.profiles.item.MajorIdentification;
 import com.wynntils.core.webapi.profiles.item.RequirementType;
-import com.wynntils.features.user.ItemStatInfoFeature;
+import com.wynntils.features.user.tooltips.ItemStatInfoFeature;
 import com.wynntils.mc.utils.ComponentUtils;
 import com.wynntils.mc.utils.McUtils;
 import com.wynntils.utils.MathUtils;
@@ -327,7 +327,7 @@ public class GearItemStack extends WynnItemStack {
 
         MutableComponent name;
         if (customName == null) {
-            name = new TextComponent(WynnUtils.normalizeBadString(ComponentUtils.getUnformatted(getHoverName())));
+            name = new TextComponent(WynnUtils.normalizeBadString(ComponentUtils.getFormatted(getHoverName())));
         } else {
             name = customName.copy();
         }

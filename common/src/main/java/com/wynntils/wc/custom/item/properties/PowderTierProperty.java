@@ -4,8 +4,8 @@
  */
 package com.wynntils.wc.custom.item.properties;
 
-import com.wynntils.features.user.ItemHighlightFeature;
-import com.wynntils.features.user.ItemTextOverlayFeature;
+import com.wynntils.features.user.inventory.ItemHighlightFeature;
+import com.wynntils.features.user.inventory.ItemTextOverlayFeature;
 import com.wynntils.utils.MathUtils;
 import com.wynntils.utils.objects.CustomColor;
 import com.wynntils.wc.custom.item.WynnItemStack;

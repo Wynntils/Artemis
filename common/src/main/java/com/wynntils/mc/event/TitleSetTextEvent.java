@@ -5,8 +5,10 @@
 package com.wynntils.mc.event;
 
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
+@Cancelable
 public class TitleSetTextEvent extends Event {
     private final Component component;
 

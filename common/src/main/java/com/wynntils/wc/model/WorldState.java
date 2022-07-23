@@ -149,7 +149,7 @@ public class WorldState implements Model {
         if (!onServer()) return;
 
         Component displayName = e.getDisplayName();
-        String name = ComponentUtils.getUnformatted(displayName);
+        String name = ComponentUtils.getFormatted(displayName);
         Matcher m = WORLD_NAME.matcher(name);
         if (m.find()) {
             String worldName = m.group(1);

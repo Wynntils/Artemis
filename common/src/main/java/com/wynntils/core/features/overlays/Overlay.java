@@ -11,7 +11,7 @@ import com.wynntils.core.config.Config;
 import com.wynntils.core.config.ConfigHolder;
 import com.wynntils.core.features.Configurable;
 import com.wynntils.core.features.Translatable;
-import com.wynntils.core.features.overlays.sizes.FixedOverlaySize;
+import com.wynntils.core.features.overlays.sizes.GuiScaledOverlaySize;
 import com.wynntils.core.features.overlays.sizes.OverlaySize;
 import com.wynntils.mc.render.HorizontalAlignment;
 import com.wynntils.mc.render.VerticalAlignment;
@@ -46,7 +46,7 @@ public abstract class Overlay implements Translatable, Configurable {
 
     public Overlay(OverlayPosition position, float width, float height) {
         this.position = position;
-        this.size = new FixedOverlaySize(width, height);
+        this.size = new GuiScaledOverlaySize(width, height);
     }
 
     public Overlay(OverlayPosition position, OverlaySize size) {

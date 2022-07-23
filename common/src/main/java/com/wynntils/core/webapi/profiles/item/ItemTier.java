@@ -5,7 +5,7 @@
 package com.wynntils.core.webapi.profiles.item;
 
 import com.wynntils.core.WynntilsMod;
-import com.wynntils.features.user.ItemHighlightFeature;
+import com.wynntils.features.user.inventory.ItemHighlightFeature;
 import com.wynntils.utils.StringUtils;
 import com.wynntils.utils.objects.CustomColor;
 import java.util.Arrays;

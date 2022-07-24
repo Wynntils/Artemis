@@ -74,6 +74,10 @@ public class ConfigHolder {
         return field.getName();
     }
 
+    public Configurable getParent() {
+        return parent;
+    }
+
     public String getJsonName() {
         if (parent instanceof Overlay) {
             // "featureName.overlayName.settingName"

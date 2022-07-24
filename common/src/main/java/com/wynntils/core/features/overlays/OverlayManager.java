@@ -11,6 +11,7 @@ import com.wynntils.mc.event.DisplayResizeEvent;
 import com.wynntils.mc.event.RenderEvent;
 import com.wynntils.mc.event.TitleScreenInitEvent;
 import com.wynntils.mc.utils.McUtils;
+import com.wynntils.screens.OverlayManagementScreen;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,15 +39,7 @@ public class OverlayManager {
         if (ignoreState) {
             enabledOverlays.addAll(overlays);
         } else {
-            enabledOverlays.addAll(overlays.stream()
-                    .filter(overlay -> {
-                        if (overlay.isUserEnabled() != null) {
-                            return overlay.isUserEnabled();
-                        }
-
-                        return overlayInfoMap.get(overlay).enabled();
-                    })
-                    .toList());
+            enabledOverlays.addAll(overlays.stream().filter(Overlay::isEnabled).toList());
         }
     }
 
@@ -65,6 +58,14 @@ public class OverlayManager {
     }
 
     private static void renderOverlays(RenderEvent event, OverlayInfo.RenderState renderState) {
+        boolean testMode = false;
+
+        if (McUtils.mc().screen instanceof OverlayManagementScreen screen) {
+            testMode = screen.isTestMode();
+        }
+
+        boolean shouldRender = !(McUtils.mc().screen instanceof OverlayManagementScreen);
+
         for (Overlay overlay : enabledOverlays) {
             OverlayInfo annotation = overlayInfoMap.get(overlay);
 
@@ -83,7 +84,13 @@ public class OverlayManager {
                 }
             }
 
-            overlay.render(event.getPoseStack(), event.getPartialTicks(), event.getWindow());
+            if (testMode) {
+                overlay.renderPreview(event.getPoseStack(), event.getPartialTicks(), event.getWindow());
+            } else {
+                if (shouldRender) {
+                    overlay.render(event.getPoseStack(), event.getPartialTicks(), event.getWindow());
+                }
+            }
         }
     }
 
@@ -124,5 +131,17 @@ public class OverlayManager {
 
     public static List<SectionCoordinates> getSections() {
         return sections;
+    }
+
+    public static Set<Overlay> getOverlays() {
+        return overlayInfoMap.keySet();
+    }
+
+    public static OverlayInfo getOverlayInfo(Overlay overlay) {
+        return overlayInfoMap.getOrDefault(overlay, null);
+    }
+
+    public static boolean isEnabled(Overlay overlay) {
+        return enabledOverlays.contains(overlay);
     }
 }

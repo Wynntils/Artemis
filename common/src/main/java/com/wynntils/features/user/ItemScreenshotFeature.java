@@ -14,6 +14,7 @@ import com.wynntils.core.features.properties.RegisterKeyBind;
 import com.wynntils.core.keybinds.KeyHolder;
 import com.wynntils.mc.event.InventoryKeyPressEvent;
 import com.wynntils.mc.event.ItemTooltipRenderEvent;
+import com.wynntils.mc.render.FontRenderer;
 import com.wynntils.mc.render.RenderUtils;
 import com.wynntils.mc.utils.McUtils;
 import com.wynntils.wc.custom.item.GearItemStack;
@@ -22,12 +23,10 @@ import com.wynntils.wc.utils.WynnItemUtils;
 import com.wynntils.wc.utils.WynnUtils;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -74,7 +73,7 @@ public class ItemScreenshotFeature extends UserFeature {
         List<Component> tooltip = stack.getTooltipLines(null, TooltipFlag.Default.NORMAL);
         WynnItemUtils.removeLoreTooltipLines(tooltip);
 
-        Font font = McUtils.mc().font;
+        Font font = FontRenderer.getInstance().getFont();
         int width = 0;
         int height = 16;
 
@@ -106,13 +105,7 @@ public class ItemScreenshotFeature extends UserFeature {
         fb.bindWrite(false);
         poseStack.pushPose();
         poseStack.scale(scalew, scaleh, 1);
-        RenderUtils.drawTooltip(
-                tooltip.stream()
-                        .map(Component::getVisualOrderText)
-                        .map(ClientTooltipComponent::create)
-                        .collect(Collectors.toList()),
-                poseStack,
-                font);
+        RenderUtils.drawTooltip(poseStack, tooltip, font, true);
         poseStack.popPose();
         fb.unbindWrite();
         McUtils.mc().getMainRenderTarget().bindWrite(true);

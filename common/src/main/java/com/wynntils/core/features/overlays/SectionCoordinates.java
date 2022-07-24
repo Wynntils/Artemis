@@ -4,4 +4,8 @@
  */
 package com.wynntils.core.features.overlays;
 
-public record SectionCoordinates(int x1, int y1, int x2, int y2) {}
+public record SectionCoordinates(int x1, int y1, int x2, int y2) {
+    public boolean overlaps(float x, float y) {
+        return (x1 <= x && x2 >= x) && (y1 <= y && y2 >= y);
+    }
+}

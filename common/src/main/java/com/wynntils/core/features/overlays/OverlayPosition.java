@@ -6,16 +6,18 @@ package com.wynntils.core.features.overlays;
 
 import com.wynntils.mc.render.HorizontalAlignment;
 import com.wynntils.mc.render.VerticalAlignment;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.world.phys.Vec2;
 
 public class OverlayPosition {
 
     protected static final Pattern POSITION_PATTERN = Pattern.compile(
             "OverlayPosition\\{verticalOffset=(.+),horizontalOffset=(.+),verticalAlignment=(.+),horizontalAlignment=(.+),anchorSection=(.+)}");
 
-    private int verticalOffset;
-    private int horizontalOffset;
+    private float verticalOffset;
+    private float horizontalOffset;
 
     private VerticalAlignment verticalAlignment;
     private HorizontalAlignment horizontalAlignment;
@@ -23,8 +25,8 @@ public class OverlayPosition {
     private AnchorSection anchorSection;
 
     public OverlayPosition(
-            int verticalOffset,
-            int horizontalOffset,
+            float verticalOffset,
+            float horizontalOffset,
             VerticalAlignment verticalAlignment,
             HorizontalAlignment horizontalAlignment,
             AnchorSection anchorSection) {
@@ -43,8 +45,8 @@ public class OverlayPosition {
         }
 
         try {
-            this.verticalOffset = Integer.parseInt(matcher.group(1));
-            this.horizontalOffset = Integer.parseInt(matcher.group(2));
+            this.verticalOffset = Float.parseFloat(matcher.group(1));
+            this.horizontalOffset = Float.parseFloat(matcher.group(2));
             this.verticalAlignment = VerticalAlignment.valueOf(matcher.group(3));
             this.horizontalAlignment = HorizontalAlignment.valueOf(matcher.group(4));
             this.anchorSection = AnchorSection.valueOf(matcher.group(5));
@@ -61,7 +63,7 @@ public class OverlayPosition {
         return horizontalAlignment;
     }
 
-    public int getHorizontalOffset() {
+    public float getHorizontalOffset() {
         return horizontalOffset;
     }
 
@@ -69,7 +71,7 @@ public class OverlayPosition {
         return verticalAlignment;
     }
 
-    public int getVerticalOffset() {
+    public float getVerticalOffset() {
         return verticalOffset;
     }
 
@@ -81,6 +83,54 @@ public class OverlayPosition {
                 + verticalAlignment + ", horizontalAlignment="
                 + horizontalAlignment + ", anchorSection="
                 + anchorSection + '}';
+    }
+
+    public static OverlayPosition getBestPositionFor(
+            Overlay overlay, float oldRenderX, float oldRenderY, float offsetX, float offsetY) {
+        Vec2 middleOfOverlay =
+                new Vec2(overlay.getRenderX() + overlay.getWidth() / 2, overlay.getRenderY() + overlay.getHeight() / 2);
+
+        // 1. Get the best section (section with the center point of overlay)
+        AnchorSection section = Arrays.stream(AnchorSection.values())
+                .filter(anchorSection ->
+                        OverlayManager.getSection(anchorSection).overlaps(middleOfOverlay.x, middleOfOverlay.y))
+                .findAny()
+                .orElse(AnchorSection.Middle);
+        SectionCoordinates sectionCoordinates = OverlayManager.getSection(section);
+
+        // 2. Calculate the best alignment inside the section
+        HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
+
+        if ((sectionCoordinates.x1() + sectionCoordinates.x2()) / 2 == (int) middleOfOverlay.x) {
+            horizontalAlignment = HorizontalAlignment.Center;
+        } else if (Math.abs(sectionCoordinates.x2() - middleOfOverlay.x)
+                < Math.abs(sectionCoordinates.x1() - middleOfOverlay.x)) {
+            horizontalAlignment = HorizontalAlignment.Right;
+        }
+
+        VerticalAlignment verticalAlignment = VerticalAlignment.Top;
+
+        if ((sectionCoordinates.y1() + sectionCoordinates.y2()) / 2 == (int) middleOfOverlay.y) {
+            verticalAlignment = VerticalAlignment.Middle;
+        } else if (Math.abs(sectionCoordinates.y2() - middleOfOverlay.y)
+                < Math.abs(sectionCoordinates.y1() - middleOfOverlay.y)) {
+            verticalAlignment = VerticalAlignment.Bottom;
+        }
+
+        // 3. Calculate render positions for new alignment
+        OverlayPosition newOverlayPositionTemp =
+                new OverlayPosition(0, 0, verticalAlignment, horizontalAlignment, section);
+
+        float renderX = Overlay.getRenderX(newOverlayPositionTemp, overlay);
+        float renderY = Overlay.getRenderY(newOverlayPositionTemp, overlay);
+
+        // 4. Calculate the alignment offsets to match the current render position, but factor in argument offsets
+        return new OverlayPosition(
+                oldRenderY - renderY + offsetY,
+                oldRenderX - renderX + offsetX,
+                verticalAlignment,
+                horizontalAlignment,
+                section);
     }
 
     public enum AnchorSection {

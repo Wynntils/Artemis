@@ -24,10 +24,12 @@ public class RestrictedRangeOverlaySize extends FixedOverlaySize {
         this.maxHeight = maxHeight;
     }
 
+    @Override
     public void setWidth(float newWidth) {
         this.width = Math.min(newWidth, maxWidth);
     }
 
+    @Override
     public void setHeight(float newHeight) {
         this.height = Math.min(newHeight, maxHeight);
     }

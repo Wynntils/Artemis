@@ -44,6 +44,14 @@ public abstract class OverlaySize {
 
     public abstract float getRenderedHeight();
 
+    public void setWidth(float newWidth) {
+        this.width = newWidth;
+    }
+
+    public void setHeight(float newHeight) {
+        this.height = newHeight;
+    }
+
     @Override
     public String toString() {
         return "OverlaySize{" + "width=" + width + ", height=" + height + '}';

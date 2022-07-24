@@ -27,6 +27,10 @@ public class FontRenderer {
         return INSTANCE;
     }
 
+    public Font getFont() {
+        return font;
+    }
+
     public int renderText(
             PoseStack poseStack,
             String text,
@@ -104,7 +108,7 @@ public class FontRenderer {
         }
     }
 
-    private void renderText(PoseStack poseStack, float x, float y, TextRenderTask line) {
+    public void renderText(PoseStack poseStack, float x, float y, TextRenderTask line) {
         renderText(
                 poseStack,
                 line.getText(),
@@ -147,6 +151,19 @@ public class FontRenderer {
         renderTexts(poseStack, renderX, renderY, toRender);
     }
 
+    public void renderTextWithAlignment(
+            PoseStack poseStack,
+            float renderX,
+            float renderY,
+            TextRenderTask toRender,
+            float width,
+            float height,
+            HorizontalAlignment horizontalAlignment,
+            VerticalAlignment verticalAlignment) {
+        renderTextsWithAlignment(
+                poseStack, renderX, renderY, List.of(toRender), width, height, horizontalAlignment, verticalAlignment);
+    }
+
     private float calculateRenderHeight(List<TextRenderTask> toRender) {
         if (toRender.isEmpty()) return 0f;
 
@@ -180,10 +197,27 @@ public class FontRenderer {
         return (float) (height - NEWLINE_OFFSET / 2 * McUtils.window().getGuiScale());
     }
 
+    public float calculateRenderHeight(List<String> lines, float maxWidth) {
+        return calculateRenderHeight(lines.stream()
+                .map(s -> new TextRenderTask(
+                        s,
+                        new TextRenderSetting(
+                                maxWidth, CustomColor.NONE, TextAlignment.LEFT_ALIGNED, TextShadow.NORMAL)))
+                .toList());
+    }
+
     public enum TextAlignment {
         LEFT_ALIGNED,
         CENTER_ALIGNED,
-        RIGHT_ALIGNED
+        RIGHT_ALIGNED;
+
+        public static TextAlignment fromHorizontalAlignment(HorizontalAlignment alignment) {
+            return switch (alignment) {
+                case Left -> LEFT_ALIGNED;
+                case Center -> CENTER_ALIGNED;
+                case Right -> RIGHT_ALIGNED;
+            };
+        }
     }
 
     public enum TextShadow {

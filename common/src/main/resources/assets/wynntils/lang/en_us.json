@@ -153,7 +153,9 @@
   "feature.wynntils.playerGhostTransparency.name": "Transparent Player Ghost Feature",
   "feature.wynntils.playerGhostTransparency.playerGhostTranslucenceLevel.description": "The level of translucence that should be applied to player ghosts",
   "feature.wynntils.playerGhostTransparency.playerGhostTranslucenceLevel.name": "Player Ghost Translucence",
-  "feature.wynntils.questInfoOverlayFeature.name": "Quest Status Overlay Feature",
+  "feature.wynntils.questInfoOverlay.name": "Quest Status Overlay Feature",
+  "feature.wynntils.questInfoOverlay.overlay.questInfo.description": "Display the currently tracked quest's info",
+  "feature.wynntils.questInfoOverlay.overlay.questInfo.name": "Quest Info Tracker Overlay",
   "feature.wynntils.soulPointTimer.name": "Soul Point Timer Feature",
   "feature.wynntils.tooltipFitting.fitToScreen.description": "Whether tooltips should be scaled to always fit on the screen",
   "feature.wynntils.tooltipFitting.fitToScreen.name": "Fit to Screen",
@@ -177,6 +179,9 @@
   "overlay.wynntils.overlay.userEnabled.name": "Enabled",
   "overlay.wynntils.overlay.verticalAlignmentOverride.description": "Set this if you want to override the position vertical alignment",
   "overlay.wynntils.overlay.verticalAlignmentOverride.name": "Vertical Alignment Override",
-  "overlay.wynntils.questInfo.description": "Display the currently tracked quest's info",
-  "overlay.wynntils.questInfo.name": "Quest Info Tracker Overlay"
+  "screens.wynntils.overlayManagement.applySettings": "Apply",
+  "screens.wynntils.overlayManagement.closeSettingsScreen": "Close",
+  "screens.wynntils.overlayManagement.name": "Overlay Management Screen",
+  "screens.wynntils.overlayManagement.testSettings": "Test",
+  "screens.wynntils.overlaySelection.name": "Overlay Selection Screen"
 }

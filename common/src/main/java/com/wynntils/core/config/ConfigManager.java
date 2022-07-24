@@ -215,4 +215,10 @@ public class ConfigManager {
     public static List<ConfigHolder> getConfigHolders() {
         return CONFIG_HOLDERS;
     }
+
+    public static List<ConfigHolder> getConfigHolders(Configurable configurable) {
+        return CONFIG_HOLDERS.stream()
+                .filter(configHolder -> configHolder.getParent() == configurable)
+                .toList();
+    }
 }

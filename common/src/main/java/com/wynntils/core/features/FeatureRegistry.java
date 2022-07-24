@@ -36,6 +36,7 @@ import com.wynntils.features.user.SoulPointTimerFeature;
 import com.wynntils.features.user.TooltipFittingFeature;
 import com.wynntils.features.user.WynncraftButtonFeature;
 import com.wynntils.features.user.WynncraftPauseScreenFeature;
+import com.wynntils.features.user.overlays.CustomBarsFeature;
 import com.wynntils.mc.utils.CrashReportManager;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -158,6 +159,7 @@ public class FeatureRegistry {
         registerFeature(new WynncraftPauseScreenFeature());
         registerFeature(new ItemLockFeature());
         registerFeature(new ItemTextOverlayFeature());
+        registerFeature(new CustomBarsFeature());
 
         // save/create config file after loading all features' options
         ConfigManager.saveConfig();

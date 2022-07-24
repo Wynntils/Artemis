@@ -126,6 +126,14 @@ public class EventFactory {
         return post(new RenderEvent.Pre(poseStack, 0, window, RenderEvent.ElementType.Crosshair));
     }
 
+    public static RenderEvent.Pre onRenderHearthsPre(PoseStack poseStack, Window window) {
+        return post(new RenderEvent.Pre(poseStack, 0, window, RenderEvent.ElementType.HealthBar));
+    }
+
+    public static RenderEvent.Pre onRenderFoodPre(PoseStack poseStack, Window window) {
+        return post(new RenderEvent.Pre(poseStack, 0, window, RenderEvent.ElementType.FoodBar));
+    }
+
     public static void onContainerRender(
             Screen screen, PoseStack poseStack, int mouseX, int mouseY, float partialTicks, Slot hoveredSlot) {
         post(new ContainerRenderEvent(screen, poseStack, mouseX, mouseY, partialTicks, hoveredSlot));

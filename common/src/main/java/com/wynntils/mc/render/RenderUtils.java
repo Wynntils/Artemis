@@ -501,6 +501,126 @@ public class RenderUtils {
         poseStack.popPose();
     }
 
+    /** drawProgressBar
+     * Draws a progress bar(textureY1 and textureY2 now specify both textures with background being on top of the bar)
+     *
+     * @param poseStack poseStack to use
+     * @param texture the texture to use
+     * @param x1 left x on screen
+     * @param y1 top y on screen
+     * @param x2 right x on screen
+     * @param y2 bottom right on screen
+     * @param textureX1 texture left x for the part
+     * @param textureY1 texture top y for the part(top of background)
+     * @param textureX2 texture right x for the part
+     * @param textureY2 texture bottom y for the part(bottom of bar)
+     * @param progress progress of the bar, 0.0f to 1.0f is left to right and 0.0f to -1.0f is right to left
+     */
+    public static void drawProgressBar(
+            PoseStack poseStack,
+            Texture texture,
+            float x1,
+            float y1,
+            float x2,
+            float y2,
+            int textureX1,
+            int textureY1,
+            int textureX2,
+            int textureY2,
+            float progress) {
+        int half = (textureY1 + textureY2) / 2;
+        drawProgressBar(poseStack, texture, x1, y1, x2, y2, textureX1, textureY1, textureX2, half + 1, progress, true);
+        drawProgressBar(poseStack, texture, x1, y1, x2, y2, textureX1, half + 1, textureX2, textureY2, progress, false);
+    }
+
+    /** drawProgressBar
+     * Draws a textured progress bar.
+     *
+     * @param poseStack poseStack to use
+     * @param texture the texture to use
+     * @param x1 left x on screen
+     * @param y1 top y on screen
+     * @param x2 right x on screen
+     * @param y2 bottom right on screen
+     * @param textureX1 texture left x for the part
+     * @param textureY1 texture top y for the part
+     * @param textureX2 texture right x for the part
+     * @param textureY2 texture bottom y for the part
+     * @param progress progress of the bar, 0.0f to 1.0f is left to right and 0.0f to -1.0f is right to left
+     * @param background is it drawing the background or not(whole ty part is background)
+     */
+    public static void drawProgressBar(
+            PoseStack poseStack,
+            Texture texture,
+            float x1,
+            float y1,
+            float x2,
+            float y2,
+            int textureX1,
+            int textureY1,
+            int textureX2,
+            int textureY2,
+            float progress,
+            boolean background) {
+        if (background) {
+            Matrix4f matrix = poseStack.last().pose();
+
+            RenderSystem.enableTexture();
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderTexture(0, texture.resource());
+            BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+            float xMin = Math.min(x1, x2),
+                    xMax = Math.max(x1, x2),
+                    yMin = Math.min(y1, y2),
+                    yMax = Math.max(y1, y2),
+                    txMin = (float) Math.min(textureX1, textureX2) / texture.width(),
+                    txMax = (float) Math.max(textureX1, textureX2) / texture.height(),
+                    tyMin = (float) Math.min(textureY1, textureY2) / texture.height(),
+                    tyMax = (float) Math.max(textureY1, textureY2) / texture.height();
+
+            bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+            bufferBuilder.vertex(matrix, xMin, yMin, 0).uv(txMin, tyMin).endVertex();
+            bufferBuilder.vertex(matrix, xMin, yMax, 0).uv(txMin, tyMax).endVertex();
+            bufferBuilder.vertex(matrix, xMax, yMax, 0).uv(txMax, tyMax).endVertex();
+            bufferBuilder.vertex(matrix, xMax, yMin, 0).uv(txMax, tyMin).endVertex();
+            bufferBuilder.end();
+            BufferUploader.end(bufferBuilder);
+        } else if (progress != 0.0f) {
+            Matrix4f matrix = poseStack.last().pose();
+
+            RenderSystem.enableTexture();
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderTexture(0, texture.resource());
+            BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+            float xMin = Math.min(x1, x2),
+                    xMax = Math.max(x1, x2),
+                    yMin = Math.min(y1, y2),
+                    yMax = Math.max(y1, y2) - 1.5f,
+                    txMin = (float) Math.min(textureX1, textureX2) / texture.width(),
+                    txMax = (float) Math.max(textureX1, textureX2) / texture.width(),
+                    tyMin = (float) Math.min(textureY1, textureY2) / texture.height(),
+                    tyMax = (float) Math.max(textureY1, textureY2) / texture.height();
+
+            if (progress < 1.0f && progress > -1.0f) {
+                if (progress < 0.0f) {
+                    xMin += (1.0f + progress) * (xMax - xMin);
+                    txMin += (1.0f + progress) * (txMax - txMin);
+                } else {
+                    xMax -= (1.0f - progress) * (xMax - xMin);
+                    txMax -= (1.0f - progress) * (txMax - txMin);
+                }
+            }
+
+            bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+            bufferBuilder.vertex(matrix, xMin, yMin, 0).uv(txMin, tyMin).endVertex();
+            bufferBuilder.vertex(matrix, xMin, yMax, 0).uv(txMin, tyMax).endVertex();
+            bufferBuilder.vertex(matrix, xMax, yMax, 0).uv(txMax, tyMax).endVertex();
+            bufferBuilder.vertex(matrix, xMax, yMin, 0).uv(txMax, tyMin).endVertex();
+            bufferBuilder.end();
+            BufferUploader.end(bufferBuilder);
+        }
+    }
+
     public static void fillGradient(
             Matrix4f matrix,
             BufferBuilder builder,

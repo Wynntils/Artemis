@@ -30,4 +30,12 @@ public abstract class ForgeIngameGuiMixin {
         EventFactory.onRenderGuiPost(
                 poseStack, partialTick, Minecraft.getInstance().getWindow());
     }
+
+    @Inject(method = "renderFood", at = @At(value = "HEAD"), cancellable = true, remap = false)
+    public void onRenderFoodPre(int width, int height, PoseStack poseStack, CallbackInfo ci) {
+        if (EventFactory.onRenderFoodPre(poseStack, Minecraft.getInstance().getWindow())
+                .isCanceled()) {
+            ci.cancel();
+        }
+    }
 }

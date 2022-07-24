@@ -40,7 +40,9 @@ public abstract class RenderEvent extends Event {
 
     public enum ElementType {
         GUI, // This is called before and after Gui#render
-        Crosshair
+        Crosshair,
+        HealthBar,
+        FoodBar
     }
 
     @Cancelable

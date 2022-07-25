@@ -215,7 +215,7 @@ public class BoundingVolumeHierarchy<T extends IBoundingBox> implements Set<T> {
                 this.pendingInserts = new HashSet<>(this.pendingInserts);
                 for (final T e : elements) {
                     if (e == null) {
-                        return false;
+                        continue;
                     }
                     if (this.pendingDeletes.contains(e)) {
                         this.pendingDeletes.remove(e);
@@ -226,7 +226,9 @@ public class BoundingVolumeHierarchy<T extends IBoundingBox> implements Set<T> {
                     }
                 }
             }
-            this.requestRebuild();
+            if (changed) {
+                this.requestRebuild();
+            }
         }
         return changed;
     }
@@ -751,6 +753,8 @@ public class BoundingVolumeHierarchy<T extends IBoundingBox> implements Set<T> {
                     }
                 } else {
                     activeNode.getLeaves().forEach(element -> this.objectCache.put(element, activeNode));
+                    activeNode.updateOwnBounds();
+                    activeNode.propagateBoundsUpwards();
                 }
                 // update the task counter: new tasks, minus the now finished one
                 this.queuedNodesCount.addAndGet(activeNode.getChildNodes().size() - 1);

@@ -5,11 +5,10 @@
 package com.wynntils.wc.utils;
 
 import com.wynntils.core.WynntilsMod;
-import com.wynntils.mc.event.PacketEvent.PacketReceivedEvent;
+import com.wynntils.mc.event.ChatReceivedEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.network.chat.ChatType;
-import net.minecraft.network.protocol.game.ClientboundChatPacket;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ActionBarManager {
@@ -24,15 +23,11 @@ public class ActionBarManager {
     private static int currentMana = -1;
     private static int maxMana = -1;
 
-    // The server doesn't send SetActionBarPackets, instead it sends ChatPackets with the ChatType GAME_INFO
     @SubscribeEvent
-    public static void onActionBarUpdate(PacketReceivedEvent<ClientboundChatPacket> e) {
-        if (!WynnUtils.onWorld()) return;
+    public static void onActionBarUpdate(ChatReceivedEvent e) {
+        if (!WynnUtils.onWorld() || e.getType() != ChatType.GAME_INFO) return;
 
-        ClientboundChatPacket packet = e.getPacket();
-        if (packet.getType() != ChatType.GAME_INFO) return;
-
-        String actionBar = packet.getMessage().getString();
+        String actionBar = e.getMessage().getString();
         // don't parse unchanged actionbar
         if (actionBar.equals(previousActionBar)) return;
         previousActionBar = actionBar;
@@ -46,7 +41,7 @@ public class ActionBarManager {
         maxMana = Integer.parseInt(matcher.group(5));
 
         String centerText = matcher.group(3);
-        // TODO: parse partial spell progress from centerText
+        SpellManager.tryUpdateSpell(centerText);
     }
 
     public static void init() {

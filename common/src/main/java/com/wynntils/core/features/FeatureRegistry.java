@@ -32,6 +32,7 @@ import com.wynntils.features.user.MountHorseHotkeyFeature;
 import com.wynntils.features.user.MythicBlockerFeature;
 import com.wynntils.features.user.PlayerGhostTransparencyFeature;
 import com.wynntils.features.user.QuestInfoOverlayFeature;
+import com.wynntils.features.user.QuickCastFeature;
 import com.wynntils.features.user.SoulPointTimerFeature;
 import com.wynntils.features.user.TooltipFittingFeature;
 import com.wynntils.features.user.WynncraftButtonFeature;
@@ -148,6 +149,7 @@ public class FeatureRegistry {
         registerFeature(new ItemScreenshotFeature());
         registerFeature(new ItemStatInfoFeature());
         registerFeature(new MountHorseHotkeyFeature());
+        registerFeature(new QuickCastFeature());
         registerFeature(new MythicBlockerFeature());
         registerFeature(new PlayerGhostTransparencyFeature());
         registerFeature(new SoulPointTimerFeature());

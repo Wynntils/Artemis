@@ -166,4 +166,13 @@ public class ItemUtils {
         TooltipFlag flag = McUtils.options().advancedItemTooltips ? Default.ADVANCED : Default.NORMAL;
         return stack.getTooltipLines(McUtils.player(), flag);
     }
+
+    /**
+     * @param heldItem The ItemStack to check
+     * @return true if the item has an attack speed specification
+     */
+    public static boolean isWeapon(ItemStack heldItem) {
+        String lore = ItemUtils.getStringLore(heldItem);
+        return lore.contains("Attack Speed") && lore.contains("§7");
+    }
 }

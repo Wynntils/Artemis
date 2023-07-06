@@ -115,6 +115,7 @@ import com.wynntils.features.tooltips.TooltipVanillaHideFeature;
 import com.wynntils.features.ui.AutoApplyResourcePackFeature;
 import com.wynntils.features.ui.ContainerScrollFeature;
 import com.wynntils.features.ui.CosmeticsPreviewFeature;
+import com.wynntils.features.ui.CustomAbilityTreeFeature;
 import com.wynntils.features.ui.CustomCharacterSelectionScreenFeature;
 import com.wynntils.features.ui.CustomLoadingScreenFeature;
 import com.wynntils.features.ui.CustomSeaskipperScreenFeature;
@@ -195,6 +196,11 @@ public final class FeatureManager extends Manager {
         // region commands
         registerFeature(new AddCommandExpansionFeature());
         registerFeature(new CommandAliasesFeature());
+        registerFeature(new CommandsFeature());
+        registerFeature(new ContainerSearchFeature());
+        registerFeature(new CosmeticsPreviewFeature());
+        registerFeature(new CustomBarsOverlayFeature());
+        registerFeature(new CustomCharacterSelectionScreenFeature());
         registerFeature(new CustomCommandKeybindsFeature());
         registerFeature(new FilterAdminCommandsFeature());
         // endregion
@@ -286,6 +292,7 @@ public final class FeatureManager extends Manager {
         registerFeature(new AutoApplyResourcePackFeature());
         registerFeature(new ContainerScrollFeature());
         registerFeature(new CosmeticsPreviewFeature());
+        registerFeature(new CustomAbilityTreeFeature());
         registerFeature(new CustomCharacterSelectionScreenFeature());
         registerFeature(new CustomLoadingScreenFeature());
         registerFeature(new CustomSeaskipperScreenFeature());

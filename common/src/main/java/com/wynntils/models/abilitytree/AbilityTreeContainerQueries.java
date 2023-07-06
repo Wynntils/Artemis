@@ -16,6 +16,7 @@ import com.wynntils.models.abilitytree.type.AbilityTreeInfo;
 import com.wynntils.models.abilitytree.type.AbilityTreeNodeState;
 import com.wynntils.models.abilitytree.type.AbilityTreeSkillNode;
 import com.wynntils.models.abilitytree.type.ParsedAbilityTree;
+import com.wynntils.screens.abilities.CustomAbilityTreeScreen;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.type.Pair;
 import com.wynntils.utils.wynn.InventoryUtils;
@@ -53,6 +54,10 @@ public class AbilityTreeContainerQueries {
                     WynntilsMod.warn("Problem querying Ability Tree: " + msg);
                     McUtils.sendMessageToClient(
                             Component.literal("Error dumping ability tree.").withStyle(ChatFormatting.RED));
+
+                    if (McUtils.mc().screen instanceof CustomAbilityTreeScreen abilityTreeScreen) {
+                        abilityTreeScreen.setTreeParseState(CustomAbilityTreeScreen.TreeParseState.FAILED);
+                    }
                 })
                 .useItemInHotbar(InventoryUtils.COMPASS_SLOT_NUM)
                 .matchTitle("Character Info")

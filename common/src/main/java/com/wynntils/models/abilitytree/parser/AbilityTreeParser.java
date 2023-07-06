@@ -41,7 +41,7 @@ public final class AbilityTreeParser {
             ItemStack itemStack, int page, int slot, int id) {
         StyledText nameStyledText = StyledText.fromComponent(itemStack.getHoverName());
 
-        AbilityTreeNodeState state = AbilityTreeNodeState.LOCKED;
+        AbilityTreeNodeState state = AbilityTreeNodeState.UNREACHABLE;
         StyledText actualName;
         if (nameStyledText.getPartCount() == 1) {
             actualName = nameStyledText;
@@ -112,6 +112,12 @@ public final class AbilityTreeParser {
                 state = AbilityTreeNodeState.UNLOCKED;
                 continue;
             }
+
+            matcher = text.getMatcher(NODE_REQUIREMENT_NOT_MET);
+            if (matcher.matches()) {
+                state = AbilityTreeNodeState.REQUIREMENT_NOT_MET;
+                continue;
+            }
         }
 
         if (state == AbilityTreeNodeState.UNLOCKABLE || state == AbilityTreeNodeState.UNLOCKED) {
@@ -128,20 +134,15 @@ public final class AbilityTreeParser {
 
             // Skip final empty line
             includedLines = tempList.subList(0, tempList.size() - 1);
-        } else if (state == AbilityTreeNodeState.LOCKED) {
+        } else if (state == AbilityTreeNodeState.REQUIREMENT_NOT_MET) {
             // Skip empty line + "requirement not met"
-            if (includedLines
-                    .get(includedLines.size() - 1)
-                    .getMatcher(NODE_REQUIREMENT_NOT_MET)
-                    .matches()) {
-                includedLines = includedLines.subList(0, includedLines.size() - 2);
-            }
+            includedLines = includedLines.subList(0, includedLines.size() - 2);
         }
 
         ItemInformation itemInformation = new ItemInformation(
                 Item.getId(itemStack.getItem()),
                 switch (state) {
-                    case LOCKED -> itemStack.getDamageValue();
+                    case UNREACHABLE, REQUIREMENT_NOT_MET -> itemStack.getDamageValue();
                     case UNLOCKABLE -> itemStack.getDamageValue() - 1;
                     case UNLOCKED -> itemStack.getDamageValue() - 2;
                     case BLOCKED -> itemStack.getDamageValue() - 3;

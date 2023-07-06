@@ -72,9 +72,9 @@ public enum AbilityTreeConnectionType {
                     new boolean[] {true, false, true, false}, 22),
             new boolean[] {true, true, true, false},
             List.of(
-                    Pair.of(VERTICAL, DOWN_RIGHT_TURN),
+                    Pair.of(VERTICAL, DOWN_LEFT_TURN),
                     Pair.of(VERTICAL, UP_RIGHT_TURN),
-                    Pair.of(DOWN_LEFT_TURN, UP_LEFT_TURN))),
+                    Pair.of(DOWN_LEFT_TURN, UP_RIGHT_TURN))),
     THREE_WAY_DOWN(
             23,
             Map.of(
@@ -96,9 +96,9 @@ public enum AbilityTreeConnectionType {
                     new boolean[] {true, false, true, false}, 32),
             new boolean[] {true, false, true, true},
             List.of(
-                    Pair.of(VERTICAL, DOWN_LEFT_TURN),
+                    Pair.of(VERTICAL, DOWN_RIGHT_TURN),
                     Pair.of(VERTICAL, UP_LEFT_TURN),
-                    Pair.of(DOWN_RIGHT_TURN, UP_RIGHT_TURN))),
+                    Pair.of(DOWN_RIGHT_TURN, UP_LEFT_TURN))),
 
     FOUR_WAY(
             1,

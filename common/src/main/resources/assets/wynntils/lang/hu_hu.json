@@ -201,8 +201,6 @@
   "feature.wynntils.itemHighlight.threeStarIngredientHighlightColor.name": "3 Csillagos Hozzávaló Kiemelési Színe",
   "feature.wynntils.itemHighlight.threeStarIngredientHighlightEnabled.description": "3 Csillagos Hozzávaló Kiemelésének Engedélyezése",
   "feature.wynntils.itemHighlight.threeStarIngredientHighlightEnabled.name": "3 Csillagos Hozzávalók Kiemelése",
-  "feature.wynntils.itemScreenshot.chatItemMessage": "Kattintson ide az tárgy másolásához a chat-hez!",
-  "feature.wynntils.itemScreenshot.chatItemTooltip": "Illeszd be ezt az üzenetet a chat-be hogy megjelenjen a tárgyad más Wynntils felhasználóknak",
   "feature.wynntils.itemStatInfo.name": "Tárgy Statisztika Infó",
   "feature.wynntils.itemStatInfo.overallPercentageInName.description": "Legyen a tárgy minősége feltüntetve a neve mellett?",
   "feature.wynntils.itemTextOverlay.amplifierTierShadow.description": "Legyen a corkian erősítők szintjének képernyőrátéte árnyékolva?",

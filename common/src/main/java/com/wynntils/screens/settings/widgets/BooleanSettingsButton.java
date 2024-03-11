@@ -1,14 +1,15 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.settings.widgets;
 
 import com.wynntils.core.persisted.config.Config;
+import com.wynntils.screens.settings.WynntilsBookSettingsScreen;
 import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.ComponentUtils;
-import com.wynntils.utils.render.FontRenderer;
+import com.wynntils.utils.mc.McUtils;
 import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -16,14 +17,16 @@ import net.minecraft.network.chat.MutableComponent;
 public class BooleanSettingsButton extends GeneralSettingsButton {
     private final Config<Boolean> config;
 
-    public BooleanSettingsButton(Config<Boolean> config) {
+    public BooleanSettingsButton(Config<Boolean> config, float translationX, float translationY) {
         super(
                 0,
                 7,
-                50,
-                FontRenderer.getInstance().getFont().lineHeight + 8,
+                100,
+                20,
                 getTitle(config),
-                ComponentUtils.wrapTooltips(List.of(Component.literal(config.getDescription())), 150));
+                ComponentUtils.wrapTooltips(List.of(Component.literal(config.getDescription())), 150),
+                translationX,
+                translationY);
         this.config = config;
     }
 
@@ -31,6 +34,12 @@ public class BooleanSettingsButton extends GeneralSettingsButton {
     public void onPress() {
         config.setValue(!isEnabled(config));
         setMessage(getTitle(config));
+
+        // Reload the configurables in case the enabled button was toggled so the checkboxes
+        // can change state
+        if (McUtils.mc().screen instanceof WynntilsBookSettingsScreen bookSettingsScreen) {
+            bookSettingsScreen.populateConfigurables();
+        }
     }
 
     private static MutableComponent getTitle(Config<Boolean> config) {

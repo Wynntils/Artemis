@@ -58,7 +58,8 @@ public final class WynntilsMenuScreen extends WynntilsMenuScreenBase {
 
     private boolean firstInit = true;
 
-    // This makes sure we "save" our status on the settings screen, and we reopen it in the same state
+    // This makes sure we "save" our status on the settings & overlay screen, and we reopen it in the same state
+    private static final Screen overlayScreenInstance = OverlaySelectionScreen.create();
     private static final Screen settingsScreenInstance = WynntilsBookSettingsScreen.create();
 
     private WynntilsMenuScreen() {
@@ -290,7 +291,7 @@ public final class WynntilsMenuScreen extends WynntilsMenuScreenBase {
                 .add(new WynntilsMenuButton(
                         Texture.OVERLAYS_ICON,
                         true,
-                        OverlaySelectionScreen.create(),
+                        overlayScreenInstance,
                         List.of(
                                 Component.literal("[>] ")
                                         .withStyle(ChatFormatting.GOLD)

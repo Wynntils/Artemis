@@ -1,9 +1,10 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.crowdsourcing.widgets;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.wynntils.core.components.Managers;
 import com.wynntils.core.crowdsource.type.CrowdSourcedDataType;
@@ -15,7 +16,6 @@ import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.ComponentUtils;
 import com.wynntils.utils.mc.McUtils;
-import com.wynntils.utils.mc.RenderedStringUtils;
 import com.wynntils.utils.render.FontRenderer;
 import com.wynntils.utils.render.RenderUtils;
 import com.wynntils.utils.render.Texture;
@@ -38,11 +38,16 @@ public class CrowdSourcedDataWidget extends WynntilsButton implements TooltipPro
             Pair.of(new CustomColor(181, 174, 151), new CustomColor(121, 116, 101));
 
     private final CrowdSourcedDataType crowdSourcedDataType;
+    private final float translationX;
+    private final float translationY;
 
-    public CrowdSourcedDataWidget(int x, int y, int width, int height, CrowdSourcedDataType crowdSourcedDataType) {
-        super(x, y, width, height, Component.literal(crowdSourcedDataType.name()));
+    public CrowdSourcedDataWidget(
+            int x, int y, CrowdSourcedDataType crowdSourcedDataType, float translationX, float translationY) {
+        super(x, y, 140, 26, Component.literal(crowdSourcedDataType.name()));
 
         this.crowdSourcedDataType = crowdSourcedDataType;
+        this.translationX = translationX;
+        this.translationY = translationY;
     }
 
     @Override
@@ -52,42 +57,67 @@ public class CrowdSourcedDataWidget extends WynntilsButton implements TooltipPro
         CustomColor backgroundColor = this.isHovered ? BUTTON_COLOR.b() : BUTTON_COLOR.a();
         RenderUtils.drawRect(poseStack, backgroundColor, this.getX(), this.getY(), 0, this.width, this.height);
 
-        int maxTextWidth = this.width - 18;
+        FontRenderer.getInstance()
+                .renderScrollingString(
+                        poseStack,
+                        StyledText.fromString(crowdSourcedDataType.getTranslatedName()),
+                        this.getX() + 2,
+                        this.getY() + 6,
+                        this.width - 4,
+                        translationX,
+                        translationY,
+                        CommonColors.BLACK,
+                        HorizontalAlignment.LEFT,
+                        VerticalAlignment.MIDDLE,
+                        TextShadow.NONE);
+
+        Component componentState;
+        Texture textureState;
+        CustomColor color;
+
+        // Get various details based on collection state
+        switch (Managers.CrowdSourcedData.getDataCollectionState(crowdSourcedDataType)) {
+            case FALSE -> {
+                componentState = Component.literal("Not collecting");
+                textureState = Texture.ACTIVITY_CANNOT_START;
+                color = CommonColors.RED;
+            }
+            case TRUE -> {
+                componentState = Component.literal("Collecting");
+                textureState = Texture.ACTIVITY_FINISHED;
+                color = CommonColors.LIGHT_GREEN;
+            }
+            default -> { // Unconfirmed
+                componentState = Component.literal("Unconfirmed");
+                textureState = Texture.QUESTION_MARK;
+                color = CommonColors.YELLOW;
+            }
+        }
+
         FontRenderer.getInstance()
                 .renderText(
                         poseStack,
-                        StyledText.fromString(RenderedStringUtils.getMaxFittingText(
-                                crowdSourcedDataType.getTranslatedName(),
-                                maxTextWidth,
-                                FontRenderer.getInstance().getFont())),
-                        this.getX() + 14,
-                        this.getY() + 1,
-                        0,
-                        CommonColors.BLACK,
+                        StyledText.fromComponent(componentState),
+                        this.getX() + 15,
+                        this.getY() + 21,
+                        this.width - 4,
+                        color,
                         HorizontalAlignment.LEFT,
-                        VerticalAlignment.TOP,
+                        VerticalAlignment.MIDDLE,
                         TextShadow.NONE);
 
-        Texture stateTexture =
-                switch (Managers.CrowdSourcedData.getDataCollectionState(crowdSourcedDataType)) {
-                    case FALSE -> Texture.ACTIVITY_CANNOT_START;
-                    case TRUE -> Texture.ACTIVITY_FINISHED;
-                    case UNCONFIRMED -> Texture.QUESTION_MARK;
-                };
+        RenderUtils.drawTexturedRect(poseStack, textureState, this.getX() + 2, this.getY() + 16);
 
-        RenderUtils.drawTexturedRect(
-                poseStack,
-                stateTexture.resource(),
-                this.getX() + 1,
-                this.getY() + 1,
-                stateTexture.width(),
-                stateTexture.height(),
-                stateTexture.width(),
-                stateTexture.height());
+        if (isHovered) {
+            McUtils.mc()
+                    .screen
+                    .setTooltipForNextRenderPass(Lists.transform(getTooltipLines(), Component::getVisualOrderText));
+        }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // Toggle collection state
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if (Managers.CrowdSourcedData.getDataCollectionState(crowdSourcedDataType) == ConfirmedBoolean.TRUE) {
                 Managers.Feature.getFeatureInstance(DataCrowdSourcingFeature.class)
@@ -114,6 +144,7 @@ public class CrowdSourcedDataWidget extends WynntilsButton implements TooltipPro
             return true;
         }
 
+        // Copy collected data to clipboard
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
             ConfirmedBoolean dataCollectionState =
                     Managers.CrowdSourcedData.getDataCollectionState(crowdSourcedDataType);
@@ -132,6 +163,13 @@ public class CrowdSourcedDataWidget extends WynntilsButton implements TooltipPro
             String jsonString = Managers.Json.GSON.toJson(Map.of(Managers.CrowdSourcedData.CURRENT_GAME_VERSION, data));
 
             McUtils.mc().keyboardHandler.setClipboard(jsonString);
+
+            // Tell the user how much they collected
+            McUtils.sendMessageToClient(Component.translatable(
+                            "screens.wynntils.wynntilsCrowdSourcing.copiedToClipboard",
+                            data.size(),
+                            crowdSourcedDataType.getTranslatedName())
+                    .withStyle(ChatFormatting.GREEN));
 
             return true;
         }

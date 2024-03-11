@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.overlays.objectives;
@@ -123,9 +123,9 @@ public class DailyObjectiveOverlay extends ObjectiveOverlayBase {
                         this.getRenderX() + this.getWidth(),
                         renderY + SPACE_BETWEEN + actualBarHeight,
                         0,
-                        objectivesTexture.get().getTextureYOffset(),
+                        objectivesTexture.get().getTextureY1(),
                         barWidth,
-                        objectivesTexture.get().getTextureYOffset() + 10,
+                        objectivesTexture.get().getTextureY2(),
                         objective.getProgress());
             }
 

@@ -16,11 +16,13 @@ import com.wynntils.utils.render.type.HorizontalAlignment;
 import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.render.type.VerticalAlignment;
 import java.util.List;
+import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.Mth;
 
 public final class FontRenderer {
     private static final FontRenderer INSTANCE = new FontRenderer();
@@ -250,6 +252,183 @@ public final class FontRenderer {
                 maxWidth,
                 customColor,
                 HorizontalAlignment.LEFT,
+                verticalAlignment,
+                textShadow,
+                1f);
+    }
+
+    public void renderScrollingString(
+            PoseStack poseStack,
+            StyledText styledText,
+            float x,
+            float y,
+            float renderWidth,
+            float translationX,
+            float translationY,
+            CustomColor customColor,
+            HorizontalAlignment horizontalAlignment,
+            VerticalAlignment verticalAlignment,
+            TextShadow shadow,
+            float textScale) {
+        int textLength = (int) ((font.width(styledText.getString()) + 1) * textScale);
+
+        if (textLength > renderWidth) {
+            float maxScrollOffset =
+                    switch (horizontalAlignment) {
+                        case CENTER -> -(textLength / 2f) + (renderWidth / 2);
+                        case RIGHT -> 0.0f;
+                        default -> textLength - renderWidth;
+                    };
+
+            double currentTimeInSeconds = (double) Util.getMillis() / 1000.0;
+            double e = Math.max((double) maxScrollOffset * 0.5, 3.0);
+            double f =
+                    Math.sin(1.5707963267948966 * Math.cos(6.283185307179586 * currentTimeInSeconds / e)) / 2.0 + 0.5;
+
+            float startOffset =
+                    switch (horizontalAlignment) {
+                        case CENTER -> (textLength / 2f) - (renderWidth / 2);
+                        case RIGHT -> renderWidth - textLength;
+                        default -> 0.0f;
+                    };
+
+            double scrollOffset = Mth.lerp(f, startOffset, maxScrollOffset);
+
+            float scissorX =
+                    switch (horizontalAlignment) {
+                        case LEFT -> x;
+                        case CENTER -> x - (renderWidth / 2);
+                        case RIGHT -> x - renderWidth;
+                    };
+
+            float scissorY =
+                    switch (verticalAlignment) {
+                        case TOP -> y;
+                        case MIDDLE -> y - (font.lineHeight / 2f) - 1;
+                        case BOTTOM -> y - font.lineHeight - 1;
+                    };
+
+            scissorX += translationX;
+            scissorY += translationY;
+
+            RenderUtils.enableScissor((int) scissorX, (int) scissorY, (int) renderWidth, (int)
+                    ((font.lineHeight + 1) * textScale)); // + 1 to account for letters that sit lower, eg y
+            renderText(
+                    poseStack,
+                    styledText,
+                    x - (int) scrollOffset,
+                    y,
+                    customColor,
+                    horizontalAlignment,
+                    verticalAlignment,
+                    shadow,
+                    textScale);
+            RenderUtils.disableScissor();
+        } else {
+            renderText(
+                    poseStack,
+                    styledText,
+                    x,
+                    y,
+                    customColor,
+                    horizontalAlignment,
+                    verticalAlignment,
+                    shadow,
+                    textScale);
+        }
+    }
+
+    public void renderScrollingString(
+            PoseStack poseStack,
+            StyledText styledText,
+            float x,
+            float y,
+            float renderWidth,
+            float translationX,
+            float translationY,
+            CustomColor customColor,
+            HorizontalAlignment horizontalAlignment,
+            VerticalAlignment verticalAlignment,
+            TextShadow shadow) {
+        renderScrollingString(
+                poseStack,
+                styledText,
+                x,
+                y,
+                renderWidth,
+                translationX,
+                translationY,
+                customColor,
+                horizontalAlignment,
+                verticalAlignment,
+                shadow,
+                1);
+    }
+
+    public void renderScrollingString(
+            PoseStack poseStack,
+            StyledText styledText,
+            float x,
+            float y,
+            float renderWidth,
+            CustomColor customColor,
+            HorizontalAlignment horizontalAlignment,
+            VerticalAlignment verticalAlignment,
+            TextShadow shadow,
+            float textScale) {
+        renderScrollingString(
+                poseStack,
+                styledText,
+                x,
+                y,
+                renderWidth,
+                0,
+                0,
+                customColor,
+                horizontalAlignment,
+                verticalAlignment,
+                shadow,
+                textScale);
+    }
+
+    public void renderScrollingAlignedTextInBox(
+            PoseStack poseStack,
+            StyledText text,
+            float x1,
+            float x2,
+            float y1,
+            float y2,
+            float renderWidth,
+            float translationX,
+            float translationY,
+            CustomColor customColor,
+            HorizontalAlignment horizontalAlignment,
+            VerticalAlignment verticalAlignment,
+            TextShadow textShadow) {
+        float renderX =
+                switch (horizontalAlignment) {
+                    case LEFT -> x1;
+                    case CENTER -> (x1 + x2) / 2f;
+                    case RIGHT -> x2;
+                };
+
+        float renderY =
+                switch (verticalAlignment) {
+                    case TOP -> y1;
+                    case MIDDLE -> (y1 + y2) / 2f;
+                    case BOTTOM -> y2;
+                };
+
+        renderScrollingString(
+                poseStack,
+                text,
+                renderX,
+                renderY,
+                renderWidth,
+                translationX,
+                translationY,
+                customColor,
+                horizontalAlignment,
                 verticalAlignment,
                 textShadow,
                 1f);

@@ -1,10 +1,10 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.utils.render.type;
 
-public enum ManaTexture {
+public enum ManaTexture implements BarTexture {
     WYNN(0, 17, 8),
     BRUNE(83, 100, 8),
     AETHER(116, 131, 7),

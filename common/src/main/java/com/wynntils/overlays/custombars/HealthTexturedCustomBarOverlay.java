@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.overlays.custombars;
@@ -44,7 +44,7 @@ public class HealthTexturedCustomBarOverlay extends CustomBarOverlayBase {
                 renderY + renderHeight,
                 0,
                 healthTexture.get().getTextureY1(),
-                81,
+                Texture.HEALTH_BAR.width(),
                 healthTexture.get().getTextureY2(),
                 progress);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.settings.widgets;
@@ -36,7 +36,7 @@ public class CategoryButton extends WynntilsButton {
                         this.getY(),
                         0,
                         CommonColors.CYAN,
-                        HorizontalAlignment.CENTER,
+                        HorizontalAlignment.LEFT,
                         TextShadow.NORMAL);
     }
 

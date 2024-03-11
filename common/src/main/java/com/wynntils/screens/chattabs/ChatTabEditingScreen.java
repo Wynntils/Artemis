@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.chattabs;
@@ -167,7 +167,8 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
                     BUTTON_HEIGHT,
                     Component.literal(type.getName()),
                     ticked,
-                    (int) (dividedWidth * 7) - 24);
+                    (int) (dividedWidth * 7) - 24,
+                    true);
 
             this.addRenderableWidget(newBox);
             recipientTypeBoxes.add(newBox);

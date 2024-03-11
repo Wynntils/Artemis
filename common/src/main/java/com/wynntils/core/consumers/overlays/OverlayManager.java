@@ -20,6 +20,7 @@ import com.wynntils.mc.event.DisplayResizeEvent;
 import com.wynntils.mc.event.RenderEvent;
 import com.wynntils.mc.event.TitleScreenInitEvent;
 import com.wynntils.screens.overlays.placement.OverlayManagementScreen;
+import com.wynntils.screens.overlays.selection.OverlaySelectionScreen;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.render.RenderUtils;
 import java.lang.reflect.Field;
@@ -214,12 +215,22 @@ public final class OverlayManager extends Manager {
     }
 
     private void renderOverlays(RenderEvent event, RenderState renderState) {
-        boolean testMode = false;
+        boolean showPreview = false;
+        boolean renderNonSelected = true;
         boolean shouldRender = true;
+        Overlay selectedOverlay = null;
 
         if (McUtils.mc().screen instanceof OverlayManagementScreen screen) {
-            testMode = screen.isTestMode();
             shouldRender = false;
+            showPreview = screen.showPreview();
+            renderNonSelected = screen.shouldRenderAllOverlays();
+            selectedOverlay = screen.getSelectedOverlay();
+        } else if (McUtils.mc().screen instanceof OverlaySelectionScreen screen) {
+            if (screen.renderingPreview()) {
+                showPreview = true;
+                renderNonSelected = screen.shouldShowOverlays();
+                selectedOverlay = screen.getSelectedOverlay();
+            }
         }
 
         List<Overlay> crashedOverlays = new LinkedList<>();
@@ -242,15 +253,15 @@ public final class OverlayManager extends Manager {
             }
 
             try {
-                if (testMode) {
+                if (showPreview) {
+                    if (selectedOverlay != null && overlay != selectedOverlay && !renderNonSelected) continue;
+
                     overlay.renderPreview(
                             event.getPoseStack(), bufferSource, event.getPartialTicks(), event.getWindow());
-                } else {
-                    if (shouldRender) {
-                        long startTime = System.currentTimeMillis();
-                        overlay.render(event.getPoseStack(), bufferSource, event.getPartialTicks(), event.getWindow());
-                        logProfilingData(startTime, overlay);
-                    }
+                } else if (shouldRender) {
+                    long startTime = System.currentTimeMillis();
+                    overlay.render(event.getPoseStack(), bufferSource, event.getPartialTicks(), event.getWindow());
+                    logProfilingData(startTime, overlay);
                 }
             } catch (Throwable t) {
                 RenderUtils.disableScissor();

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.overlays.custombars;
@@ -43,9 +43,9 @@ public class BubbleTexturedCustomBarOverlay extends CustomBarOverlayBase {
                 getRenderX() + getWidth(),
                 renderY + barHeight,
                 0,
-                objectivesTexture.get().getTextureYOffset(),
-                182,
-                objectivesTexture.get().getTextureYOffset() + 10,
+                objectivesTexture.get().getTextureY1(),
+                Texture.BUBBLE_BAR.width(),
+                objectivesTexture.get().getTextureY2(),
                 progress);
     }
 

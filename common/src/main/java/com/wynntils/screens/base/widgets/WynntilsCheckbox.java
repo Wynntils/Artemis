@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class WynntilsCheckbox extends Checkbox {
+    private final boolean showLabel;
     private final int maxTextWidth;
     private final int color;
 
@@ -26,9 +27,17 @@ public class WynntilsCheckbox extends Checkbox {
     private List<Component> tooltip;
 
     public WynntilsCheckbox(
-            int x, int y, int width, int height, Component message, boolean selected, int maxTextWidth) {
+            int x,
+            int y,
+            int width,
+            int height,
+            Component message,
+            boolean selected,
+            int maxTextWidth,
+            boolean showLabel) {
         super(x, y, width, height, message, selected);
         this.maxTextWidth = maxTextWidth;
+        this.showLabel = showLabel;
         this.color = CommonColors.WHITE.asInt();
     }
 
@@ -40,10 +49,12 @@ public class WynntilsCheckbox extends Checkbox {
             Component message,
             boolean selected,
             int maxTextWidth,
+            boolean showLabel,
             Consumer<Integer> onClick,
             List<Component> tooltip) {
         super(x, y, width, height, message, selected);
         this.maxTextWidth = maxTextWidth;
+        this.showLabel = showLabel;
         this.color = CommonColors.WHITE.asInt();
         this.onClick = onClick;
         this.tooltip = tooltip;
@@ -57,9 +68,11 @@ public class WynntilsCheckbox extends Checkbox {
             Component message,
             boolean selected,
             int maxTextWidth,
+            boolean showLabel,
             CustomColor color) {
         super(x, y, width, height, message, selected);
         this.maxTextWidth = maxTextWidth;
+        this.showLabel = showLabel;
         this.color = color.asInt();
     }
 

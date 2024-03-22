@@ -72,7 +72,8 @@ public class CombatListProvider extends BuiltInProvider {
 
         @Override
         public Location getLocation() {
-            return location;
+            // FIXME: debug
+            return location.offset(15, 0, 15);
         }
     }
 }

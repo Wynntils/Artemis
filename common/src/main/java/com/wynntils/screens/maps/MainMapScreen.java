@@ -321,6 +321,13 @@ public final class MainMapScreen extends AbstractMapScreen {
         if (showTerrs) {
             pois = Stream.concat(pois, Models.Territory.getTerritoryPois().stream());
         }
+        // FIXME
+
+        // Uncomment to append all mapdata features
+        // pois = Stream.concat(pois, Services.MapData.getFeaturesAsPois());
+
+        // Uncomment to remove POIs and only use mapdata features
+        pois = Services.MapData.getFeaturesAsPois();
 
         renderPois(
                 pois.collect(Collectors.toList()),

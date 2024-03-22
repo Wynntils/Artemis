@@ -5,6 +5,7 @@
 package com.wynntils.services.mapdata;
 
 import com.wynntils.core.components.Service;
+import com.wynntils.services.map.pois.Poi;
 import com.wynntils.services.mapdata.attributes.FullCategoryAttributes;
 import com.wynntils.services.mapdata.attributes.FullFeatureAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapAttributes;
@@ -28,6 +29,10 @@ public class MapDataService extends Service {
 
     public Stream<MapFeature> getFeatures() {
         return providers.getProviders().flatMap(MapDataProvider::getFeatures);
+    }
+
+    public Stream<Poi> getFeaturesAsPois() {
+        return getFeatures().map(MapFeaturePoiWrapper::new);
     }
 
     public MapAttributes getFullFeatureAttributes(MapFeature feature) {

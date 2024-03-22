@@ -1,3 +1,80 @@
+MapData rewrite
+========
+
+## TODO
+
+* Old POIs that are not (properly) converted
+
+All these should really have their json data converted to the new format, and just read from online,
+as one (or possibly several) providers.
+  private final Set<LabelPoi> labelPois = new HashSet<>(); // read from json (but sort of done in PlaceListProvider)
+  private final Set<ServicePoi> servicePois = new HashSet<>(); // read from json (but sort of done in ServiceListProvider)
+  private final Set<CombatPoi> combatPois = new HashSet<>(); // read from json (but sort of done in CombatListProvider)
+  private final Set<CombatPoi> cavePois = new HashSet<>(); // read from json (NOT DONE!)
+
+This should have a system for storing user-provided custom points in a local file, using the new format.
+We might need to have a conversion system for the old POI data.
+private final Map<CustomPoiProvider, List<CustomPoi>> providedCustomPois = new ConcurrentHashMap<>(); // not done!
+
+The Compass system will need to be reworked to fit better into the new mapdata model.
+
+* Attibrutes (like zoom fading) that are not (fully) implemented
+
+Comments about current zoom levels:
+        // zoom 3 (max zoomed in) up until 0.8 will keep service poi at 100% alpha (1.0f)
+        // fading until we get to zoom 0.540, at which point it goes to 0.1f and disappears.
+        // and finally at zoom 0.4727, it goes to 0.0f
+
+        // fast travel is at 100% until 0.1667, and disappareas with 0.1f at:
+        // 0.10858048, or possibly 0.11261813, and completely with 0.0f at 0.1,
+        // which is max zoomed out
+
+        // these happense since:
+        // public final Config<Float> servicePoiMinZoom = new Config<>(0.8f);
+        // public final Config<Float> fastTravelPoiMinZoom = new Config<>(0.166f);
+
+        // so this point shows when it starts to fade, but we want to specify
+        // the opposite, when it should be totally gone.
+        // and then also possibly a fading speed...
+
+        // we also have
+        // public final Config<Float> poiFadeAdjustment = new Config<>(0.4f);
+        // which is used to calculate where the item is completely faded out:
+        // minZoom * (1 - poiFadeAdjustment),
+
+How to map DisplayPriority enums to priority int levels:
+    LOWEST, // 100
+    LOW, // 300
+    NORMAL, // 500
+    HIGH, // 700
+    HIGHEST // 900
+
+## Design notes
+
+/*
+style application:
+1) root style
+2) category style, starting at top category and letting most specific category override
+3) the feature's own style, starting at top category and letting most specific category override
+
+json files can contain:
+features == list of concrete map features (locations, paths or areas)
+categories == list of category definitions
+icons == icon name -> base64 png representation
+*/
+
+Examples of categories:
+
+// wynntils:lootrun:chest:tier1
+// wynntils:service:profession:scribing
+// wynntils:service:identifier
+// wynntils:npc:quest
+// wynntils:personal:lootrunpath
+// wynntils:personal:openedchest:tier3
+// wynntils:personal:discovery:territory
+// wynntils:personal:saved_bookmarks_poi ???
+
+
 Artemis
 ========
 [![Discord](https://discordapp.com/api/guilds/394189072635133952/widget.png)](https://discord.gg/ve49m9J)

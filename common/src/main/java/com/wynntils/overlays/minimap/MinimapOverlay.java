@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.overlays.minimap;
@@ -49,7 +49,7 @@ public class MinimapOverlay extends Overlay {
     private static final int DEFAULT_SIZE = 130;
 
     @Persisted
-    public final Config<Float> scale = new Config<>(1f);
+    public final Config<Integer> scaleSteps = new Config<>(MapRenderer.DEFAULT_ZOOM_STEP);
 
     @Persisted
     public final Config<Float> poiScale = new Config<>(0.6f);
@@ -98,9 +98,8 @@ public class MinimapOverlay extends Overlay {
                 new OverlaySize(DEFAULT_SIZE, DEFAULT_SIZE));
     }
 
-    public void scale(float multiplier) {
-        scale.setValue(MathUtils.clamp(scale.get() * multiplier, MapRenderer.MIN_ZOOM, MapRenderer.MAX_ZOOM));
-        scale.touched();
+    public void adjustZoomStep(int delta) {
+        scaleSteps.setValue(scaleSteps.get() + delta);
     }
 
     // FIXME: This is the only overlay not to use buffer sources for rendering. This is due to `createMask`
@@ -122,8 +121,10 @@ public class MinimapOverlay extends Overlay {
         double playerX = McUtils.player().getX();
         double playerZ = McUtils.player().getZ();
 
+        final float zoomScale = MapRenderer.getZoomFromSteps(scaleSteps.get());
+
         BoundingCircle textureBoundingCircle = BoundingCircle.enclosingCircle(
-                BoundingBox.centered((float) playerX, (float) playerZ, width * scale.get(), height * scale.get()));
+                BoundingBox.centered((float) playerX, (float) playerZ, width * zoomScale, height * zoomScale));
 
         List<MapTexture> maps = Services.Map.getMapsForBoundingCircle(textureBoundingCircle);
 
@@ -173,7 +174,7 @@ public class MinimapOverlay extends Overlay {
                     textureZ,
                     width * extraFactor,
                     height * extraFactor,
-                    this.scale.get());
+                    zoomScale);
         }
 
         // disable rotation if necessary
@@ -181,7 +182,7 @@ public class MinimapOverlay extends Overlay {
             poseStack.popPose();
         }
 
-        renderPois(poseStack, centerX, centerZ, width, height, playerX, playerZ, textureBoundingCircle);
+        renderPois(poseStack, centerX, centerZ, width, height, playerX, playerZ, zoomScale, textureBoundingCircle);
 
         // cursor
         MapRenderer.renderCursor(
@@ -214,6 +215,7 @@ public class MinimapOverlay extends Overlay {
             float height,
             double playerX,
             double playerZ,
+            float zoomScale,
             BoundingCircle textureBoundingCircle) {
         float sinRotationRadians;
         float cosRotationRadians;
@@ -227,7 +229,7 @@ public class MinimapOverlay extends Overlay {
             cosRotationRadians = 0f;
         }
 
-        float currentZoom = 1f / scale.get();
+        float currentZoom = 1f / zoomScale;
 
         Stream<? extends Poi> poisToRender = Services.Poi.getServicePois();
 
@@ -249,8 +251,8 @@ public class MinimapOverlay extends Overlay {
 
         Poi[] pois = poisToRender.toArray(Poi[]::new);
         for (Poi poi : pois) {
-            float dX = (poi.getLocation().getX() - (float) playerX) / scale.get();
-            float dZ = (poi.getLocation().getZ() - (float) playerZ) / scale.get();
+            float dX = (poi.getLocation().getX() - (float) playerX) / zoomScale;
+            float dZ = (poi.getLocation().getZ() - (float) playerZ) / zoomScale;
 
             if (followPlayerRotation.get()) {
                 float tempdX = dX * cosRotationRadians - dZ * sinRotationRadians;
@@ -282,8 +284,8 @@ public class MinimapOverlay extends Overlay {
             PoiLocation compassLocation = waypointPoi.getLocation();
             if (compassLocation == null) return;
 
-            float compassOffsetX = (compassLocation.getX() - (float) playerX) / scale.get();
-            float compassOffsetZ = (compassLocation.getZ() - (float) playerZ) / scale.get();
+            float compassOffsetX = (compassLocation.getX() - (float) playerX) / zoomScale;
+            float compassOffsetZ = (compassLocation.getZ() - (float) playerZ) / zoomScale;
 
             if (followPlayerRotation.get()) {
                 float tempCompassOffsetX = compassOffsetX * cosRotationRadians - compassOffsetZ * sinRotationRadians;
@@ -340,7 +342,7 @@ public class MinimapOverlay extends Overlay {
                                 compassRenderZ,
                                 false,
                                 poiScale.get(),
-                                1f / scale.get());
+                                1f / zoomScale);
                 poseStack.popPose();
             } else {
                 waypointPoi.renderAt(
@@ -357,7 +359,7 @@ public class MinimapOverlay extends Overlay {
             FontRenderer fontRenderer = FontRenderer.getInstance();
             Font font = fontRenderer.getFont();
 
-            String text = StringUtils.integerToShortString(Math.round(distance * scale.get())) + "m";
+            String text = StringUtils.integerToShortString(Math.round(distance * zoomScale)) + "m";
             float w = font.width(text) / 2f, h = font.lineHeight / 2f;
 
             RenderUtils.drawRect(
@@ -494,7 +496,12 @@ public class MinimapOverlay extends Overlay {
     }
 
     @Override
-    protected void onConfigUpdate(Config<?> config) {}
+    protected void onConfigUpdate(Config<?> config) {
+        if (config == scaleSteps && (scaleSteps.get() < 1 || scaleSteps.get() > MapRenderer.ZOOM_STEPS)) {
+            // Clamp scale steps to prevent weird zoom levels
+            scaleSteps.setValue(MathUtils.clamp(scaleSteps.get(), 1, MapRenderer.ZOOM_STEPS));
+        }
+    }
 
     public enum UnmappedOption {
         MINIMAP,

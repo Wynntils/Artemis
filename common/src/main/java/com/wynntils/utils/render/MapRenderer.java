@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.utils.render;
@@ -32,11 +32,34 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 public final class MapRenderer {
-    // Zoom is the scaling of the map. The bigger the zoom, the more detailed the map becomes.
-    public static final float MIN_ZOOM = 0.1f;
-    public static final float MAX_ZOOM = 3;
+    // ZOOM_STEPS is the number of steps the zoom can take, [1, ZOOM_STEPS] (inclusive).
+    // Steps can be thought of as a percentage of the zoom,
+    // with 1 being the minimum zoom, and ZOOM_STEPS being the maximum zoom.
+    public static final int ZOOM_STEPS = 100;
+    // This value should be the nearest step to the default zoom, 1.0f.
+    public static final int DEFAULT_ZOOM_STEP = 60;
 
-    public static Poi hovered = null;
+    // The minimum and maximum zoom values. This is the range of the zoom.
+    // The minimum zoom is where the map is at its smallest, and the maximum zoom is where the map is at its largest.
+    // The ratio is 10:1 when the zoom is at it's minimum, 1:5 when the zoom is at it's maximum.
+    public static final float MIN_ZOOM = 0.1f;
+    public static final float MAX_ZOOM = 5f;
+
+    // These don't have significance, they are just used to calculate the zoom,
+    // and are cached for performance.
+    private static final double MIN_ZOOM_LOG = Math.log(MIN_ZOOM);
+    private static final double MAX_ZOOM_LOG = Math.log(MAX_ZOOM);
+
+    // Zoom is calculated using exponential interpolation between MIN_ZOOM and MAX_ZOOM.
+    // The result is that the zoom increases uniformly for all steps, no matter the current zoom.
+    // To achieve this, we need to exponentially increase the zoom value for each step.
+    // - Taking the log of the zoom value, and then linearly interpolating between the log values.
+    // - This means that the zoom values for each step become exponentially larger.
+    // - Steps are 1-based (1 to ZOOM_STEPS), so we subtract 1 from the step to get the correct zoom value,
+    //   to ensure that the real zoom values are in the range [MIN_ZOOM, MAX_ZOOM] (including the boundaries).
+    public static float getZoomFromSteps(float step) {
+        return (float) Math.exp(MIN_ZOOM_LOG + (MAX_ZOOM_LOG - MIN_ZOOM_LOG) * (step - 1) / (ZOOM_STEPS - 1));
+    }
 
     public static void renderMapQuad(
             MapTexture map,

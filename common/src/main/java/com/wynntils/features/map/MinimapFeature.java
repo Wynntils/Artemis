@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.map;
@@ -31,9 +31,9 @@ public class MinimapFeature extends Feature {
 
     @RegisterKeyBind
     public final KeyBind zoomIn =
-            new KeyBind("Increase Minimap Zoom", GLFW.GLFW_KEY_EQUAL, false, () -> minimapOverlay.scale(0.95f));
+            new KeyBind("Increase Minimap Zoom", GLFW.GLFW_KEY_EQUAL, false, () -> minimapOverlay.adjustZoomStep(2));
 
     @RegisterKeyBind
     public final KeyBind zoomOut =
-            new KeyBind("Decrease Minimap Zoom", GLFW.GLFW_KEY_MINUS, false, () -> minimapOverlay.scale(1.05f));
+            new KeyBind("Decrease Minimap Zoom", GLFW.GLFW_KEY_MINUS, false, () -> minimapOverlay.adjustZoomStep(-2));
 }

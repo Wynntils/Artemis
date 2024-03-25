@@ -9,12 +9,13 @@ import com.wynntils.services.mapdata.attributes.type.MapDecoration;
 import com.wynntils.services.mapdata.attributes.type.MapVisibility;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.render.type.TextShadow;
+import com.wynntils.utils.type.RangedValue;
 
 public class JsonAttributes implements MapAttributes {
     private final String label;
     private final String icon;
     private final int priority;
-    private final int level;
+    private final RangedValue level;
     private final CustomColor labelColor;
     private final TextShadow labelShadow;
     private final MapVisibility labelVisibility;
@@ -25,7 +26,7 @@ public class JsonAttributes implements MapAttributes {
             String label,
             String icon,
             int priority,
-            int level,
+            RangedValue level,
             CustomColor labelColor,
             TextShadow labelShadow,
             MapVisibility labelVisibility,
@@ -58,7 +59,7 @@ public class JsonAttributes implements MapAttributes {
     }
 
     @Override
-    public int getLevel() {
+    public RangedValue getLevelRange() {
         return level;
     }
 

@@ -40,7 +40,7 @@ public class MapDataProviders {
     // can be added just from disk, or downloaded from an url
     public void createLocalProvider(String id, String filename) {
         String completeId = "local:" + id;
-        JsonProvider provider = JsonProvider.loadLocalResource(completeId, filename);
+        JsonProvider provider = JsonProvider.loadBundledResource(completeId, filename);
         registerProvider(completeId, provider);
     }
 

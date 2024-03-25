@@ -6,19 +6,33 @@ package com.wynntils.services.map;
 
 import com.wynntils.utils.StringUtils;
 import com.wynntils.utils.mc.type.Location;
+import com.wynntils.utils.type.RangedValue;
 
 public class Label {
     private final String name;
     private final int x;
     private final int z;
     private final int layer;
-    private final String level;
 
-    public Label(String name, int x, int z, int layer, String level) {
+    // level is provided as a string for some data sources
+    private final String levelString;
+    private final transient RangedValue level;
+
+    public Label(String name, int x, int z, int layer, String levelString) {
         this.name = name;
         this.x = x;
         this.z = z;
         this.layer = layer;
+        this.levelString = levelString;
+        this.level = RangedValue.fromStringSafe(levelString);
+    }
+
+    public Label(String name, int x, int z, int layer, RangedValue level) {
+        this.name = name;
+        this.x = x;
+        this.z = z;
+        this.layer = layer;
+        this.levelString = level.asString();
         this.level = level;
     }
 
@@ -44,20 +58,16 @@ public class Label {
     /**
      * The recommended minimum combat level for visiting this place
      */
-    public String getLevel() {
-        if (level == null) return "";
+    public String getLevelString() {
+        if (levelString == null) return "";
 
-        return level;
+        return levelString;
     }
 
-    public int getCombatLevel() {
-        if (level == null) return 0;
+    public RangedValue getCombatLevel() {
+        if (level == null) return RangedValue.NONE;
 
-        try {
-            return Integer.parseInt(level);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
+        return level;
     }
 
     public Location getLocation() {

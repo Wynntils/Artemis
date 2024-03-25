@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.map.pois;
@@ -127,7 +127,7 @@ public class LabelPoi implements Poi {
                         getTextShadow(),
                         1f);
         if (hovered) {
-            String level = label.getLevel();
+            String level = label.getLevelString();
             if (!level.isEmpty()) {
                 BufferedFontRenderer.getInstance()
                         .renderText(

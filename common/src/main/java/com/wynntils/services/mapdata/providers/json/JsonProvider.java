@@ -25,6 +25,8 @@ import com.wynntils.utils.JsonUtils;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.mc.type.Location;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,7 +39,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
-public class JsonProvider implements MapDataProvider {
+public final class JsonProvider implements MapDataProvider {
     private static final Gson GSON = new GsonBuilder()
             .registerTypeHierarchyAdapter(MapCategory.class, new CategoryDeserializer())
             .registerTypeHierarchyAdapter(MapFeature.class, new FeatureDeserializer())
@@ -47,17 +49,28 @@ public class JsonProvider implements MapDataProvider {
             .enableComplexMapKeySerialization()
             .create();
 
+    // Note: The version field is not used, but is kept for future compatibility
+    //       If the need arises, it can be used to handle different versions of the json format
+    //       This is easily achieved by GSON switching to different deserializers based on the version
+    private final int version;
     private final List<MapFeature> features;
     private final List<MapCategory> categories;
     private final List<MapIcon> icons;
 
-    private JsonProvider(List<MapFeature> features, List<MapCategory> categories, List<MapIcon> icons) {
+    private JsonProvider(int version, List<MapFeature> features, List<MapCategory> categories, List<MapIcon> icons) {
+        this.version = version;
         this.features = features;
         this.categories = categories;
         this.icons = icons;
     }
 
-    public static JsonProvider loadLocalResource(String id, String filename) {
+    /**
+     * Load a bundled resource from the mod jar
+     * @param id The id of the resource
+     * @param filename The filename of the resource
+     * @return The loaded json provider
+     */
+    public static JsonProvider loadBundledResource(String id, String filename) {
         try (InputStream inputStream = WynntilsMod.getModResourceAsStream(filename);
                 Reader targetReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             return GSON.fromJson(targetReader, JsonProvider.class);
@@ -75,6 +88,35 @@ public class JsonProvider implements MapDataProvider {
         return null;
     }
 
+    /**
+     * Load a local resource from a file
+     * @param id The id of the resource
+     * @param file The file to load
+     * @return The loaded json provider
+     */
+    public static JsonProvider loadLocalResource(String id, File file) {
+        try (Reader reader = new FileReader(file, StandardCharsets.UTF_8)) {
+            return GSON.fromJson(reader, JsonProvider.class);
+        } catch (MalformedJsonException e) {
+            McUtils.sendErrorToClient("Error parsing map data for '" + id + "'");
+            WynntilsMod.warn("Error parsing map data for '" + id + "'", e);
+        } catch (IOException e) {
+            McUtils.sendErrorToClient("Error reading map data for '" + id + "'");
+            WynntilsMod.warn("Error reading map data for '" + id + "'", e);
+        } catch (Throwable e) {
+            // This is either a json parse error or a NPE in GSON parsing
+            McUtils.sendErrorToClient("Error parsing map data for '" + id + "'");
+            WynntilsMod.warn("Error parsing map data for '" + id + "'", e);
+        }
+        return null;
+    }
+
+    /**
+     * Load an online resource from a url
+     * @param id The id of the resource
+     * @param url The url to load
+     * @param registerCallback The callback to call with the loaded provider
+     */
     public static void loadOnlineResource(String id, String url, BiConsumer<String, MapDataProvider> registerCallback) {
         Download dl = Managers.Net.download(URI.create(url), id);
         dl.handleReader(
@@ -91,6 +133,10 @@ public class JsonProvider implements MapDataProvider {
                     McUtils.sendErrorToClient("Error downloading map data for '" + id + "'");
                     WynntilsMod.warn("Error occurred while downloading map data for '" + id + "'", onError);
                 });
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     @Override

@@ -83,6 +83,9 @@ public final class SkillPointLoadoutsScreen extends WynntilsGridLayoutScreen {
                     () -> I18n.get("screens.wynntils.skillPointLoadouts.gear", Models.SkillPoint.getGearSum()),
                     Models.SkillPoint::getGearSkillPoints));
             summaryParts.add(Pair.of(
+                    () -> I18n.get("screens.wynntils.skillPointLoadouts.setBonus", Models.SkillPoint.getSetBonusSum()),
+                    Models.SkillPoint::getSetBonusSkillPoints));
+            summaryParts.add(Pair.of(
                     () -> I18n.get("screens.wynntils.skillPointLoadouts.tomes", Models.SkillPoint.getTomeSum()),
                     Models.SkillPoint::getTomeSkillPoints));
             summaryParts.add(Pair.of(

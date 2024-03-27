@@ -11,6 +11,7 @@ import com.wynntils.models.gear.type.GearInfo;
 import com.wynntils.models.gear.type.GearInstance;
 import com.wynntils.models.gear.type.GearTier;
 import com.wynntils.models.gear.type.GearType;
+import com.wynntils.models.gear.type.SetInstance;
 import com.wynntils.models.items.items.game.CraftedGearItem;
 import com.wynntils.models.items.items.game.GearBoxItem;
 import com.wynntils.models.items.items.game.GearItem;
@@ -48,9 +49,10 @@ public final class GearModel extends Model {
 
     private final GearChatEncoding gearChatEncoding = new GearChatEncoding();
     private final Map<GearBoxItem, List<GearInfo>> possibilitiesCache = new HashMap<>();
+    private final Map<String, List<SetInstance>> activeSetsCache = new HashMap<>();
 
-    public GearModel() {
-        super(List.of());
+    public GearModel(SetModel setModel) {
+        super(List.of(setModel));
     }
 
     public List<GearInfo> getPossibleGears(GearBoxItem gearBoxItem) {
@@ -83,6 +85,7 @@ public final class GearModel extends Model {
         gearInfoRegistry.reloadData();
     }
 
+    // For "real" gear items eg. from the inventory
     public GearInstance parseInstance(GearInfo gearInfo, ItemStack itemStack) {
         WynnItemParseResult result = WynnItemParser.parseItemStack(itemStack, gearInfo.getVariableStatsMap());
         if (result.tier() != gearInfo.tier()) {
@@ -93,6 +96,7 @@ public final class GearModel extends Model {
                 gearInfo, result.identifications(), result.powders(), result.rerolls(), result.shinyStat());
     }
 
+    // For parsing gear from the gear viewer
     public GearInstance parseInstance(GearInfo gearInfo, JsonObject itemData) {
         WynnItemParseResult result = WynnItemParser.parseInternalRolls(gearInfo, itemData);
 

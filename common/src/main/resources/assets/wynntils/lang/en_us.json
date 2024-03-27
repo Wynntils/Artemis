@@ -2021,6 +2021,7 @@
   "screens.wynntils.skillPointLoadouts.save": "Save",
   "screens.wynntils.skillPointLoadouts.saveBuild": "Save Build",
   "screens.wynntils.skillPointLoadouts.saveNameConflict": "A loadout with this name already exists. Click again to overwrite.",
+  "screens.wynntils.skillPointLoadouts.setBonus": "From Set Bonus (%d)",
   "screens.wynntils.skillPointLoadouts.statusEffects": "From Status Effects (%d)",
   "screens.wynntils.skillPointLoadouts.summary": "Summary",
   "screens.wynntils.skillPointLoadouts.tomes": "From Tomes (%d)",

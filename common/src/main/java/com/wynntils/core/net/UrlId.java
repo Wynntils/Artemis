@@ -38,6 +38,7 @@ public enum UrlId {
     DATA_STATIC_IDENTIFICATION_KEYS("dataStaticIdentificationKeys"),
     DATA_STATIC_INGREDIENTS_ADVANCED("dataStaticIngredientsAdvanced"),
     DATA_STATIC_ITEM_OBTAIN("dataStaticItemObtain"),
+    DATA_STATIC_ITEM_SETS("dataStaticItemSets"),
     DATA_STATIC_LOOTRUN_TASKS_NAMED("dataStaticLootrunTasksNamed"),
     DATA_STATIC_MAPS("dataStaticMaps"),
     DATA_STATIC_MATERIAL_CONVERSION("dataStaticMaterialConversion"),

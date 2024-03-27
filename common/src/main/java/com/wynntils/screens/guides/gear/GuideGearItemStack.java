@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.guides.gear;
@@ -27,7 +27,14 @@ public final class GuideGearItemStack extends GuideItemStack {
     private List<Component> generatedTooltip;
 
     public GuideGearItemStack(GearInfo gearInfo) {
-        super(gearInfo.metaInfo().material().itemStack(), new GearItem(gearInfo, null), gearInfo.name());
+        super(
+                gearInfo.metaInfo().material().itemStack(),
+                new GearItem(
+                        gearInfo,
+                        null,
+                        Optional.ofNullable(Models.Set.getSetInfoForItem(gearInfo.name())),
+                        Optional.empty()),
+                gearInfo.name());
 
         this.gearInfo = gearInfo;
         this.name = Component.literal(gearInfo.name()).withStyle(gearInfo.tier().getChatFormatting());
@@ -64,7 +71,13 @@ public final class GuideGearItemStack extends GuideItemStack {
     }
 
     public void buildTooltip() {
-        IdentifiableTooltipBuilder tooltipBuilder = Handlers.Tooltip.buildNew(new GearItem(gearInfo, null), true);
+        IdentifiableTooltipBuilder tooltipBuilder = Handlers.Tooltip.buildNew(
+                new GearItem(
+                        gearInfo,
+                        null,
+                        Optional.ofNullable(Models.Set.getSetInfoForItem(gearInfo.name())),
+                        Optional.empty()),
+                true);
         this.generatedTooltip = tooltipBuilder.getTooltipLines(Models.Character.getClassType());
 
         // Force ItemStatInfoFeature to recreate its cache

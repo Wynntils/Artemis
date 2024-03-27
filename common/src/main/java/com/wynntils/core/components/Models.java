@@ -28,6 +28,7 @@ import com.wynntils.models.dungeon.DungeonModel;
 import com.wynntils.models.elements.ElementModel;
 import com.wynntils.models.emeralds.EmeraldModel;
 import com.wynntils.models.gear.GearModel;
+import com.wynntils.models.gear.SetModel;
 import com.wynntils.models.horse.HorseModel;
 import com.wynntils.models.ingredients.IngredientModel;
 import com.wynntils.models.items.ItemEncodingModel;
@@ -80,7 +81,6 @@ public final class Models {
     public static final ElementModel Element = new ElementModel();
     public static final EmeraldModel Emerald = new EmeraldModel();
     public static final FriendsModel Friends = new FriendsModel();
-    public static final GearModel Gear = new GearModel();
     public static final GuildAttackTimerModel GuildAttackTimer = new GuildAttackTimerModel();
     public static final GuildModel Guild = new GuildModel();
     public static final HorseModel Horse = new HorseModel();
@@ -101,6 +101,7 @@ public final class Models {
     public static final RewardsModel Rewards = new RewardsModel();
     public static final SeaskipperModel Seaskipper = new SeaskipperModel();
     public static final ServerListModel ServerList = new ServerListModel();
+    public static final SetModel Set = new SetModel();
     public static final ShamanMaskModel ShamanMask = new ShamanMaskModel();
     public static final ShamanTotemModel ShamanTotem = new ShamanTotemModel();
     public static final ShinyModel Shiny = new ShinyModel();
@@ -119,5 +120,6 @@ public final class Models {
 
     // Models with constructor dependencies, ordered alphabetically as far as possible
     public static final ActivityModel Activity = new ActivityModel(Marker);
+    public static final GearModel Gear = new GearModel(Set);
     public static final LootrunModel Lootrun = new LootrunModel(Marker);
 }

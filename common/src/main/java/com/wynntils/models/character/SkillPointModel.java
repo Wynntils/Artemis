@@ -17,6 +17,8 @@ import com.wynntils.handlers.container.type.ContainerContentChangeType;
 import com.wynntils.models.character.type.SavableSkillPointSet;
 import com.wynntils.models.containers.ContainerModel;
 import com.wynntils.models.elements.type.Skill;
+import com.wynntils.models.gear.type.SetInfo;
+import com.wynntils.models.gear.type.SetInstance;
 import com.wynntils.models.items.WynnItem;
 import com.wynntils.models.items.items.game.CraftedGearItem;
 import com.wynntils.models.items.items.game.GearItem;
@@ -27,13 +29,15 @@ import com.wynntils.utils.mc.LoreUtils;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.wynn.ContainerUtils;
 import com.wynntils.utils.wynn.InventoryUtils;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
@@ -53,12 +57,15 @@ public class SkillPointModel extends Model {
     private static final int CHARACTER_INFO_SOUL_POINT_SLOT = 62;
     private static final int TOME_MENU_SOUL_POINT_SLOT = 89;
 
+    private Set<String> processedSets = new HashSet<>();
+
     private Map<Skill, Integer> totalSkillPoints = new EnumMap<>(Skill.class);
     private Map<Skill, Integer> gearSkillPoints = new EnumMap<>(Skill.class);
     private Map<Skill, Integer> craftedSkillPoints = new EnumMap<>(Skill.class);
     private Map<Skill, Integer> tomeSkillPoints = new EnumMap<>(Skill.class);
-    private Map<Skill, Integer> assignedSkillPoints = new EnumMap<>(Skill.class);
     private Map<Skill, Integer> statusEffectSkillPoints = new EnumMap<>(Skill.class);
+    private Map<Skill, Integer> setBonusSkillPoints = new EnumMap<>(Skill.class);
+    private Map<Skill, Integer> assignedSkillPoints = new EnumMap<>(Skill.class);
 
     public SkillPointModel() {
         super(List.of());
@@ -194,6 +201,14 @@ public class SkillPointModel extends Model {
         return statusEffectSkillPoints.values().stream().reduce(0, Integer::sum);
     }
 
+    public int getSetBonusSkillPoints(Skill skill) {
+        return setBonusSkillPoints.getOrDefault(skill, 0);
+    }
+
+    public int getSetBonusSum() {
+        return setBonusSkillPoints.values().stream().reduce(0, Integer::sum);
+    }
+
     public int getAssignedSkillPoints(Skill skill) {
         return assignedSkillPoints.getOrDefault(skill, 0);
     }
@@ -292,16 +307,24 @@ public class SkillPointModel extends Model {
     private void calculateGearSkillPoints() {
         gearSkillPoints = new EnumMap<>(Skill.class);
         craftedSkillPoints = new EnumMap<>(Skill.class);
+        setBonusSkillPoints = new EnumMap<>(Skill.class);
+        processedSets = new HashSet<>();
 
         // Cannot combine these loops because of the way the inventory is numbered when a container is open
-        McUtils.inventory().armor.forEach(this::calculateSingleGearSkillPoints);
-
-        for (int i : ACCESSORY_SLOTS) {
-            calculateSingleGearSkillPoints(McUtils.inventory().getItem(i));
+        for (ItemStack itemStack : McUtils.inventory().armor) {
+            calculateSingleGearSkillPoints(itemStack);
         }
 
-        // held item
-        calculateSingleGearSkillPoints(McUtils.player().getItemInHand(InteractionHand.MAIN_HAND));
+        for (int i : ACCESSORY_SLOTS) {
+            ItemStack itemStack = McUtils.inventory().getItem(i);
+            calculateSingleGearSkillPoints(itemStack);
+        }
+
+        // held item - must check if it's actually valid before counting
+        ItemStack itemInHand = McUtils.player().getItemInHand(InteractionHand.MAIN_HAND);
+        if (InventoryUtils.itemRequirementsMet(itemInHand)) {
+            calculateSingleGearSkillPoints(itemInHand);
+        }
     }
 
     private void calculateSingleGearSkillPoints(ItemStack itemStack) {
@@ -314,6 +337,25 @@ public class SkillPointModel extends Model {
                     gearSkillPoints.merge(skillStat.getSkill(), x.value(), Integer::sum);
                 }
             });
+
+            if (gear.getSetInfo().isPresent() && gear.getSetInstance().isPresent()) {
+                SetInfo setInfo = gear.getSetInfo().get();
+                SetInstance setInstance = gear.getSetInstance().get();
+
+                if (!processedSets.contains(setInfo.name())) {
+                    System.out.println("processing set " + setInfo.name() + " on item " + itemStack.getHoverName());
+                    System.out.println("SetInstance is " + setInstance);
+                    // fixme: this setinstance returns 3-4 true count even when count is actually 8
+                    // probably because we need to update/reannotate all items in the set when some set item is updated
+                    // deal with in gearmodel laterf
+                    setInstance.getTrueCountBonuses().forEach((statType, value) -> {
+                        if (Skill.isSkill(statType.getDisplayName())) {
+                            setBonusSkillPoints.merge(Skill.fromString(statType.getDisplayName()), value, Integer::sum);
+                        }
+                    });
+                    processedSets.add(setInfo.name());
+                }
+            }
         } else if (wynnItemOptional.get() instanceof CraftedGearItem craftedGear) {
             craftedGear.getIdentifications().forEach(x -> {
                 if (x.statType() instanceof SkillStatType skillStat) {
@@ -358,7 +400,7 @@ public class SkillPointModel extends Model {
 
     private boolean verifyChange(
             ContainerContent content,
-            Int2ObjectMap<ItemStack> changes,
+            Int2ObjectFunction<ItemStack> changes,
             ContainerContentChangeType changeType,
             int soulPointItemSlot) {
         // soul points resent last for both containers
@@ -420,6 +462,7 @@ public class SkillPointModel extends Model {
                     skill,
                     getTotalSkillPoints(skill)
                             - getGearSkillPoints(skill)
+                            - getSetBonusSkillPoints(skill)
                             - getTomeSkillPoints(skill)
                             - getCraftedSkillPoints(skill)
                             - getStatusEffectSkillPoints(skill));

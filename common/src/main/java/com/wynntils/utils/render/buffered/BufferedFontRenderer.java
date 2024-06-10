@@ -65,12 +65,14 @@ public final class BufferedFontRenderer {
         renderX = switch (horizontalAlignment) {
             case LEFT -> x;
             case CENTER -> x - (font.width(text.getString()) / 2f * textScale);
-            case RIGHT -> x - font.width(text.getString()) * textScale;};
+            case RIGHT -> x - font.width(text.getString()) * textScale;
+        };
 
         renderY = switch (verticalAlignment) {
             case TOP -> y;
             case MIDDLE -> y - (font.lineHeight / 2f * textScale);
-            case BOTTOM -> y - font.lineHeight * textScale;};
+            case BOTTOM -> y - font.lineHeight * textScale;
+        };
 
         poseStack.pushPose();
         poseStack.translate(renderX, renderY, 0);
@@ -316,7 +318,7 @@ public final class BufferedFontRenderer {
                 poseStack, bufferSource, text, x, y, customColor, horizontalAlignment, verticalAlignment, shadow, 1f);
     }
 
-    private void renderText(
+    public void renderText(
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             StyledText text,

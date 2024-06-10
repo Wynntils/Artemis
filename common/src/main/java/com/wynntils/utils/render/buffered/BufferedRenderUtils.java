@@ -7,6 +7,7 @@ package com.wynntils.utils.render.buffered;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.wynntils.core.WynntilsMod;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.render.Texture;
 import java.util.List;
@@ -14,6 +15,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.lwjgl.opengl.GL11;
 
 public final class BufferedRenderUtils {
@@ -414,19 +416,19 @@ public final class BufferedRenderUtils {
      * drawProgressBar
      * Draws a progress bar (textureY1 and textureY2 now specify both textures with background being on top of the bar)
      *
-     * @param poseStack poseStack to use
+     * @param poseStack    poseStack to use
      * @param bufferSource bufferSource to use
-     * @param texture   the texture to use
-     * @param customColor the color for the bar
-     * @param x1        left x on screen
-     * @param y1        top y on screen
-     * @param x2        right x on screen
-     * @param y2        bottom right on screen
-     * @param textureX1 texture left x for the part
-     * @param textureY1 texture top y for the part (top of background)
-     * @param textureX2 texture right x for the part
-     * @param textureY2 texture bottom y for the part (bottom of bar)
-     * @param progress  progress of the bar, 0.0f to 1.0f is left to right and 0.0f to -1.0f is right to left
+     * @param texture      the texture to use
+     * @param customColor  the color for the bar
+     * @param x1           left x on screen
+     * @param y1           top y on screen
+     * @param x2           right x on screen
+     * @param y2           bottom right on screen
+     * @param textureX1    texture left x for the part
+     * @param textureY1    texture top y for the part (top of background)
+     * @param textureX2    texture right x for the part
+     * @param textureY2    texture bottom y for the part (bottom of bar)
+     * @param progress     progress of the bar, 0.0f to 1.0f is left to right and 0.0f to -1.0f is right to left
      */
     public static void drawColoredProgressBar(
             PoseStack poseStack,
@@ -525,18 +527,18 @@ public final class BufferedRenderUtils {
      * drawProgressBar
      * Draws a progress bar (textureY1 and textureY2 now specify both textures with background being on top of the bar)
      *
-     * @param poseStack poseStack to use
+     * @param poseStack    poseStack to use
      * @param bufferSource bufferSource to use
-     * @param texture   the texture to use
-     * @param x1        left x on screen
-     * @param y1        top y on screen
-     * @param x2        right x on screen
-     * @param y2        bottom right on screen
-     * @param textureX1 texture left x for the part
-     * @param textureY1 texture top y for the part (top of background)
-     * @param textureX2 texture right x for the part
-     * @param textureY2 texture bottom y for the part (bottom of bar)
-     * @param progress  progress of the bar, 0.0f to 1.0f is left to right and 0.0f to -1.0f is right to left
+     * @param texture      the texture to use
+     * @param x1           left x on screen
+     * @param y1           top y on screen
+     * @param x2           right x on screen
+     * @param y2           bottom right on screen
+     * @param textureX1    texture left x for the part
+     * @param textureY1    texture top y for the part (top of background)
+     * @param textureX2    texture right x for the part
+     * @param textureY2    texture bottom y for the part (bottom of bar)
+     * @param progress     progress of the bar, 0.0f to 1.0f is left to right and 0.0f to -1.0f is right to left
      */
     public static void drawProgressBar(
             PoseStack poseStack,
@@ -659,10 +661,10 @@ public final class BufferedRenderUtils {
      * white will allow drawing.
      *
      * @param texture mask texture(please use Textures.Masks)
-     * @param x1 bottom-left x(on screen)
-     * @param y1 bottom-left y(on screen)
-     * @param x2 top-right x(on screen)
-     * @param y2 top-right y(on screen)
+     * @param x1      bottom-left x(on screen)
+     * @param y1      bottom-left y(on screen)
+     * @param x2      top-right x(on screen)
+     * @param y2      top-right y(on screen)
      */
     private static void createMask(
             PoseStack poseStack,
@@ -717,5 +719,36 @@ public final class BufferedRenderUtils {
         RenderSystem.stencilMask(0x00);
         RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
         RenderSystem.stencilFunc(GL11.GL_EQUAL, 1, 0xff);
+    }
+
+    public static void drawPolygon(
+            PoseStack poseStack, MultiBufferSource bufferSource, CustomColor color, List<Vector2f> vertices, float z) {
+        if (vertices.size() < 3) {
+            WynntilsMod.warn("Tried to draw a polygon with less than 3 vertices");
+            return;
+        }
+
+        Matrix4f matrix = poseStack.last().pose();
+        VertexConsumer buffer = bufferSource.getBuffer(CustomRenderType.POSITION_COLOR_TRIANGLE_STRIP);
+
+        // First vertex
+        Vector2f firstVertex = vertices.get(0);
+
+        // Add each vertex
+        for (int i = 1; i < vertices.size() - 1; i++) {
+            Vector2f v1 = vertices.get(i);
+            Vector2f v2 = vertices.get(i + 1);
+
+            // Triangle strip needs v0, v1, v2 in sequence, then v1, v2, v3, and so on
+            buffer.vertex(matrix, firstVertex.x(), firstVertex.y(), z)
+                    .color(color.r, color.g, color.b, color.a)
+                    .endVertex();
+            buffer.vertex(matrix, v1.x(), v1.y(), z)
+                    .color(color.r, color.g, color.b, color.a)
+                    .endVertex();
+            buffer.vertex(matrix, v2.x(), v2.y(), z)
+                    .color(color.r, color.g, color.b, color.a)
+                    .endVertex();
+        }
     }
 }

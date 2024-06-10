@@ -17,12 +17,11 @@ import com.wynntils.core.net.UrlId;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.mc.event.AdvancementUpdateEvent;
 import com.wynntils.models.items.items.gui.TerritoryItem;
+import com.wynntils.models.territories.event.TerritoriesUpdatedEvent;
 import com.wynntils.models.territories.profile.TerritoryProfile;
 import com.wynntils.models.territories.type.TerritoryConnectionType;
 import com.wynntils.screens.territorymanagement.TerritoryManagementHolder;
 import com.wynntils.services.map.pois.TerritoryPoi;
-import com.wynntils.services.map.type.TerritoryDefenseFilterType;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
@@ -51,8 +50,8 @@ public final class TerritoryModel extends Model {
             .registerTypeHierarchyAdapter(TerritoryProfile.class, new TerritoryProfile.TerritoryDeserializer())
             .create();
 
-    // This is territory POIs as returned by the advancement from Wynncraft
-    private final Map<String, TerritoryPoi> territoryPoiMap = new ConcurrentHashMap<>();
+    // This is the info gathered from the advancement from Wynncraft
+    private final Map<String, TerritoryInfo> territoryInfoMap = new ConcurrentHashMap<>();
 
     // This is the profiles as downloaded from Athena
     private Map<String, TerritoryProfile> territoryProfileMap = new HashMap<>();
@@ -71,12 +70,17 @@ public final class TerritoryModel extends Model {
                 this::updateTerritoryProfileMap, 0, TERRITORY_UPDATE_MS, TimeUnit.MILLISECONDS);
     }
 
+    public Collection<TerritoryProfile> getTerritoryProfiles() {
+        return territoryProfileMap.values();
+    }
+
     public TerritoryProfile getTerritoryProfile(String name) {
         return territoryProfileMap.get(name);
     }
 
     /**
-     * Get the territory profile from a short name. This is used when the territory name is cut off, like scoreboards.
+     * Get the territory profile from a short name. This is used when the territory name is cut off, like
+     * scoreboards.
      *
      * @param shortName           The short name of the territory
      * @param excludedTerritories Territories to exclude from the search
@@ -94,31 +98,31 @@ public final class TerritoryModel extends Model {
         return territoryProfileMap.keySet().stream();
     }
 
-    public Set<TerritoryPoi> getTerritoryPois() {
-        return allTerritoryPois;
-    }
-
-    public List<TerritoryPoi> getTerritoryPoisFromAdvancement() {
-        return new ArrayList<>(territoryPoiMap.values());
-    }
-
-    public List<TerritoryPoi> getFilteredTerritoryPoisFromAdvancement(
-            int filterLevel, TerritoryDefenseFilterType filterType) {
-        return switch (filterType) {
-            case HIGHER -> territoryPoiMap.values().stream()
-                    .filter(poi -> poi.getTerritoryInfo().getDefences().getLevel() >= filterLevel)
-                    .collect(Collectors.toList());
-            case LOWER -> territoryPoiMap.values().stream()
-                    .filter(poi -> poi.getTerritoryInfo().getDefences().getLevel() <= filterLevel)
-                    .collect(Collectors.toList());
-            case DEFAULT -> territoryPoiMap.values().stream()
-                    .filter(poi -> poi.getTerritoryInfo().getDefences().getLevel() == filterLevel)
-                    .collect(Collectors.toList());
-        };
-    }
-
-    public TerritoryPoi getTerritoryPoiFromAdvancement(String name) {
-        return territoryPoiMap.get(name);
+    //    public Set<TerritoryPoi> getTerritoryPois() {
+    //        return allTerritoryPois;
+    //    }
+    //
+    //    public List<TerritoryPoi> getTerritoryPoisFromAdvancement() {
+    //        return new ArrayList<>(territoryInfoMap.values());
+    //    }
+    //
+    //    public List<TerritoryPoi> getFilteredTerritoryPoisFromAdvancement(
+    //            int filterLevel, TerritoryDefenseFilterType filterType) {
+    //        return switch (filterType) {
+    //            case HIGHER -> territoryInfoMap.values().stream()
+    //                    .filter(poi -> poi.getTerritoryInfo().getDefences().getLevel() >= filterLevel)
+    //                    .collect(Collectors.toList());
+    //            case LOWER -> territoryInfoMap.values().stream()
+    //                    .filter(poi -> poi.getTerritoryInfo().getDefences().getLevel() <= filterLevel)
+    //                    .collect(Collectors.toList());
+    //            case DEFAULT -> territoryInfoMap.values().stream()
+    //                    .filter(poi -> poi.getTerritoryInfo().getDefences().getLevel() == filterLevel)
+    //                    .collect(Collectors.toList());
+    //        };
+    //    }
+    //
+    public TerritoryInfo getTerritoryInfo(String name) {
+        return territoryInfoMap.get(name);
     }
 
     public TerritoryProfile getTerritoryProfileForPosition(Position position) {
@@ -162,14 +166,8 @@ public final class TerritoryModel extends Model {
             tempMap.put(territoryName, container);
         }
 
-        for (Map.Entry<String, TerritoryInfo> entry : tempMap.entrySet()) {
-            TerritoryProfile territoryProfile = getTerritoryProfile(entry.getKey());
-
-            if (territoryProfile == null) continue;
-
-            territoryPoiMap.put(
-                    entry.getKey(), new TerritoryPoi(() -> getTerritoryProfile(entry.getKey()), entry.getValue()));
-        }
+        territoryInfoMap.putAll(tempMap);
+        WynntilsMod.postEvent(new TerritoriesUpdatedEvent.Advancements());
     }
 
     public Map<TerritoryItem, TerritoryConnectionType> getTerritoryConnections(List<TerritoryItem> territoryItems) {
@@ -198,13 +196,11 @@ public final class TerritoryModel extends Model {
             for (TerritoryItem territoryItem : territoryItems) {
                 if (connectedTerritories.contains(territoryItem)) continue;
 
-                TerritoryInfo currentTerritoryInfo =
-                        getTerritoryPoiFromAdvancement(current.getName()).getTerritoryInfo();
-                TerritoryInfo territoryInfo =
-                        getTerritoryPoiFromAdvancement(territoryItem.getName()).getTerritoryInfo();
+                TerritoryInfo currentTerritoryInfo = getTerritoryInfo(current.getName());
+                TerritoryInfo territoryInfo = getTerritoryInfo(territoryItem.getName());
 
-                // Note: Wynn is bugged, and sometimes forgets to add the bi-directional trading routes to both
-                // territories
+                // Note: Wynn is bugged, and sometimes forgets to add the bidirectional trading routes to both
+                //       territories
                 if ((territoryInfo != null && territoryInfo.getTradingRoutes().contains(current.getName()))
                         || (currentTerritoryInfo != null
                                 && currentTerritoryInfo.getTradingRoutes().contains(territoryItem.getName()))) {
@@ -249,6 +245,8 @@ public final class TerritoryModel extends Model {
                     allTerritoryPois = territoryProfileMap.values().stream()
                             .map(TerritoryPoi::new)
                             .collect(Collectors.toSet());
+
+                    WynntilsMod.postEventOnMainThread(new TerritoriesUpdatedEvent.Api());
                 },
                 onError -> WynntilsMod.warn("Failed to update territory data."));
     }

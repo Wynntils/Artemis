@@ -25,4 +25,33 @@ public record BoundingBox(float x1, float z1, float x2, float z2) implements Bou
     public boolean contains(float x, float z) {
         return x1 <= x && x <= x2 && z1 <= z && z <= z2;
     }
+
+    @Override
+    public boolean intersects(BoundingBox boundingBox) {
+        // Check if the bounding boxes intersect in the x and z dimensions
+        boolean xIntersects = Math.max(this.x1(), boundingBox.x1()) < Math.min(this.x2(), boundingBox.x2());
+        boolean zIntersects = Math.max(this.z1(), boundingBox.z1()) < Math.min(this.z2(), boundingBox.z2());
+
+        // If the bounding boxes intersect in both dimensions, they intersect
+        return xIntersects && zIntersects;
+    }
+
+    @Override
+    public boolean intersects(BoundingCircle boundingCircle) {
+        // Nearest point on the bounding box to the center of the circle
+        float nearestX = Math.max(this.x1(), Math.min(this.x2(), boundingCircle.x()));
+        float nearestZ = Math.max(this.z1(), Math.min(this.z2(), boundingCircle.z()));
+
+        // Find the distance between the nearest point and the center of the circle
+        float deltaX = boundingCircle.x() - nearestX;
+        float deltaZ = boundingCircle.z() - nearestZ;
+
+        // If the distance is less than the radius, the circle intersects the bounding box
+        return (deltaX * deltaX + deltaZ * deltaZ) < (boundingCircle.radius() * boundingCircle.radius());
+    }
+
+    @Override
+    public boolean intersects(BoundingPolygon boundingPolygon) {
+        return BoundingShape.intersects(this, boundingPolygon);
+    }
 }

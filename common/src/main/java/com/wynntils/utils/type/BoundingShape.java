@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.utils.type;
@@ -7,38 +7,34 @@ package com.wynntils.utils.type;
 public interface BoundingShape {
     boolean contains(float x, float z);
 
+    boolean intersects(BoundingBox boundingBox);
+
+    boolean intersects(BoundingCircle boundingCircle);
+
+    boolean intersects(BoundingPolygon boundingPolygon);
+
     static boolean intersects(BoundingBox boundingBox1, BoundingBox boundingBox2) {
-        // Check if the bounding boxes intersect in the x and z dimensions
-        boolean xIntersects =
-                Math.max(boundingBox1.x1(), boundingBox2.x1()) < Math.min(boundingBox1.x2(), boundingBox2.x2());
-        boolean zIntersects =
-                Math.max(boundingBox1.z1(), boundingBox2.z1()) < Math.min(boundingBox1.z2(), boundingBox2.z2());
-
-        // If the bounding boxes intersect in both dimensions, they intersect
-        return xIntersects && zIntersects;
-    }
-
-    static boolean intersects(BoundingBox boundingBox, BoundingCircle boundingCircle) {
-        // Nearest point on the bounding box to the center of the circle
-        float nearestX = Math.max(boundingBox.x1(), Math.min(boundingBox.x2(), boundingCircle.x()));
-        float nearestZ = Math.max(boundingBox.z1(), Math.min(boundingBox.z2(), boundingCircle.z()));
-
-        // Find the distance between the nearest point and the center of the circle
-        float deltaX = boundingCircle.x() - nearestX;
-        float deltaZ = boundingCircle.z() - nearestZ;
-
-        // If the distance is less than the radius, the circle intersects the bounding box
-        return (deltaX * deltaX + deltaZ * deltaZ) < (boundingCircle.radius() * boundingCircle.radius());
+        return boundingBox1.intersects(boundingBox2);
     }
 
     static boolean intersects(BoundingCircle boundingCircle1, BoundingCircle boundingCircle2) {
-        // Find the distance between the centers of the circles
-        float deltaX = boundingCircle2.x() - boundingCircle1.x();
-        float deltaZ = boundingCircle2.z() - boundingCircle1.z();
+        return boundingCircle1.intersects(boundingCircle2);
+    }
 
-        // If the distance is less than the sum of the radii, the circles intersect
-        return (deltaX * deltaX + deltaZ * deltaZ)
-                < ((boundingCircle1.radius() + boundingCircle2.radius())
-                        * (boundingCircle1.radius() + boundingCircle2.radius()));
+    static boolean intersects(BoundingPolygon boundingPolygon1, BoundingPolygon boundingPolygon2) {
+        return boundingPolygon1.intersects(boundingPolygon2);
+    }
+
+    static boolean intersects(BoundingBox boundingBox, BoundingCircle boundingCircle) {
+        return boundingBox.intersects(boundingCircle);
+    }
+
+    static boolean intersects(BoundingBox boundingBox, BoundingPolygon boundingPolygon) {
+        // This is done by turning the bounding box into a polygon and then checking for polygon-polygon intersection
+        return boundingPolygon.intersects(BoundingPolygon.fromBox(boundingBox));
+    }
+
+    static boolean intersects(BoundingCircle boundingCircle, BoundingPolygon boundingPolygon) {
+        return boundingPolygon.intersects(boundingCircle);
     }
 }

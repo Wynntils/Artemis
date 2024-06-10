@@ -32,7 +32,7 @@ public class WaypointsProvider extends BuiltInProvider {
         waypoints.forEach(WaypointsProvider::registerFeature);
     }
 
-    public static void registerFeature(WaypointLocation waypoint) {
+    private static void registerFeature(WaypointLocation waypoint) {
         PROVIDED_FEATURES.add(waypoint);
     }
 }

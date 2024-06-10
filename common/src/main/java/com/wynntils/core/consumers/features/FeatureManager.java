@@ -77,11 +77,10 @@ import com.wynntils.features.inventory.ItemTextOverlayFeature;
 import com.wynntils.features.inventory.LootchestTextFeature;
 import com.wynntils.features.inventory.ReplaceRecipeBookFeature;
 import com.wynntils.features.inventory.UnidentifiedItemIconFeature;
-import com.wynntils.features.map.BeaconBeamFeature;
 import com.wynntils.features.map.GuildMapFeature;
 import com.wynntils.features.map.MainMapFeature;
 import com.wynntils.features.map.MinimapFeature;
-import com.wynntils.features.map.WorldWaypointDistanceFeature;
+import com.wynntils.features.map.WorldMarkersFeature;
 import com.wynntils.features.overlays.ArrowShieldTrackerOverlayFeature;
 import com.wynntils.features.overlays.BombBellOverlayFeature;
 import com.wynntils.features.overlays.CombatExperienceOverlayFeature;
@@ -273,11 +272,10 @@ public final class FeatureManager extends Manager {
         // endregion
 
         // region map
-        registerFeature(new BeaconBeamFeature());
         registerFeature(new GuildMapFeature());
         registerFeature(new MainMapFeature());
         registerFeature(new MinimapFeature());
-        registerFeature(new WorldWaypointDistanceFeature());
+        registerFeature(new WorldMarkersFeature());
         // endregion
 
         // region overlays

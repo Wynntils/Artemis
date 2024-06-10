@@ -8,8 +8,10 @@ import com.wynntils.core.components.Services;
 import com.wynntils.services.mapdata.attributes.DefaultMapAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapVisibility;
+import com.wynntils.services.mapdata.attributes.type.MarkerOptions;
 import com.wynntils.services.mapdata.attributes.type.ResolvedMapAttributes;
 import com.wynntils.services.mapdata.attributes.type.ResolvedMapVisibility;
+import com.wynntils.services.mapdata.attributes.type.ResolvedMarkerOptions;
 import com.wynntils.services.mapdata.type.MapCategory;
 import com.wynntils.services.mapdata.type.MapFeature;
 import java.util.Optional;
@@ -18,7 +20,7 @@ import java.util.stream.Stream;
 
 /**
  * This will create a special type of MapAttributes that are a record with fixed values,
- * which are guarenteed to exist. It does this by extending the lookup for the
+ * which are guaranteed to exist. It does this by extending the lookup for the
  * attribute first to the category hierarchy for the given feature, and
  * finally by going to the default value for each attribute.
  */
@@ -42,7 +44,8 @@ public class MapAttributesResolver {
                 resolver.getAttribute(MapAttributes::getLabelShadow),
                 resolver.getResolvedMapVisibility(MapAttributes::getIconVisibility),
                 resolver.getAttribute(MapAttributes::getIconColor),
-                resolver.getAttribute(MapAttributes::getIconDecoration));
+                resolver.getAttribute(MapAttributes::getIconDecoration),
+                resolver.getResolvedMarkerOptions(MapAttributes::getMarkerOptions));
     }
 
     private <T> T getAttribute(Function<MapAttributes, Optional<T>> attributeGetter) {
@@ -66,33 +69,44 @@ public class MapAttributesResolver {
         return attributeGetter.apply(DefaultMapAttributes.INSTANCE).get();
     }
 
+    private ResolvedMarkerOptions getResolvedMarkerOptions(
+            Function<MapAttributes, Optional<MarkerOptions>> attributeGetter) {
+        return new ResolvedMarkerOptions(
+                getInheritedValue(MarkerOptions::getInnerRadius, attributeGetter),
+                getInheritedValue(MarkerOptions::getOuterRadius, attributeGetter),
+                getInheritedValue(MarkerOptions::getFade, attributeGetter),
+                getInheritedValue(MarkerOptions::getBeaconColor, attributeGetter),
+                getInheritedValue(MarkerOptions::renderLabel, attributeGetter),
+                getInheritedValue(MarkerOptions::renderDistance, attributeGetter),
+                getInheritedValue(MarkerOptions::renderIcon, attributeGetter));
+    }
+
     private ResolvedMapVisibility getResolvedMapVisibility(
             Function<MapAttributes, Optional<MapVisibility>> attributeGetter) {
         return new ResolvedMapVisibility(
-                getVisibilityValue(MapVisibility::getMin, attributeGetter),
-                getVisibilityValue(MapVisibility::getMax, attributeGetter),
-                getVisibilityValue(MapVisibility::getFade, attributeGetter));
+                getInheritedValue(MapVisibility::getMin, attributeGetter),
+                getInheritedValue(MapVisibility::getMax, attributeGetter),
+                getInheritedValue(MapVisibility::getFade, attributeGetter));
     }
 
-    private float getVisibilityValue(
-            Function<MapVisibility, Optional<Float>> valueGetter,
-            Function<MapAttributes, Optional<MapVisibility>> attributeGetter) {
+    private <F, T> T getInheritedValue(
+            Function<F, Optional<T>> valueGetter, Function<MapAttributes, Optional<F>> attributeGetter) {
         // Check if the feature has overridden this attribute
-        Optional<MapVisibility> featureVisibility = getFromFeature(attributeGetter);
-        if (featureVisibility.isPresent()) {
+        Optional<F> featureValue = getFromFeature(attributeGetter);
+        if (featureValue.isPresent()) {
             // We got the attribute, but do we got the value?
-            Optional<Float> featureValue = valueGetter.apply(featureVisibility.get());
-            if (featureValue.isPresent()) {
-                return featureValue.get();
+            Optional<T> value = valueGetter.apply(featureValue.get());
+            if (value.isPresent()) {
+                return value.get();
             }
         }
 
         // Otherwise try to get it from the category
         for (String id = getCategoryId(); id != null; id = getParentCategoryId(id)) {
-            Stream<MapVisibility> attributes = getAttributesForCategoryId(attributeGetter, id);
+            Stream<F> attributes = getAttributesForCategoryId(attributeGetter, id);
 
-            // Then check each visibility in turn for the value we're looking for
-            Optional<Float> attribute = attributes
+            // Then check each value in turn for the value we're looking for
+            Optional<T> attribute = attributes
                     .map(valueGetter)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
@@ -127,7 +141,7 @@ public class MapAttributesResolver {
                 .filter(Optional::isPresent)
                 .map(Optional::get);
 
-        // Mulitple providers might provide MapAttributes to the same category, but not
+        // Multiple providers might provide MapAttributes to the same category, but not
         // all of them might provide the attribute we're actually looking for, so
         // check all (in the arbitrary order that Services.MapData gave them to us).
         return allAttributes.map(attributeGetter).filter(Optional::isPresent).map(Optional::get);

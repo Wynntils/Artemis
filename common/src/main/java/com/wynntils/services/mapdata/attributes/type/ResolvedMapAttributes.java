@@ -17,4 +17,5 @@ public record ResolvedMapAttributes(
         TextShadow labelShadow,
         ResolvedMapVisibility iconVisibility,
         CustomColor iconColor,
-        MapDecoration iconDecoration) {}
+        MapDecoration iconDecoration,
+        ResolvedMarkerOptions markerOptions) {}

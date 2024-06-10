@@ -7,6 +7,7 @@ package com.wynntils.services.mapdata.providers.json;
 import com.wynntils.services.mapdata.attributes.type.MapAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapDecoration;
 import com.wynntils.services.mapdata.attributes.type.MapVisibility;
+import com.wynntils.services.mapdata.attributes.type.MarkerOptions;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.render.type.TextShadow;
 import java.util.Optional;
@@ -21,6 +22,7 @@ public class JsonMapAttributes implements MapAttributes {
     private final JsonMapVisibility labelVisibility;
     private final CustomColor iconColor;
     private final JsonMapVisibility iconVisibility;
+    private final JsonMarkerOptions markerOptions;
 
     public JsonMapAttributes(
             String label,
@@ -31,7 +33,8 @@ public class JsonMapAttributes implements MapAttributes {
             TextShadow labelShadow,
             JsonMapVisibility labelVisibility,
             CustomColor iconColor,
-            JsonMapVisibility iconVisibility) {
+            JsonMapVisibility iconVisibility,
+            JsonMarkerOptions markerOptions) {
         this.label = label;
         this.icon = icon;
         this.priority = priority;
@@ -41,6 +44,7 @@ public class JsonMapAttributes implements MapAttributes {
         this.labelVisibility = labelVisibility;
         this.iconColor = iconColor;
         this.iconVisibility = iconVisibility;
+        this.markerOptions = markerOptions;
     }
 
     @Override
@@ -86,6 +90,11 @@ public class JsonMapAttributes implements MapAttributes {
     @Override
     public Optional<CustomColor> getIconColor() {
         return Optional.ofNullable(iconColor);
+    }
+
+    @Override
+    public Optional<MarkerOptions> getMarkerOptions() {
+        return Optional.ofNullable(markerOptions);
     }
 
     @Override

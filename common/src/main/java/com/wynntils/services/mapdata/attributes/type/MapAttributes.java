@@ -30,15 +30,25 @@ public interface MapAttributes {
     // 1 means suitable for all levels
     Optional<Integer> getLevel();
 
+    // The visibility of the label on the map
     Optional<MapVisibility> getLabelVisibility();
 
+    // The color of the label on the map, and in-world
     Optional<CustomColor> getLabelColor();
 
+    // The shadow of the label on the map, and in-world
     Optional<TextShadow> getLabelShadow();
 
+    // The visibility of the icon on the map
     Optional<MapVisibility> getIconVisibility();
 
+    // The color of the icon on the map, and in-world
     Optional<CustomColor> getIconColor();
 
+    // The decoration of the icon on the map, and in-world
     Optional<MapDecoration> getIconDecoration();
+
+    // The options of the marker in the world
+    // This is only supported for MapLocations
+    Optional<MarkerOptions> getMarkerOptions();
 }

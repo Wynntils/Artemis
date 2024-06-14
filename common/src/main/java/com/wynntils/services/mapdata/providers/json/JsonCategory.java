@@ -4,19 +4,30 @@
  */
 package com.wynntils.services.mapdata.providers.json;
 
-import com.wynntils.services.mapdata.attributes.type.MapAttributes;
+import com.wynntils.services.mapdata.attributes.type.MapAreaAttributes;
+import com.wynntils.services.mapdata.attributes.type.MapLocationAttributes;
+import com.wynntils.services.mapdata.attributes.type.MapPathAttributes;
 import com.wynntils.services.mapdata.type.MapCategory;
 import java.util.Optional;
 
 public class JsonCategory implements MapCategory {
     private final String id;
     private final String name;
-    private final JsonMapAttributes attributes;
+    private final JsonLocationAttributes locationAttributes;
+    private final JsonAreaAttributes areaAttributes;
+    private final JsonPathAttributes pathAttributes;
 
-    public JsonCategory(String id, String name, JsonMapAttributes attributes) {
+    public JsonCategory(
+            String id,
+            String name,
+            JsonLocationAttributes locationAttributes,
+            JsonAreaAttributes areaAttributes,
+            JsonPathAttributes pathAttributes) {
         this.id = id;
         this.name = name;
-        this.attributes = attributes;
+        this.locationAttributes = locationAttributes;
+        this.areaAttributes = areaAttributes;
+        this.pathAttributes = pathAttributes;
     }
 
     @Override
@@ -30,7 +41,17 @@ public class JsonCategory implements MapCategory {
     }
 
     @Override
-    public Optional<MapAttributes> getAttributes() {
-        return Optional.ofNullable(attributes);
+    public Optional<MapLocationAttributes> getLocationAttributes() {
+        return Optional.ofNullable(locationAttributes);
+    }
+
+    @Override
+    public Optional<MapPathAttributes> getPathAttributes() {
+        return Optional.ofNullable(pathAttributes);
+    }
+
+    @Override
+    public Optional<MapAreaAttributes> getAreaAttributes() {
+        return Optional.ofNullable(areaAttributes);
     }
 }

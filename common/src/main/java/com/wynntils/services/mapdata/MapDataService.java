@@ -8,7 +8,10 @@ import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Service;
 import com.wynntils.core.components.Services;
 import com.wynntils.services.mapdata.attributes.type.MapIcon;
+import com.wynntils.services.mapdata.attributes.type.ResolvedMapAreaAttributes;
 import com.wynntils.services.mapdata.attributes.type.ResolvedMapAttributes;
+import com.wynntils.services.mapdata.attributes.type.ResolvedMapLocationAttributes;
+import com.wynntils.services.mapdata.attributes.type.ResolvedMapPathAttributes;
 import com.wynntils.services.mapdata.attributes.type.ResolvedMapVisibility;
 import com.wynntils.services.mapdata.providers.MapDataProvider;
 import com.wynntils.services.mapdata.providers.builtin.BuiltInProvider;
@@ -21,9 +24,12 @@ import com.wynntils.services.mapdata.providers.builtin.PlayerProvider;
 import com.wynntils.services.mapdata.providers.builtin.ServiceListProvider;
 import com.wynntils.services.mapdata.providers.builtin.WaypointsProvider;
 import com.wynntils.services.mapdata.providers.json.JsonProvider;
+import com.wynntils.services.mapdata.type.MapArea;
 import com.wynntils.services.mapdata.type.MapCategory;
 import com.wynntils.services.mapdata.type.MapDataProvidedType;
 import com.wynntils.services.mapdata.type.MapFeature;
+import com.wynntils.services.mapdata.type.MapLocation;
+import com.wynntils.services.mapdata.type.MapPath;
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -74,8 +80,31 @@ public class MapDataService extends Service {
 
     // region Lookup features and resolve attributes
 
-    public ResolvedMapAttributes resolveMapAttributes(MapFeature feature) {
-        return resolvedAttributesCache.computeIfAbsent(feature, k -> MapAttributesResolver.resolve(feature));
+    public ResolvedMapAttributes resolvedMapFeatureAttributes(MapFeature feature) {
+        if (feature instanceof MapLocation location) {
+            return resolveMapAttributes(location);
+        } else if (feature instanceof MapArea area) {
+            return resolveMapAttributes(area);
+        } else if (feature instanceof MapPath path) {
+            return resolveMapAttributes(path);
+        } else {
+            throw new IllegalArgumentException("Unknown feature type: " + feature.getClass());
+        }
+    }
+
+    public ResolvedMapLocationAttributes resolveMapAttributes(MapLocation location) {
+        return (ResolvedMapLocationAttributes)
+                resolvedAttributesCache.computeIfAbsent(location, k -> MapAttributesResolver.resolve(location));
+    }
+
+    public ResolvedMapAreaAttributes resolveMapAttributes(MapArea area) {
+        return (ResolvedMapAreaAttributes)
+                resolvedAttributesCache.computeIfAbsent(area, k -> MapAttributesResolver.resolve(area));
+    }
+
+    public ResolvedMapPathAttributes resolveMapAttributes(MapPath path) {
+        return (ResolvedMapPathAttributes)
+                resolvedAttributesCache.computeIfAbsent(path, k -> MapAttributesResolver.resolve(path));
     }
 
     public Stream<MapCategory> getCategoryDefinitions(String categoryId) {
@@ -101,8 +130,8 @@ public class MapDataService extends Service {
         });
     }
 
-    public Optional<MapIcon> getIcon(MapFeature feature) {
-        return getIcon(resolveMapAttributes(feature).iconId());
+    public Optional<MapIcon> getIcon(MapLocation location) {
+        return getIcon(resolveMapAttributes(location).iconId());
     }
 
     public MapIcon getIconOrFallback(String iconId) {
@@ -111,8 +140,8 @@ public class MapDataService extends Service {
                         .get());
     }
 
-    public MapIcon getIconOrFallback(MapFeature feature) {
-        return getIcon(feature)
+    public MapIcon getIconOrFallback(MapLocation location) {
+        return getIcon(location)
                 .orElse(Services.MapData.getIcon(MapIconsProvider.FALLBACK_ICON_ID)
                         .get());
     }
@@ -209,7 +238,9 @@ public class MapDataService extends Service {
 
     // endregion
 
-    /** This method requires a MapVisibility with all values non-empty to work correctly. */
+    /**
+     * This method requires a MapVisibility with all values non-empty to work correctly.
+     */
     public float calculateVisibility(ResolvedMapVisibility mapVisibility, float zoomLevel) {
         float min = mapVisibility.min();
         float max = mapVisibility.max();

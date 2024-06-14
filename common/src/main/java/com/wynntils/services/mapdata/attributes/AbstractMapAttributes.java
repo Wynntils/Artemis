@@ -4,14 +4,14 @@
  */
 package com.wynntils.services.mapdata.attributes;
 
-import com.wynntils.services.mapdata.attributes.type.MapAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapDecoration;
+import com.wynntils.services.mapdata.attributes.type.MapLocationAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapVisibility;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.render.type.TextShadow;
 import java.util.Optional;
 
-public abstract class AbstractMapAttributes implements MapAttributes {
+public abstract class AbstractMapAttributes implements MapLocationAttributes {
     @Override
     public Optional<String> getLabel() {
         return Optional.empty();

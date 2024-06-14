@@ -11,6 +11,7 @@ import com.wynntils.core.text.StyledText;
 import com.wynntils.services.mapdata.attributes.type.MapDecoration;
 import com.wynntils.services.mapdata.attributes.type.MapIcon;
 import com.wynntils.services.mapdata.attributes.type.ResolvedMapAttributes;
+import com.wynntils.services.mapdata.attributes.type.ResolvedMapLocationAttributes;
 import com.wynntils.services.mapdata.type.MapFeature;
 import com.wynntils.services.mapdata.type.MapLocation;
 import com.wynntils.utils.MathUtils;
@@ -52,7 +53,7 @@ public class MapFeatureRenderer {
                     poseStack,
                     bufferSource,
                     location,
-                    attributes,
+                    (ResolvedMapLocationAttributes) attributes,
                     mapCenter,
                     screenCenter,
                     rotationVector,
@@ -72,7 +73,7 @@ public class MapFeatureRenderer {
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             MapLocation location,
-            ResolvedMapAttributes attributes,
+            ResolvedMapLocationAttributes attributes,
             Vector2f mapCenter,
             Vector2f screenCenter,
             Vector2f rotationVector,
@@ -196,6 +197,8 @@ public class MapFeatureRenderer {
             float zoomLevel,
             float featureRenderScale) {
         if (mapFeature instanceof MapLocation location) {
+            ResolvedMapLocationAttributes locationAttributes = (ResolvedMapLocationAttributes) attributes;
+
             Location featureLocation = location.getLocation();
             float dX = (featureLocation.x() - mapCenter.x()) * zoomRenderScale;
             float dZ = (featureLocation.z() - mapCenter.y()) * zoomRenderScale;
@@ -211,8 +214,8 @@ public class MapFeatureRenderer {
 
             int yOffset = 0;
 
-            float iconAlpha = Services.MapData.calculateVisibility(attributes.iconVisibility(), zoomLevel);
-            Optional<MapIcon> icon = Services.MapData.getIcon(attributes.iconId());
+            float iconAlpha = Services.MapData.calculateVisibility(locationAttributes.iconVisibility(), zoomLevel);
+            Optional<MapIcon> icon = Services.MapData.getIcon(locationAttributes.iconId());
             boolean drawIcon = iconAlpha > MINIMUM_RENDER_ALPHA;
             if (icon.isPresent() && drawIcon) {
                 int iconWidth = (int) (icon.get().getWidth() * featureRenderScale);
@@ -231,7 +234,7 @@ public class MapFeatureRenderer {
                 yOffset += (iconHeight + labelHeight) / 2 + SPACING;
             }
 
-            float labelAlpha = Services.MapData.calculateVisibility(attributes.labelVisibility(), zoomLevel);
+            float labelAlpha = Services.MapData.calculateVisibility(locationAttributes.labelVisibility(), zoomLevel);
             boolean drawLabel = labelAlpha > MINIMUM_RENDER_ALPHA;
             if (!attributes.label().isEmpty() && drawLabel) {
                 int labelWidth =

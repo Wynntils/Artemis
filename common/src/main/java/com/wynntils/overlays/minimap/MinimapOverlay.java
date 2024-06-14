@@ -254,7 +254,7 @@ public class MinimapOverlay extends Overlay {
         // Get all MapData features as Pois
         Stream<Pair<MapFeature, ResolvedMapAttributes>> mapFeatures = Services.MapData.getFeatures()
                 .filter(feature -> feature.isVisible(textureBoundingCircle))
-                .map(feature -> Pair.of(feature, Services.MapData.resolveMapAttributes(feature)))
+                .map(feature -> Pair.of(feature, Services.MapData.resolvedMapFeatureAttributes(feature)))
                 .sorted(Comparator.comparing(pair -> pair.b().priority()));
 
         // FIXME: Add back the pois that are still not converted to MapData

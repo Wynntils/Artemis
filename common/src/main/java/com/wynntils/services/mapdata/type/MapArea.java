@@ -4,15 +4,19 @@
  */
 package com.wynntils.services.mapdata.type;
 
+import com.wynntils.services.mapdata.attributes.type.MapAreaAttributes;
 import com.wynntils.utils.mc.type.Location;
 import com.wynntils.utils.type.BoundingShape;
 import java.util.List;
+import java.util.Optional;
 
 public interface MapArea extends MapFeature {
     // The area is described by a polygon. This list is the sequence of
     // vertices of that polygon, ordered in a counterclockwise orientation.
     // The last segment of the polygon connects from the last vertice to the first.
     List<Location> getPolygonArea();
+
+    Optional<MapAreaAttributes> getAttributes();
 
     @Override
     default boolean isVisible(BoundingShape boundingShape) {

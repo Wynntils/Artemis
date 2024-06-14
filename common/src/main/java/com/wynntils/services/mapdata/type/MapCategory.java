@@ -4,7 +4,9 @@
  */
 package com.wynntils.services.mapdata.type;
 
-import com.wynntils.services.mapdata.attributes.type.MapAttributes;
+import com.wynntils.services.mapdata.attributes.type.MapAreaAttributes;
+import com.wynntils.services.mapdata.attributes.type.MapLocationAttributes;
+import com.wynntils.services.mapdata.attributes.type.MapPathAttributes;
 import java.util.Optional;
 
 public interface MapCategory extends MapDataProvidedType {
@@ -12,5 +14,15 @@ public interface MapCategory extends MapDataProvidedType {
 
     Optional<String> getName();
 
-    Optional<MapAttributes> getAttributes();
+    default Optional<MapLocationAttributes> getLocationAttributes() {
+        return Optional.empty();
+    }
+
+    default Optional<MapAreaAttributes> getAreaAttributes() {
+        return Optional.empty();
+    }
+
+    default Optional<MapPathAttributes> getPathAttributes() {
+        return Optional.empty();
+    }
 }

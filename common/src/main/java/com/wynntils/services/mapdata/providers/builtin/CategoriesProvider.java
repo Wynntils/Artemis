@@ -8,8 +8,8 @@ import com.wynntils.models.containers.type.LootChestTier;
 import com.wynntils.services.hades.type.PlayerRelation;
 import com.wynntils.services.mapdata.attributes.AbstractMapAttributes;
 import com.wynntils.services.mapdata.attributes.FixedMapVisibility;
-import com.wynntils.services.mapdata.attributes.type.MapAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapIcon;
+import com.wynntils.services.mapdata.attributes.type.MapLocationAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapVisibility;
 import com.wynntils.services.mapdata.features.CombatLocation;
 import com.wynntils.services.mapdata.features.PlaceLocation;
@@ -74,7 +74,7 @@ public class CategoriesProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getLocationAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<String> getIconId() {
@@ -96,7 +96,7 @@ public class CategoriesProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getLocationAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<Integer> getPriority() {
@@ -143,7 +143,7 @@ public class CategoriesProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getLocationAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<String> getIconId() {
@@ -209,7 +209,7 @@ public class CategoriesProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getLocationAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<String> getLabel() {
@@ -271,7 +271,7 @@ public class CategoriesProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getLocationAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<String> getLabel() {
@@ -335,7 +335,7 @@ public class CategoriesProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getLocationAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<String> getIconId() {
@@ -382,7 +382,7 @@ public class CategoriesProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getLocationAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<Integer> getPriority() {
@@ -420,7 +420,7 @@ public class CategoriesProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getLocationAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<CustomColor> getLabelColor() {

@@ -63,8 +63,8 @@ public class JsonMapAttributesBuilder {
         return this;
     }
 
-    public JsonMapAttributes build() {
-        return new JsonMapAttributes(
+    public JsonLocationAttributes build() {
+        return new JsonLocationAttributes(
                 label, icon, priority, level, labelColor, labelShadow, labelVisibility, iconColor, iconVisibility);
     }
 }

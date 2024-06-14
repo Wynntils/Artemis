@@ -174,7 +174,7 @@ public abstract class AbstractMapScreen extends WynntilsScreen {
 
         Stream<Pair<MapFeature, ResolvedMapAttributes>> mapFeatures = getRenderedMapFeatures()
                 .filter(feature -> feature.isVisible(mapBoundingBox))
-                .map(feature -> Pair.of(feature, Services.MapData.resolveMapAttributes(feature)))
+                .map(feature -> Pair.of(feature, Services.MapData.resolvedMapFeatureAttributes(feature)))
                 .sorted(Comparator.comparing(pair -> pair.b().priority()));
 
         Vector2f mapCenter = new Vector2f(mapCenterX, mapCenterZ);

@@ -13,8 +13,8 @@ import com.wynntils.services.hades.HadesUser;
 import com.wynntils.services.hades.event.HadesEvent;
 import com.wynntils.services.hades.event.HadesUserEvent;
 import com.wynntils.services.mapdata.attributes.AbstractMapAttributes;
-import com.wynntils.services.mapdata.attributes.type.MapAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapDecoration;
+import com.wynntils.services.mapdata.attributes.type.MapLocationAttributes;
 import com.wynntils.services.mapdata.type.MapFeature;
 import com.wynntils.services.mapdata.type.MapLocation;
 import com.wynntils.utils.mc.SkinUtils;
@@ -98,7 +98,7 @@ public class PlayerProvider extends BuiltInProvider {
         }
 
         @Override
-        public Optional<MapAttributes> getAttributes() {
+        public Optional<MapLocationAttributes> getAttributes() {
             return Optional.of(new AbstractMapAttributes() {
                 @Override
                 public Optional<String> getLabel() {

@@ -36,7 +36,8 @@ public class LocateCommand extends Command {
     public static final SuggestionProvider<CommandSourceStack> PLACES_SUGGESTION_PROVIDER =
             (context, builder) -> SharedSuggestionProvider.suggest(
                     Services.MapData.getFeaturesForCategory("wynntils:place")
-                            .map(f -> Services.MapData.resolveMapAttributes(f).label()),
+                            .map(f -> Services.MapData.resolvedMapFeatureAttributes(f)
+                                    .label()),
                     builder);
 
     @Override

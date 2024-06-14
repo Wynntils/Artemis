@@ -174,11 +174,19 @@ public final class JsonProvider implements MapDataProvider {
 
             String id = json.get("id").getAsString();
             String name = JsonUtils.getNullableJsonString(json, "name");
-            JsonElement attributesJson = json.get("attributes");
-            JsonMapAttributes attributes =
-                    attributesJson == null ? null : GSON.fromJson(attributesJson, JsonMapAttributes.class);
+            JsonElement locationAttributes = json.get("locationAttributes");
+            JsonLocationAttributes locationAttributesObj =
+                    locationAttributes == null ? null : GSON.fromJson(locationAttributes, JsonLocationAttributes.class);
 
-            return new JsonCategory(id, name, attributes);
+            JsonElement areaAttributes = json.get("areaAttributes");
+            JsonAreaAttributes areaAttributesObj =
+                    areaAttributes == null ? null : GSON.fromJson(areaAttributes, JsonAreaAttributes.class);
+
+            JsonElement pathAttributes = json.get("pathAttributes");
+            JsonPathAttributes pathAttributesObj =
+                    pathAttributes == null ? null : GSON.fromJson(pathAttributes, JsonPathAttributes.class);
+
+            return new JsonCategory(id, name, locationAttributesObj, areaAttributesObj, pathAttributesObj);
         }
     }
 
@@ -193,8 +201,8 @@ public final class JsonProvider implements MapDataProvider {
             JsonElement locationJson = json.get("location");
             Location location = GSON.fromJson(locationJson, Location.class);
             JsonElement attributesJson = json.get("attributes");
-            JsonMapAttributes attributes =
-                    attributesJson == null ? null : GSON.fromJson(attributesJson, JsonMapAttributes.class);
+            JsonLocationAttributes attributes =
+                    attributesJson == null ? null : GSON.fromJson(attributesJson, JsonLocationAttributes.class);
 
             return new JsonMapLocation(id, category, attributes, location);
         }

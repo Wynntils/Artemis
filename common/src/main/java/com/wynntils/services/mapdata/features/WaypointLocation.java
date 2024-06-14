@@ -4,13 +4,13 @@
  */
 package com.wynntils.services.mapdata.features;
 
-import com.wynntils.services.mapdata.providers.json.JsonMapAttributes;
+import com.wynntils.services.mapdata.providers.json.JsonLocationAttributes;
 import com.wynntils.services.mapdata.providers.json.JsonMapLocation;
 import com.wynntils.utils.mc.type.Location;
 import java.util.Locale;
 
 public final class WaypointLocation extends JsonMapLocation {
-    public WaypointLocation(Location location, String label, String subcategory, JsonMapAttributes attributes) {
+    public WaypointLocation(Location location, String label, String subcategory, JsonLocationAttributes attributes) {
         super(
                 "waypoint" + "-" + label.toLowerCase(Locale.ROOT).replaceAll("\\s", "-") + "-" + location.hashCode(),
                 "wynntils:personal:waypoint" + (subcategory.isEmpty() ? "" : ":" + subcategory),

@@ -4,14 +4,14 @@
  */
 package com.wynntils.services.mapdata.providers.json;
 
-import com.wynntils.services.mapdata.attributes.type.MapAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapDecoration;
+import com.wynntils.services.mapdata.attributes.type.MapLocationAttributes;
 import com.wynntils.services.mapdata.attributes.type.MapVisibility;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.render.type.TextShadow;
 import java.util.Optional;
 
-public class JsonMapAttributes implements MapAttributes {
+public class JsonLocationAttributes implements MapLocationAttributes {
     private final String label;
     private final String icon;
     private final int priority;
@@ -22,7 +22,7 @@ public class JsonMapAttributes implements MapAttributes {
     private final CustomColor iconColor;
     private final JsonMapVisibility iconVisibility;
 
-    public JsonMapAttributes(
+    public JsonLocationAttributes(
             String label,
             String icon,
             int priority,

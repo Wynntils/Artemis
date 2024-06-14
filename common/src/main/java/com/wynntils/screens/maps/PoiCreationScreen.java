@@ -18,7 +18,7 @@ import com.wynntils.services.map.pois.Poi;
 import com.wynntils.services.mapdata.attributes.FixedMapVisibility;
 import com.wynntils.services.mapdata.features.WaypointLocation;
 import com.wynntils.services.mapdata.providers.builtin.MapIconsProvider;
-import com.wynntils.services.mapdata.providers.json.JsonMapAttributes;
+import com.wynntils.services.mapdata.providers.json.JsonLocationAttributes;
 import com.wynntils.services.mapdata.providers.json.JsonMapAttributesBuilder;
 import com.wynntils.services.mapdata.providers.json.JsonMapVisibility;
 import com.wynntils.services.mapdata.type.MapFeature;
@@ -607,7 +607,7 @@ public final class PoiCreationScreen extends AbstractMapScreen implements Textbo
         JsonMapVisibility iconVisibility =
                 new JsonMapVisibility(FixedMapVisibility.ICON_ALWAYS); // TODO: Add visibility input
 
-        JsonMapAttributes attributes = new JsonMapAttributesBuilder()
+        JsonLocationAttributes attributes = new JsonMapAttributesBuilder()
                 .setLabel(label)
                 .setIcon(iconId)
                 .setPriority(priority)

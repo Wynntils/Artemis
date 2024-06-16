@@ -13,11 +13,11 @@ import com.wynntils.core.persisted.config.Config;
 import com.wynntils.core.persisted.config.ConfigCategory;
 import com.wynntils.core.persisted.config.HiddenConfig;
 import com.wynntils.screens.maps.MainMapScreen;
-import com.wynntils.screens.maps.PoiCreationScreen;
+import com.wynntils.screens.maps.WaypointCreationScreen;
 import com.wynntils.services.map.pois.CustomPoi;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.McUtils;
-import com.wynntils.utils.mc.type.PoiLocation;
+import com.wynntils.utils.mc.type.Location;
 import com.wynntils.utils.render.type.HealthTexture;
 import com.wynntils.utils.render.type.PointerType;
 import java.util.ArrayList;
@@ -76,11 +76,11 @@ public class MainMapFeature extends Feature {
     }
 
     private void openWaypointSetup() {
-        PoiLocation location = new PoiLocation(
+        Location location = new Location(
                 McUtils.player().getBlockX(),
                 McUtils.player().getBlockY(),
                 McUtils.player().getBlockZ());
 
-        McUtils.mc().setScreen(PoiCreationScreen.create(null, location));
+        McUtils.mc().setScreen(WaypointCreationScreen.create(null, location));
     }
 }

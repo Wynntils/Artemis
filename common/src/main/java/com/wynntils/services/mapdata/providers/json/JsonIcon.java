@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 public class JsonIcon implements MapIcon {
     private final String iconId;
     private final NativeImage nativeImage;
+    private final byte[] texture;
     private final int width;
     private final int height;
     private boolean registered;
@@ -22,6 +23,8 @@ public class JsonIcon implements MapIcon {
     public JsonIcon(String iconId, byte[] texture) throws IOException {
         this.iconId = iconId;
         this.nativeImage = NativeImage.read(texture);
+        // It's hard to get the bytes back from the native image, so we store them here
+        this.texture = texture;
         this.width = nativeImage.getWidth();
         this.height = nativeImage.getHeight();
         this.resource = new ResourceLocation("wynntils", "icons/" + iconId.replace(":", "."));
@@ -51,5 +54,9 @@ public class JsonIcon implements MapIcon {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    public byte[] getTextureBytes() {
+        return texture;
     }
 }

@@ -68,6 +68,10 @@ public class MapDataService extends Service {
         return getProviders().flatMap(MapDataProvider::getFeatures);
     }
 
+    public Stream<MapIcon> getIcons() {
+        return getProviders().flatMap(MapDataProvider::getIcons);
+    }
+
     public Stream<MapFeature> getFeaturesForCategory(String categoryId) {
         return getFeatures().filter(f -> f.getCategoryId().startsWith(categoryId));
     }

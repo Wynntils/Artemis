@@ -16,6 +16,9 @@ import com.wynntils.core.components.Manager;
 import com.wynntils.core.crowdsource.CrowdSourcedData;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.services.itemrecord.type.SavedItem;
+import com.wynntils.services.mapdata.providers.json.JsonCategory;
+import com.wynntils.services.mapdata.providers.json.JsonIcon;
+import com.wynntils.services.mapdata.providers.json.JsonProvider;
 import com.wynntils.utils.EnumUtils;
 import com.wynntils.utils.FileUtils;
 import com.wynntils.utils.colors.CustomColor;
@@ -35,11 +38,14 @@ import java.util.List;
 import org.apache.commons.lang3.RandomStringUtils;
 
 public final class JsonManager extends Manager {
+    // FIXME: Add JsonFeatureSerializer once it's fixed
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(CustomColor.class, new CustomColor.CustomColorSerializer())
             .registerTypeAdapter(StyledText.class, new StyledText.StyledTextSerializer())
             .registerTypeAdapter(CrowdSourcedData.class, new CrowdSourcedData.CrowdSourceDataSerializer())
             .registerTypeAdapter(SavedItem.class, new SavedItem.SavedItemSerializer())
+            .registerTypeHierarchyAdapter(JsonCategory.class, new JsonProvider.JsonCategorySerializer())
+            .registerTypeHierarchyAdapter(JsonIcon.class, new JsonProvider.JsonIconSerializer())
             .registerTypeAdapterFactory(new EnumUtils.EnumTypeAdapterFactory<>())
             .enableComplexMapKeySerialization()
             .setPrettyPrinting()

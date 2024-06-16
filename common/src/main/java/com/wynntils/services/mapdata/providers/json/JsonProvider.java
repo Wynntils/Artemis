@@ -11,6 +11,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.stream.MalformedJsonException;
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Managers;
@@ -41,10 +43,10 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public final class JsonProvider implements MapDataProvider {
+    // FIXME: Add JsonFeatureSerializer once it's fixed
     private static final Gson GSON = new GsonBuilder()
-            .registerTypeHierarchyAdapter(MapCategory.class, new CategoryDeserializer())
-            .registerTypeHierarchyAdapter(MapFeature.class, new FeatureDeserializer())
-            .registerTypeHierarchyAdapter(MapIcon.class, new IconDeserializer())
+            .registerTypeHierarchyAdapter(JsonCategory.class, new JsonCategorySerializer())
+            .registerTypeHierarchyAdapter(JsonIcon.class, new JsonIconSerializer())
             .registerTypeHierarchyAdapter(CustomColor.class, new CustomColor.CustomColorSerializer())
             .registerTypeAdapterFactory(new EnumUtils.EnumTypeAdapterFactory<>())
             .enableComplexMapKeySerialization()
@@ -67,7 +69,8 @@ public final class JsonProvider implements MapDataProvider {
 
     /**
      * Load a bundled resource from the mod jar
-     * @param id The id of the resource
+     *
+     * @param id       The id of the resource
      * @param filename The filename of the resource
      * @return The loaded json provider
      */
@@ -91,7 +94,8 @@ public final class JsonProvider implements MapDataProvider {
 
     /**
      * Load a local resource from a file
-     * @param id The id of the resource
+     *
+     * @param id   The id of the resource
      * @param file The file to load
      * @return The loaded json provider
      */
@@ -114,8 +118,9 @@ public final class JsonProvider implements MapDataProvider {
 
     /**
      * Load an online resource from a url
-     * @param id The id of the resource
-     * @param url The url to load
+     *
+     * @param id               The id of the resource
+     * @param url              The url to load
      * @param registerCallback The callback to call with the loaded provider
      */
     public static void loadOnlineResource(String id, String url, BiConsumer<String, MapDataProvider> registerCallback) {
@@ -166,9 +171,10 @@ public final class JsonProvider implements MapDataProvider {
         // FIXME: To be implemented if needed (when the first json provider is added)
     }
 
-    private static final class CategoryDeserializer implements JsonDeserializer<MapCategory> {
+    public static final class JsonCategorySerializer
+            implements JsonDeserializer<JsonCategory>, JsonSerializer<JsonCategory> {
         @Override
-        public MapCategory deserialize(JsonElement jsonElement, Type jsonType, JsonDeserializationContext context)
+        public JsonCategory deserialize(JsonElement jsonElement, Type jsonType, JsonDeserializationContext context)
                 throws JsonParseException {
             JsonObject json = jsonElement.getAsJsonObject();
 
@@ -180,9 +186,20 @@ public final class JsonProvider implements MapDataProvider {
 
             return new JsonCategory(id, name, attributes);
         }
+
+        @Override
+        public JsonElement serialize(JsonCategory mapCategory, Type type, JsonSerializationContext context) {
+            JsonObject json = new JsonObject();
+            json.addProperty("id", mapCategory.getCategoryId());
+            json.addProperty("name", mapCategory.getName().orElse(""));
+            json.add("attributes", GSON.toJsonTree(mapCategory.getAttributes()));
+            return json;
+        }
     }
 
-    private static final class FeatureDeserializer implements JsonDeserializer<MapFeature> {
+    // FIXME: The serializer should be able to handle the different types of map features, not just locations
+    //        (Also needs a serializer implementation)
+    public static final class JsonFeatureDeserializer implements JsonDeserializer<MapFeature> {
         @Override
         public MapFeature deserialize(JsonElement jsonElement, Type jsonType, JsonDeserializationContext context)
                 throws JsonParseException {
@@ -200,9 +217,9 @@ public final class JsonProvider implements MapDataProvider {
         }
     }
 
-    private static final class IconDeserializer implements JsonDeserializer<MapIcon> {
+    public static final class JsonIconSerializer implements JsonDeserializer<JsonIcon>, JsonSerializer<JsonIcon> {
         @Override
-        public MapIcon deserialize(JsonElement jsonElement, Type jsonType, JsonDeserializationContext context)
+        public JsonIcon deserialize(JsonElement jsonElement, Type jsonType, JsonDeserializationContext context)
                 throws JsonParseException {
             JsonObject json = jsonElement.getAsJsonObject();
 
@@ -216,6 +233,14 @@ public final class JsonProvider implements MapDataProvider {
                 WynntilsMod.warn("Bad icon texture for " + id, e);
                 return null;
             }
+        }
+
+        @Override
+        public JsonElement serialize(JsonIcon mapIcon, Type type, JsonSerializationContext context) {
+            JsonObject json = new JsonObject();
+            json.addProperty("id", mapIcon.getIconId());
+            json.addProperty("texture", Base64.getEncoder().encodeToString(mapIcon.getTextureBytes()));
+            return json;
         }
     }
 }

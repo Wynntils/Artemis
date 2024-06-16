@@ -9,7 +9,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.wynntils.core.components.Managers;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.components.Services;
-import com.wynntils.core.persisted.config.HiddenConfig;
 import com.wynntils.features.map.MainMapFeature;
 import com.wynntils.models.marker.type.DynamicLocationSupplier;
 import com.wynntils.models.marker.type.MarkerInfo;
@@ -20,12 +19,12 @@ import com.wynntils.services.map.pois.IconPoi;
 import com.wynntils.services.map.pois.Poi;
 import com.wynntils.services.map.pois.TerritoryPoi;
 import com.wynntils.services.map.pois.WaypointPoi;
+import com.wynntils.services.mapdata.features.WaypointLocation;
 import com.wynntils.services.mapdata.type.MapFeature;
 import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.mc.KeyboardUtils;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.mc.type.Location;
-import com.wynntils.utils.mc.type.PoiLocation;
 import com.wynntils.utils.render.MapRenderer;
 import com.wynntils.utils.render.RenderUtils;
 import com.wynntils.utils.render.Texture;
@@ -203,7 +202,7 @@ public final class MainMapScreen extends AbstractMapScreen {
                 14,
                 14,
                 Texture.ADD_ICON,
-                (b) -> McUtils.mc().setScreen(PoiCreationScreen.create(this)),
+                (b) -> McUtils.mc().setScreen(WaypointCreationScreen.create(this)),
                 List.of(
                         Component.literal("[>] ")
                                 .withStyle(ChatFormatting.DARK_GREEN)
@@ -396,20 +395,17 @@ public final class MainMapScreen extends AbstractMapScreen {
             }
         } else if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
             if (KeyboardUtils.isShiftDown()) {
-                if (hovered instanceof CustomPoi customPoi && !Services.Poi.isPoiProvided(customPoi)) {
-                    McUtils.mc().setScreen(PoiCreationScreen.create(this, customPoi));
+                if (hoveredFeature instanceof WaypointLocation location) {
+                    McUtils.mc().setScreen(WaypointCreationScreen.create(this, location));
                 } else {
                     int gameX = (int) ((mouseX - centerX) / zoomRenderScale + mapCenterX);
                     int gameZ = (int) ((mouseY - centerZ) / zoomRenderScale + mapCenterZ);
 
-                    McUtils.mc().setScreen(PoiCreationScreen.create(this, new PoiLocation(gameX, null, gameZ)));
+                    McUtils.mc().setScreen(WaypointCreationScreen.create(this, new Location(gameX, 0, gameZ)));
                 }
             } else if (KeyboardUtils.isAltDown()) {
-                if (hovered instanceof CustomPoi customPoi && !Services.Poi.isPoiProvided(customPoi)) {
-                    HiddenConfig<List<CustomPoi>> customPois =
-                            Managers.Feature.getFeatureInstance(MainMapFeature.class).customPois;
-                    customPois.get().remove(customPoi);
-                    customPois.touched();
+                if (hoveredFeature instanceof WaypointLocation location) {
+                    Services.Waypoints.removeWaypoint(location);
                 }
             } else {
                 setCompassToMouseCoords(mouseX, mouseY, true);

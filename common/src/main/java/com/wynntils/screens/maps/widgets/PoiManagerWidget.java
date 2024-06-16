@@ -9,8 +9,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.text.StyledText;
-import com.wynntils.screens.maps.PoiCreationScreen;
 import com.wynntils.screens.maps.PoiManagementScreen;
+import com.wynntils.screens.maps.WaypointCreationScreen;
 import com.wynntils.services.map.pois.CustomPoi;
 import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.colors.CustomColor;
@@ -66,7 +66,8 @@ public class PoiManagerWidget extends AbstractWidget {
 
         editButton = new Button.Builder(
                         Component.translatable("screens.wynntils.poiManagementGui.edit"),
-                        (button) -> McUtils.mc().setScreen(PoiCreationScreen.create(managementScreen, poi)))
+                        // FIXME: null should be a WaypointLocation object (fix when porting PoiManagementScreen
+                        (button) -> McUtils.mc().setScreen(WaypointCreationScreen.create(managementScreen, null)))
                 .pos(x + width - 20 - (manageButtonsWidth * 2), y)
                 .size(manageButtonsWidth, 20)
                 .build();

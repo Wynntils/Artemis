@@ -18,17 +18,24 @@ import com.wynntils.services.mapdata.attributes.FixedMapVisibility;
 import com.wynntils.services.mapdata.attributes.type.MapVisibility;
 import com.wynntils.services.mapdata.features.WaypointLocation;
 import com.wynntils.services.mapdata.providers.builtin.MapIconsProvider;
+import com.wynntils.services.mapdata.providers.json.JsonIcon;
 import com.wynntils.services.mapdata.providers.json.JsonMapAttributes;
 import com.wynntils.services.mapdata.providers.json.JsonMapAttributesBuilder;
+import com.wynntils.services.mapdata.providers.json.JsonMapLocation;
 import com.wynntils.services.mapdata.providers.json.JsonMapVisibility;
 import com.wynntils.utils.mc.type.Location;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class WaypointsService extends Service {
     @Persisted
     private final Storage<List<WaypointLocation>> waypoints = new Storage<>(new ArrayList<>());
+
+    @Persisted
+    private final Storage<List<JsonIcon>> customIcons = new Storage<>(new ArrayList<>());
 
     public WaypointsService() {
         super(List.of());
@@ -40,10 +47,34 @@ public class WaypointsService extends Service {
             startPoiMigration();
             Services.MapData.WAYPOINTS_PROVIDER.updateWaypoints(waypoints.get());
         }
+
+        if (storage == customIcons) {
+            Services.MapData.WAYPOINTS_PROVIDER.updateIcons(customIcons.get());
+        }
     }
 
     public List<WaypointLocation> getWaypoints() {
         return Collections.unmodifiableList(waypoints.get());
+    }
+
+    public List<JsonIcon> getCustomIcons() {
+        return Collections.unmodifiableList(customIcons.get());
+    }
+
+    public void addCustomIcon(JsonIcon iconToAdd) {
+        customIcons.get().add(iconToAdd);
+        customIcons.touched();
+        Services.MapData.WAYPOINTS_PROVIDER.updateIcons(customIcons.get());
+    }
+
+    public void removeCustomIcon(JsonIcon iconToRemove) {
+        customIcons.get().remove(iconToRemove);
+        customIcons.touched();
+        Services.MapData.WAYPOINTS_PROVIDER.updateIcons(customIcons.get());
+    }
+
+    public Set<String> getCategories() {
+        return getWaypoints().stream().map(JsonMapLocation::getCategoryId).collect(Collectors.toSet());
     }
 
     public void addWaypoint(WaypointLocation waypoint) {

@@ -4,11 +4,12 @@
  */
 package com.wynntils.utils.render;
 
+import com.wynntils.utils.render.type.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 
 // If a texture is currently in a specific category but you want to use
 // it elsewhere, please move it to a more appropriate location
-public enum Texture {
+public enum Texture implements AbstractTexture {
     // region Character Selection
     CHANGE_WORLD_BUTTON("character_selection/change_world_button.png", 26, 52),
     CHARACTER_BUTTON("character_selection/character_button.png", 104, 64),
@@ -136,8 +137,8 @@ public enum Texture {
 
     // Map
     ALCHEMIST_STATION("icons/map/alchemist_station.png", 16, 19),
-    ARMOR_MERCHANT("icons/map/armor_merchant.png", 17, 17),
     ARMORING_STATION("icons/map/armoring_station.png", 17, 17),
+    ARMOR_MERCHANT("icons/map/armor_merchant.png", 17, 17),
     BLACKSMITH("icons/map/blacksmith.png", 18, 18),
     BOOTH_SHOP("icons/map/booth_shop.png", 19, 17),
     BOSS_ALTAR("icons/map/boss_altar.png", 18, 13),
@@ -162,6 +163,7 @@ public enum Texture {
     ITEM_IDENTIFIER("icons/map/item_identifier.png", 18, 17),
     JEWELING_STATION("icons/map/jeweling_station.png", 17, 16),
     LIQUID_MERCHANT("icons/map/liquid_merchant.png", 15, 17),
+    LOOTRUN_CAMP("icons/map/lootrun_camp.png", 18, 16),
     MINING("icons/map/mining.png", 18, 14),
     PARTY_FINDER("icons/map/party_finder.png", 18, 18),
     POINTER("icons/map/pointer.png", 10, 8),
@@ -174,13 +176,14 @@ public enum Texture {
     SHRINE("icons/map/shrine.png", 18, 18),
     SIGN("icons/map/sign.png", 17, 18),
     STAR("icons/map/star.png", 18, 18),
+    PLAYER_HEAD("icons/map/player_head.png", 24, 24),
     TAILORING_STATION("icons/map/tailoring_station.png", 18, 15),
     TOOL_MERCHANT("icons/map/tool_merchant.png", 17, 15),
     TRADE_MARKET("icons/map/trade_market.png", 18, 18),
     WALL("icons/map/wall.png", 12, 16),
     WAYPOINT("icons/map/waypoint.png", 14, 18),
-    WEAPON_MERCHANT("icons/map/weapon_merchant.png", 18, 15),
     WEAPONSMITHING_STATION("icons/map/weaponsmithing_station.png", 18, 15),
+    WEAPON_MERCHANT("icons/map/weapon_merchant.png", 18, 15),
     WOODCUTTING("icons/map/woodcutting.png", 16, 17),
     WOODWORKING_STATION("icons/map/woodworking_station.png", 17, 15),
     // endregion

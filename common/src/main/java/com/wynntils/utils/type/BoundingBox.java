@@ -1,14 +1,11 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.utils.type;
 
-public class BoundingBox implements BoundingShape {
-    private final float x1;
-    private final float z1;
-    private final float x2;
-    private final float z2;
+public record BoundingBox(float x1, float z1, float x2, float z2) implements BoundingShape {
+    public static final BoundingBox EMPTY = new BoundingBox(0, 0, 0, 0);
 
     public static BoundingBox centered(float centerX, float centerZ, float widthX, float widthZ) {
         return new BoundingBox(
@@ -21,23 +18,7 @@ public class BoundingBox implements BoundingShape {
         this.x2 = x2;
         this.z2 = z2;
 
-        assert x1 < x2 && z1 < z2;
-    }
-
-    public float x1() {
-        return x1;
-    }
-
-    public float z1() {
-        return z1;
-    }
-
-    public float x2() {
-        return x2;
-    }
-
-    public float z2() {
-        return z2;
+        assert x1 <= x2 && z1 <= z2;
     }
 
     @Override

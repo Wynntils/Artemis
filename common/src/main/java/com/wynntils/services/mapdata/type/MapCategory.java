@@ -7,7 +7,7 @@ package com.wynntils.services.mapdata.type;
 import com.wynntils.services.mapdata.attributes.type.MapAttributes;
 import java.util.Optional;
 
-public interface MapCategory {
+public interface MapCategory extends MapDataProvidedType {
     String getCategoryId();
 
     Optional<String> getName();

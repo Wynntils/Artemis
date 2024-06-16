@@ -568,7 +568,7 @@ public final class PoiManagementScreen extends WynntilsGridLayoutScreen {
 
         customPois.get().remove(poiToDelete);
         customPois.touched();
-        Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
+        // Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
 
         deletedPois.add(poiToDelete);
         deletedIndexes.add(deletedPoiIndex);
@@ -614,7 +614,7 @@ public final class PoiManagementScreen extends WynntilsGridLayoutScreen {
                 customPois.get().indexOf(poiToSwap));
 
         customPois.touched();
-        Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
+        // Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
 
         populatePois();
     }
@@ -949,7 +949,7 @@ public final class PoiManagementScreen extends WynntilsGridLayoutScreen {
         existingPois.addAll(poisToAdd);
         customPoiConfig.setValue(existingPois);
         customPoiConfig.touched();
-        Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
+        // Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
 
         // Enable search and filter after importing new pois
         if (!customPoiConfig.get().isEmpty()) {
@@ -993,7 +993,7 @@ public final class PoiManagementScreen extends WynntilsGridLayoutScreen {
             allPois.get().add(deletedIndexes.get(deletedIndexes.size() - 1), deletedPois.get(deletedPois.size() - 1));
 
             allPois.touched();
-            Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
+            // Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
 
             // Scroll up 1 poi if not already at the top of the list
             scrollOffset = Math.max(scrollOffset - 1, 0);

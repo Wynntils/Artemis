@@ -27,7 +27,6 @@ import com.wynntils.models.worlds.type.WorldState;
 import com.wynntils.services.athena.event.AthenaLoginEvent;
 import com.wynntils.services.hades.event.HadesEvent;
 import com.wynntils.services.hades.type.PlayerStatus;
-import com.wynntils.services.map.pois.PlayerMainMapPoi;
 import com.wynntils.utils.mc.McUtils;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -58,13 +57,6 @@ public final class HadesService extends Service {
 
     public HadesService() {
         super(List.of());
-    }
-
-    public Stream<PlayerMainMapPoi> getPlayerPois(boolean renderRemotePartyPlayers, boolean renderRemoteFriendPlayers) {
-        return getHadesUsers()
-                .filter(hadesUser -> (hadesUser.isPartyMember() && renderRemotePartyPlayers)
-                        || (hadesUser.isMutualFriend() && renderRemoteFriendPlayers))
-                .map(PlayerMainMapPoi::new);
     }
 
     public Stream<HadesUser> getHadesUsers() {

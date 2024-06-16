@@ -14,6 +14,7 @@ import com.wynntils.screens.base.widgets.BasicTexturedButton;
 import com.wynntils.screens.maps.widgets.SeaskipperDestinationButton;
 import com.wynntils.screens.maps.widgets.SeaskipperTravelButton;
 import com.wynntils.services.map.pois.SeaskipperDestinationPoi;
+import com.wynntils.services.mapdata.type.MapFeature;
 import com.wynntils.utils.MathUtils;
 import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.colors.CustomColor;
@@ -31,6 +32,7 @@ import com.wynntils.utils.type.BoundingShape;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -93,7 +95,7 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
         mapWidth -= (departureListWidth) - 5;
         departureBoardY = (this.height
                         - (Texture.DESTINATION_LIST.height() * currentTextureScale
-                                + (Texture.TRAVEL_BUTTON.height() / 2) * currentTextureScale))
+                                + (Texture.TRAVEL_BUTTON.height() / 2f) * currentTextureScale))
                 / 2;
         scrollButtonRenderX = 5 + departureListWidth * 0.933f;
         destinationButtonsRenderX = 5 + departureListWidth * 0.027f;
@@ -101,10 +103,14 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
 
         // region Map buttons
         this.addRenderableWidget(new BasicTexturedButton(
-                (int) (width / 2 - Texture.MAP_BUTTONS_BACKGROUND.width() / 2 + 7 + 20 * 3 + (departureListWidth) / 2),
+                (int) (width / 2f
+                        - Texture.MAP_BUTTONS_BACKGROUND.width() / 2f
+                        + 7
+                        + 20 * 3
+                        + (departureListWidth) / 2),
                 (int) (this.renderHeight
                         - this.renderedBorderYOffset
-                        - Texture.MAP_BUTTONS_BACKGROUND.height() / 2
+                        - Texture.MAP_BUTTONS_BACKGROUND.height() / 2f
                         - 8),
                 12,
                 16,
@@ -119,10 +125,14 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
                                 .withStyle(ChatFormatting.GRAY))));
 
         this.addRenderableWidget(new BasicTexturedButton(
-                (int) (width / 2 - Texture.MAP_BUTTONS_BACKGROUND.width() / 2 + 6 + 20 * 2 + (departureListWidth) / 2),
+                (int) (width / 2f
+                        - Texture.MAP_BUTTONS_BACKGROUND.width() / 2f
+                        + 6
+                        + 20 * 2
+                        + (departureListWidth) / 2),
                 (int) (this.renderHeight
                         - this.renderedBorderYOffset
-                        - Texture.MAP_BUTTONS_BACKGROUND.height() / 2
+                        - Texture.MAP_BUTTONS_BACKGROUND.height() / 2f
                         - 7),
                 14,
                 14,
@@ -138,10 +148,10 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
                                 .withStyle(ChatFormatting.GRAY))));
 
         this.addRenderableWidget(new BasicTexturedButton(
-                (int) (width / 2 - Texture.MAP_BUTTONS_BACKGROUND.width() / 2 + 5 + 20 + (departureListWidth) / 2),
+                (int) (width / 2f - Texture.MAP_BUTTONS_BACKGROUND.width() / 2f + 5 + 20 + (departureListWidth) / 2),
                 (int) (this.renderHeight
                         - this.renderedBorderYOffset
-                        - Texture.MAP_BUTTONS_BACKGROUND.height() / 2
+                        - Texture.MAP_BUTTONS_BACKGROUND.height() / 2f
                         - 8),
                 16,
                 16,
@@ -156,10 +166,10 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
                                 .withStyle(ChatFormatting.GRAY))));
 
         this.addRenderableWidget(new BasicTexturedButton(
-                (int) (width / 2 - Texture.MAP_BUTTONS_BACKGROUND.width() / 2 + 6 + (departureListWidth) / 2),
+                (int) (width / 2f - Texture.MAP_BUTTONS_BACKGROUND.width() / 2f + 6 + (departureListWidth) / 2),
                 (int) (this.renderHeight
                         - this.renderedBorderYOffset
-                        - Texture.MAP_BUTTONS_BACKGROUND.height() / 2
+                        - Texture.MAP_BUTTONS_BACKGROUND.height() / 2f
                         - 7),
                 15,
                 14,
@@ -177,7 +187,7 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
                 5,
                 (int) (departureBoardY + Texture.DESTINATION_LIST.height() * currentTextureScale),
                 (int) (Texture.TRAVEL_BUTTON.width() * currentTextureScale),
-                (int) ((Texture.TRAVEL_BUTTON.height() / 2) * currentTextureScale),
+                (int) ((Texture.TRAVEL_BUTTON.height() / 2f) * currentTextureScale),
                 this));
 
         // Only center the map and reload possible pois for first init
@@ -204,6 +214,7 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
                 (int) (renderX + renderedBorderXOffset), (int) (renderY + renderedBorderYOffset), (int) mapWidth, (int)
                         mapHeight);
 
+        // FIXME: Port after seaskipper map feature is implemented
         renderPois(poseStack, mouseX, mouseY);
 
         renderCursor(
@@ -381,6 +392,11 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
 
     public SeaskipperDestinationPoi getSelectedDestination() {
         return selectedPoi;
+    }
+
+    @Override
+    protected Stream<MapFeature> getRenderedMapFeatures() {
+        return Stream.empty();
     }
 
     private void renderPois(PoseStack poseStack, int mouseX, int mouseY) {

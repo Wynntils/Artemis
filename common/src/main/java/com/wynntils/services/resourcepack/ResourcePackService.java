@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.resourcepack;
@@ -47,7 +47,7 @@ public final class ResourcePackService extends Service {
     }
 
     @Override
-    public void onStorageLoad() {
+    public void onStorageLoad(Storage<?> storage) {
         preloadResourcePack();
     }
 

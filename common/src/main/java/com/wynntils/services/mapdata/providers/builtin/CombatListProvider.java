@@ -4,20 +4,27 @@
  */
 package com.wynntils.services.mapdata.providers.builtin;
 
-import com.wynntils.services.map.type.CombatKind;
-import com.wynntils.services.mapdata.attributes.AbstractMapAttributes;
-import com.wynntils.services.mapdata.attributes.type.MapAttributes;
+import com.google.gson.reflect.TypeToken;
+import com.wynntils.core.components.Managers;
+import com.wynntils.core.net.Download;
+import com.wynntils.core.net.UrlId;
+import com.wynntils.services.mapdata.features.CombatLocation;
 import com.wynntils.services.mapdata.type.MapFeature;
-import com.wynntils.services.mapdata.type.MapLocation;
-import com.wynntils.utils.mc.type.Location;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class CombatListProvider extends BuiltInProvider {
     private static final List<MapFeature> PROVIDED_FEATURES = new ArrayList<>();
-    private static int counter;
+
+    public CombatListProvider() {
+        reloadData();
+    }
+
+    @Override
+    public void reloadData() {
+        loadCombatLocations();
+    }
 
     @Override
     public String getProviderId() {
@@ -29,51 +36,14 @@ public class CombatListProvider extends BuiltInProvider {
         return PROVIDED_FEATURES.stream();
     }
 
-    public static void registerFeature(Location location, CombatKind kind, String name) {
-        PROVIDED_FEATURES.add(new CombatLocation(location, kind, name));
-    }
-
-    private static final class CombatLocation implements MapLocation {
-        private final Location location;
-        private final CombatKind kind;
-        private final String name;
-        private final int number;
-
-        private CombatLocation(Location location, CombatKind kind, String name) {
-            this.location = location;
-            this.kind = kind;
-            this.name = name;
-            this.number = CombatListProvider.counter++;
-        }
-
-        @Override
-        public String getFeatureId() {
-            return kind.getMapDataId() + "-" + number;
-        }
-
-        @Override
-        public String getCategoryId() {
-            return "wynntils:content:" + kind.getMapDataId();
-        }
-
-        @Override
-        public Optional<MapAttributes> getAttributes() {
-            return Optional.of(new AbstractMapAttributes() {
-                @Override
-                public Optional<String> getLabel() {
-                    return Optional.of(name);
-                }
-            });
-        }
-
-        @Override
-        public List<String> getTags() {
-            return List.of();
-        }
-
-        @Override
-        public Location getLocation() {
-            return location;
-        }
+    private void loadCombatLocations() {
+        Download dl = Managers.Net.download(UrlId.DATA_STATIC_COMBAT_MAPFEATURES);
+        dl.handleReader(reader -> {
+            TypeToken<List<CombatLocation>> type = new TypeToken<>() {};
+            List<CombatLocation> combatLocations = Managers.Json.GSON.fromJson(reader, type.getType());
+            PROVIDED_FEATURES.forEach(this::notifyCallbacks);
+            PROVIDED_FEATURES.clear();
+            PROVIDED_FEATURES.addAll(combatLocations);
+        });
     }
 }

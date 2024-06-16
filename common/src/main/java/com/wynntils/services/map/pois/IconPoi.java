@@ -12,8 +12,8 @@ import com.wynntils.utils.MathUtils;
 import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.render.FontRenderer;
-import com.wynntils.utils.render.Texture;
 import com.wynntils.utils.render.buffered.BufferedRenderUtils;
+import com.wynntils.utils.render.type.AbstractTexture;
 import com.wynntils.utils.render.type.HorizontalAlignment;
 import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.render.type.VerticalAlignment;
@@ -30,7 +30,7 @@ public abstract class IconPoi implements Poi {
         return (int) (getIcon().height() * scale);
     }
 
-    public abstract Texture getIcon();
+    public abstract AbstractTexture getIcon();
 
     // Returns the minimum zoom where the poi should be rendered with full alpha
     // Return -1 to always render without fading
@@ -76,7 +76,7 @@ public abstract class IconPoi implements Poi {
             modifier *= 1.05;
         }
 
-        Texture icon = getIcon();
+        AbstractTexture icon = getIcon();
 
         float width = icon.width() * modifier;
         float height = icon.height() * modifier;

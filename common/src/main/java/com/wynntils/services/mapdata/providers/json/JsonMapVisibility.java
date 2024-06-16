@@ -18,6 +18,13 @@ public final class JsonMapVisibility implements MapVisibility {
         this.fade = fade;
     }
 
+    public JsonMapVisibility(MapVisibility visibility) {
+        this(
+                visibility.getMin().orElse(null),
+                visibility.getMax().orElse(null),
+                visibility.getFade().orElse(null));
+    }
+
     @Override
     public Optional<Float> getMin() {
         return Optional.ofNullable(min);

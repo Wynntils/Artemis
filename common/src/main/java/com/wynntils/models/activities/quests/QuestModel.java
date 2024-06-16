@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.Position;
 import org.apache.commons.lang3.StringUtils;
 
 public final class QuestModel extends Model {
@@ -213,14 +213,14 @@ public final class QuestModel extends Model {
     }
 
     private static class LocationComparator implements Comparator<QuestInfo> {
-        private final Vec3 playerLocation = McUtils.player().position();
+        private final Position playerLocation = McUtils.player().position();
 
         private double getDistance(Optional<Location> loc) {
             // Quests with no location always counts as closest
             if (loc.isEmpty()) return 0f;
 
             Location location = loc.get();
-            return playerLocation.distanceToSqr(location.toVec3());
+            return location.distanceToSqr(playerLocation);
         }
 
         @Override

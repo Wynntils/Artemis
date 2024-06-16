@@ -19,7 +19,9 @@ import com.wynntils.handlers.container.type.ContainerContent;
 import com.wynntils.mc.event.ContainerClickEvent;
 import com.wynntils.mc.event.MenuEvent.MenuClosedEvent;
 import com.wynntils.mc.event.PlayerTeleportEvent;
+import com.wynntils.mc.event.TickEvent;
 import com.wynntils.models.character.event.CharacterDeathEvent;
+import com.wynntils.models.character.event.CharacterMovedEvent;
 import com.wynntils.models.character.event.CharacterUpdateEvent;
 import com.wynntils.models.character.type.ClassType;
 import com.wynntils.models.containers.ContainerModel;
@@ -68,6 +70,9 @@ public final class CharacterModel extends Model {
     // we need a .* in front because the message may have a custom timestamp prefix (or some other mod could do
     // something weird)
     private static final Pattern WYNN_DEATH_MESSAGE = Pattern.compile(".*§4§lYou have died\\.\\.\\.");
+    public static final int MOVE_CHECK_FREQUENCY = 10;
+    private int moveCheckTicks;
+    private Position currentPosition;
     private Position lastPositionBeforeTeleport;
     private Location lastDeathLocation;
 
@@ -204,6 +209,18 @@ public final class CharacterModel extends Model {
             hasCharacter = true;
             WynntilsMod.postEvent(new CharacterUpdateEvent());
             WynntilsMod.info("Selected character " + getCharacterString());
+        }
+    }
+
+    @SubscribeEvent
+    public void checkPlayerMove(TickEvent e) {
+        if (McUtils.player() == null) return;
+        if (moveCheckTicks++ % MOVE_CHECK_FREQUENCY != 0) return;
+
+        Position newPosition = McUtils.player().position();
+        if (newPosition != currentPosition) {
+            currentPosition = newPosition;
+            WynntilsMod.postEvent(new CharacterMovedEvent(currentPosition));
         }
     }
 

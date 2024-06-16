@@ -18,6 +18,7 @@ import com.wynntils.core.net.Download;
 import com.wynntils.services.mapdata.attributes.type.MapIcon;
 import com.wynntils.services.mapdata.providers.MapDataProvider;
 import com.wynntils.services.mapdata.type.MapCategory;
+import com.wynntils.services.mapdata.type.MapDataProvidedType;
 import com.wynntils.services.mapdata.type.MapFeature;
 import com.wynntils.utils.EnumUtils;
 import com.wynntils.utils.JsonUtils;
@@ -36,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public final class JsonProvider implements MapDataProvider {
@@ -151,6 +153,17 @@ public final class JsonProvider implements MapDataProvider {
     @Override
     public Stream<MapIcon> getIcons() {
         return icons.stream();
+    }
+
+    @Override
+    public void onChange(Consumer<MapDataProvidedType> callback) {
+        // The json does not change, as long as we do not implement a
+        // reload of the file, so we do not need to register callbacks.
+    }
+
+    @Override
+    public void reloadData() {
+        // FIXME: To be implemented if needed (when the first json provider is added)
     }
 
     private static final class CategoryDeserializer implements JsonDeserializer<MapCategory> {

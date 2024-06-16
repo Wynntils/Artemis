@@ -4,18 +4,18 @@
  */
 package com.wynntils.services.mapdata.providers.builtin;
 
-import com.wynntils.services.mapdata.features.WaypointLocation;
+import com.wynntils.services.mapdata.features.FoundChestLocation;
 import com.wynntils.services.mapdata.type.MapFeature;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class WaypointsProvider extends BuiltInProvider {
+public class LootChestsProvider extends BuiltInProvider {
     private static final List<MapFeature> PROVIDED_FEATURES = new ArrayList<>();
 
     @Override
     public String getProviderId() {
-        return "waypoints";
+        return "loot-chests";
     }
 
     @Override
@@ -26,13 +26,13 @@ public class WaypointsProvider extends BuiltInProvider {
     @Override
     public void reloadData() {}
 
-    public void updateWaypoints(List<WaypointLocation> waypoints) {
+    public void updateFoundChests(List<FoundChestLocation> foundChests) {
         PROVIDED_FEATURES.forEach(this::notifyCallbacks);
         PROVIDED_FEATURES.clear();
-        waypoints.forEach(WaypointsProvider::registerFeature);
+        foundChests.forEach(LootChestsProvider::registerFeature);
     }
 
-    public static void registerFeature(WaypointLocation waypoint) {
-        PROVIDED_FEATURES.add(waypoint);
+    public static void registerFeature(FoundChestLocation foundChest) {
+        PROVIDED_FEATURES.add(foundChest);
     }
 }

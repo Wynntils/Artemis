@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.marker;
@@ -14,6 +14,7 @@ import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.type.Location;
 import com.wynntils.utils.mc.type.PoiLocation;
 import com.wynntils.utils.render.Texture;
+import com.wynntils.utils.render.type.AbstractTexture;
 import com.wynntils.utils.type.Pair;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -22,7 +23,8 @@ import java.util.stream.Stream;
 public class UserWaypointMarkerProvider implements MarkerProvider<WaypointPoi> {
     private final Set<Pair<MarkerInfo, WaypointPoi>> markerInfoSet = new CopyOnWriteArraySet<>();
 
-    public void addLocation(Location location, Texture texture, CustomColor beaconColor, CustomColor textColor) {
+    public void addLocation(
+            Location location, AbstractTexture texture, CustomColor beaconColor, CustomColor textColor) {
         addLocation(new MarkerInfo(
                 "Waypoint", new StaticLocationSupplier(location), texture, beaconColor, textColor, CommonColors.WHITE));
     }
@@ -37,7 +39,7 @@ public class UserWaypointMarkerProvider implements MarkerProvider<WaypointPoi> {
                 CommonColors.WHITE));
     }
 
-    public void addLocation(Location location, Texture texture) {
+    public void addLocation(Location location, AbstractTexture texture) {
         addLocation(new MarkerInfo(
                 "Waypoint",
                 new StaticLocationSupplier(location),

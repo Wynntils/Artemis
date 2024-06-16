@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.hades;
@@ -24,8 +24,8 @@ public final class HadesUserRegistry {
         hadesUserMap.put(uuid, hadesUser);
     }
 
-    public void removeUser(UUID uuid) {
-        hadesUserMap.remove(uuid);
+    public HadesUser removeUser(UUID uuid) {
+        return hadesUserMap.remove(uuid);
     }
 
     public void reset() {

@@ -18,6 +18,7 @@ public class MapIconsProvider extends BuiltInProvider {
             new BuiltInIcon("wynntils:icon:content:cave", Texture.CAVE),
             new BuiltInIcon("wynntils:icon:content:dungeon", Texture.DUNGEON_ENTRANCE),
             new BuiltInIcon("wynntils:icon:content:grind-spot", Texture.GRIND_SPOT),
+            new BuiltInIcon("wynntils:icon:content:lootrun-camp", Texture.LOOTRUN_CAMP),
             new BuiltInIcon("wynntils:icon:content:raid", Texture.RAID_ENTRANCE),
             new BuiltInIcon("wynntils:icon:content:shrine", Texture.SHRINE),
             new BuiltInIcon("wynntils:icon:gathering:farming", Texture.FARMING),
@@ -28,6 +29,7 @@ public class MapIconsProvider extends BuiltInProvider {
             new BuiltInIcon("wynntils:icon:lootchest:tier-2", Texture.CHEST_T2),
             new BuiltInIcon("wynntils:icon:lootchest:tier-3", Texture.CHEST_T3),
             new BuiltInIcon("wynntils:icon:lootchest:tier-4", Texture.CHEST_T4),
+            new BuiltInIcon("wynntils:icon:player:head", Texture.PLAYER_HEAD),
             new BuiltInIcon("wynntils:icon:service:blacksmith", Texture.BLACKSMITH),
             new BuiltInIcon("wynntils:icon:service:booth-shop", Texture.BOOTH_SHOP),
             new BuiltInIcon("wynntils:icon:service:fast-travel", Texture.FAST_TRAVEL),
@@ -71,6 +73,9 @@ public class MapIconsProvider extends BuiltInProvider {
     public Stream<MapIcon> getIcons() {
         return PROVIDED_ICONS.stream();
     }
+
+    @Override
+    public void reloadData() {}
 
     public static String getIconIdFromTexture(Texture texture) {
         for (MapIcon icon : PROVIDED_ICONS) {

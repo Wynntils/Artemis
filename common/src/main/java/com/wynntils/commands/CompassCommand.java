@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.commands;
@@ -14,15 +14,14 @@ import com.wynntils.core.components.Services;
 import com.wynntils.core.consumers.commands.Command;
 import com.wynntils.models.marker.type.MarkerInfo;
 import com.wynntils.models.territories.profile.TerritoryProfile;
-import com.wynntils.services.map.pois.Poi;
-import com.wynntils.services.map.pois.ServicePoi;
-import com.wynntils.services.map.type.ServiceKind;
+import com.wynntils.services.mapdata.MapIconTextureWrapper;
+import com.wynntils.services.mapdata.features.ServiceLocation;
+import com.wynntils.services.mapdata.type.MapLocation;
 import com.wynntils.utils.StringUtils;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.mc.type.Location;
 import com.wynntils.utils.mc.type.PoiLocation;
 import com.wynntils.utils.wynn.LocationUtils;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -33,10 +32,10 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.coordinates.Coordinates;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
+import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 
 public class CompassCommand extends Command {
     private static final SuggestionProvider<CommandSourceStack> SHARE_TARGET_SUGGESTION_PROVIDER =
@@ -170,16 +169,15 @@ public class CompassCommand extends Command {
     private int compassService(CommandContext<CommandSourceStack> context) {
         String searchedName = context.getArgument("name", String.class);
 
-        ServiceKind selectedKind = LocateCommand.getServiceKind(context, searchedName);
+        ServiceLocation.ServiceKind selectedKind = LocateCommand.getServiceKind(context, searchedName);
         if (selectedKind == null) return 0;
 
-        Vec3 currentLocation = McUtils.player().position();
-        Optional<ServicePoi> closestServiceOptional = Services.Poi.getServicePois()
-                .filter(poi -> poi.getKind() == selectedKind)
-                .min(Comparator.comparingDouble(poi -> currentLocation.distanceToSqr(
-                        poi.getLocation().getX(),
-                        poi.getLocation().getY().orElse((int) currentLocation.y),
-                        poi.getLocation().getZ())));
+        Position currentPosition = McUtils.player().position();
+        Optional<MapLocation> closestServiceOptional = Services.MapData.getFeaturesForCategory(
+                        "wynntils:service:" + selectedKind.getMapDataId())
+                .map(f -> (MapLocation) f)
+                .min(Comparator.comparingDouble(loc -> loc.getLocation().distanceToSqr(currentPosition)));
+
         if (closestServiceOptional.isEmpty()) {
             // This really should not happen...
             MutableComponent response = Component.literal("Found no services of kind '" + selectedKind.getName() + "'")
@@ -187,14 +185,15 @@ public class CompassCommand extends Command {
             context.getSource().sendFailure(response);
             return 0;
         }
-        Poi closestService = closestServiceOptional.get();
+        MapLocation closestService = closestServiceOptional.get();
 
         Models.Marker.USER_WAYPOINTS_PROVIDER.removeAllLocations();
         Models.Marker.USER_WAYPOINTS_PROVIDER.addLocation(
-                closestService.getLocation().asLocation(),
-                closestServiceOptional.get().getIcon());
+                closestService.getLocation(),
+                new MapIconTextureWrapper(Services.MapData.getIconOrFallback(closestService)));
 
-        MutableComponent response = Component.literal("Compass set to " + selectedKind.getName() + " at ")
+        MutableComponent response = Component.literal("Compass set to "
+                        + Services.MapData.resolveMapAttributes(closestService).label() + " at ")
                 .withStyle(ChatFormatting.AQUA);
         response.append(
                 Component.literal(closestService.getLocation().toString()).withStyle(ChatFormatting.WHITE));
@@ -205,9 +204,11 @@ public class CompassCommand extends Command {
     private int compassPlace(CommandContext<CommandSourceStack> context) {
         String searchedName = context.getArgument("name", String.class);
 
-        List<Poi> places = new ArrayList<>(Services.Poi.getLabelPois()
-                .filter(poi -> StringUtils.partialMatch(poi.getName(), searchedName))
-                .toList());
+        List<MapLocation> places = Services.MapData.getFeaturesForCategory("wynntils:place")
+                .map(f -> (MapLocation) f)
+                .filter(loc -> StringUtils.partialMatch(
+                        Services.MapData.resolveMapAttributes(loc).label(), searchedName))
+                .toList();
 
         if (places.isEmpty()) {
             MutableComponent response = Component.literal("Found no places matching '" + searchedName + "'")
@@ -216,19 +217,24 @@ public class CompassCommand extends Command {
             return 0;
         }
 
-        Poi place;
+        MapLocation place;
 
         if (places.size() > 1) {
             // Try to find one with an exact match, to differentiate e.g. "Detlas" from "Detlas Suburbs"
-            Optional<Poi> exactMatch = places.stream()
-                    .filter(poi -> poi.getName().equals(searchedName))
+            Optional<MapLocation> exactMatch = places.stream()
+                    .filter(loc ->
+                            Services.MapData.resolveMapAttributes(loc).label().equals(searchedName))
                     .findFirst();
             if (exactMatch.isEmpty()) {
                 MutableComponent response = Component.literal("Found multiple places matching '" + searchedName
                                 + "', but none matched exactly. Matching: ")
                         .withStyle(ChatFormatting.RED);
-                response.append(Component.literal(
-                        String.join(", ", places.stream().map(Poi::getName).toList())));
+                response.append(Component.literal(String.join(
+                        ", ",
+                        places.stream()
+                                .map(loc -> Services.MapData.resolveMapAttributes(loc)
+                                        .label())
+                                .toList())));
                 context.getSource().sendFailure(response);
                 return 0;
             }
@@ -238,10 +244,11 @@ public class CompassCommand extends Command {
         }
 
         Models.Marker.USER_WAYPOINTS_PROVIDER.removeAllLocations();
-        Models.Marker.USER_WAYPOINTS_PROVIDER.addLocation(place.getLocation().asLocation());
+        Models.Marker.USER_WAYPOINTS_PROVIDER.addLocation(place.getLocation());
 
-        MutableComponent response =
-                Component.literal("Compass set to " + place.getName() + " at ").withStyle(ChatFormatting.AQUA);
+        MutableComponent response = Component.literal("Compass set to "
+                        + Services.MapData.resolveMapAttributes(place).label() + " at ")
+                .withStyle(ChatFormatting.AQUA);
         response.append(Component.literal(place.getLocation().toString()).withStyle(ChatFormatting.WHITE));
         context.getSource().sendSuccess(() -> response, false);
         return 1;

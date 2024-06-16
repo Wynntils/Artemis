@@ -6,7 +6,9 @@ package com.wynntils.services.mapdata.providers;
 
 import com.wynntils.services.mapdata.attributes.type.MapIcon;
 import com.wynntils.services.mapdata.type.MapCategory;
+import com.wynntils.services.mapdata.type.MapDataProvidedType;
 import com.wynntils.services.mapdata.type.MapFeature;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public interface MapDataProvider {
@@ -15,4 +17,8 @@ public interface MapDataProvider {
     Stream<MapCategory> getCategories();
 
     Stream<MapIcon> getIcons();
+
+    void onChange(Consumer<MapDataProvidedType> callback);
+
+    void reloadData();
 }

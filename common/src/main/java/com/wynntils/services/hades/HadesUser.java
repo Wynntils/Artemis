@@ -1,10 +1,11 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.hades;
 
 import com.wynntils.hades.protocol.packets.server.HSPacketUpdateMutual;
+import com.wynntils.services.hades.type.PlayerRelation;
 import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.type.PoiLocation;
@@ -15,9 +16,7 @@ public class HadesUser {
     private final UUID uuid;
     private final String name;
 
-    private boolean isPartyMember;
-    private boolean isMutualFriend;
-    private boolean isGuildMember;
+    private PlayerRelation relation;
     private float x, y, z;
     private PoiLocation poiLocation;
     private CappedValue health;
@@ -41,9 +40,7 @@ public class HadesUser {
 
         this.poiLocation = new PoiLocation((int) x, (int) y, (int) z);
 
-        this.isGuildMember = false;
-        this.isMutualFriend = false;
-        this.isPartyMember = true;
+        this.relation = PlayerRelation.FRIEND;
 
         this.health = health;
         this.mana = mana;
@@ -55,18 +52,6 @@ public class HadesUser {
 
     public String getName() {
         return name;
-    }
-
-    public boolean isPartyMember() {
-        return isPartyMember;
-    }
-
-    public boolean isMutualFriend() {
-        return isMutualFriend;
-    }
-
-    public boolean isGuildMember() {
-        return isGuildMember;
     }
 
     public float getX() {
@@ -102,16 +87,18 @@ public class HadesUser {
         this.health = new CappedValue(packet.getHealth(), packet.getMaxHealth());
         this.mana = new CappedValue(packet.getMana(), packet.getMaxMana());
 
-        this.isPartyMember = packet.isPartyMember();
-        this.isMutualFriend = packet.isMutualFriend();
-        this.isGuildMember = packet.isGuildMember();
+        this.relation = packet.isPartyMember()
+                ? PlayerRelation.PARTY
+                : packet.isMutualFriend()
+                        ? PlayerRelation.FRIEND
+                        : packet.isGuildMember() ? PlayerRelation.GUILD : PlayerRelation.OTHER;
     }
 
     public CustomColor getRelationColor() {
-        if (isPartyMember) return CommonColors.YELLOW;
-        if (isMutualFriend) return CommonColors.GREEN;
-        if (isGuildMember) return CommonColors.LIGHT_BLUE;
+        return relation != null ? relation.getRelationColor() : CommonColors.WHITE;
+    }
 
-        return CustomColor.NONE;
+    public PlayerRelation getRelation() {
+        return relation;
     }
 }

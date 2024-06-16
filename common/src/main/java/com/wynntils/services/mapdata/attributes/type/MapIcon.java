@@ -4,9 +4,10 @@
  */
 package com.wynntils.services.mapdata.attributes.type;
 
+import com.wynntils.services.mapdata.type.MapDataProvidedType;
 import net.minecraft.resources.ResourceLocation;
 
-public interface MapIcon {
+public interface MapIcon extends MapDataProvidedType {
     String NO_ICON_ID = "none";
 
     String getIconId();

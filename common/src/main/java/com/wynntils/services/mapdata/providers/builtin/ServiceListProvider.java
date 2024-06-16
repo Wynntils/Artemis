@@ -4,19 +4,27 @@
  */
 package com.wynntils.services.mapdata.providers.builtin;
 
-import com.wynntils.services.map.type.ServiceKind;
-import com.wynntils.services.mapdata.attributes.type.MapAttributes;
+import com.google.gson.reflect.TypeToken;
+import com.wynntils.core.components.Managers;
+import com.wynntils.core.net.Download;
+import com.wynntils.core.net.UrlId;
+import com.wynntils.services.mapdata.features.ServiceLocation;
 import com.wynntils.services.mapdata.type.MapFeature;
-import com.wynntils.services.mapdata.type.MapLocation;
-import com.wynntils.utils.mc.type.Location;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ServiceListProvider extends BuiltInProvider {
     private static final List<MapFeature> PROVIDED_FEATURES = new ArrayList<>();
-    private static int counter;
+
+    public ServiceListProvider() {
+        reloadData();
+    }
+
+    @Override
+    public void reloadData() {
+        loadServices();
+    }
 
     @Override
     public String getProviderId() {
@@ -28,44 +36,14 @@ public class ServiceListProvider extends BuiltInProvider {
         return PROVIDED_FEATURES.stream();
     }
 
-    public static void registerFeature(Location location, ServiceKind kind) {
-        PROVIDED_FEATURES.add(new ServiceLocation(location, kind));
-    }
-
-    private static final class ServiceLocation implements MapLocation {
-        private final Location location;
-        private final ServiceKind kind;
-        private final int number;
-
-        private ServiceLocation(Location location, ServiceKind kind) {
-            this.location = location;
-            this.kind = kind;
-            this.number = ServiceListProvider.counter++;
-        }
-
-        @Override
-        public String getFeatureId() {
-            return kind.getMapDataId() + "-" + number;
-        }
-
-        @Override
-        public String getCategoryId() {
-            return "wynntils:service:" + kind.getMapDataId();
-        }
-
-        @Override
-        public Optional<MapAttributes> getAttributes() {
-            return Optional.empty();
-        }
-
-        @Override
-        public List<String> getTags() {
-            return List.of();
-        }
-
-        @Override
-        public Location getLocation() {
-            return location;
-        }
+    private void loadServices() {
+        Download dl = Managers.Net.download(UrlId.DATA_STATIC_SERVICE_MAPFEATURES);
+        dl.handleReader(reader -> {
+            TypeToken<List<ServiceLocation>> type = new TypeToken<>() {};
+            List<ServiceLocation> services = Managers.Json.GSON.fromJson(reader, type.getType());
+            PROVIDED_FEATURES.forEach(this::notifyCallbacks);
+            PROVIDED_FEATURES.clear();
+            PROVIDED_FEATURES.addAll(services);
+        });
     }
 }

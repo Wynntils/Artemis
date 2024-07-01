@@ -56,7 +56,7 @@ public class CustomNametagRendererFeature extends Feature {
     public final Config<Boolean> hideNametagBackground = new Config<>(false);
 
     @Persisted
-    public final Config<Boolean> showProfessionBadges = new Config<>(true);
+    public final Config<Boolean> showLeaderboardBadges = new Config<>(true);
 
     @Persisted
     public final Config<Integer> badgeCount = new Config<>(7);
@@ -216,7 +216,7 @@ public class CustomNametagRendererFeature extends Feature {
     }
 
     private void drawBadges(PlayerNametagRenderEvent event, float height) {
-        if (!showProfessionBadges.get()) return;
+        if (!showLeaderboardBadges.get()) return;
         if (badgeCount.get() <= 0) return;
 
         List<LeaderboardBadge> allBadges =

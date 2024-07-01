@@ -6,7 +6,6 @@ package com.wynntils.mc.mixin;
 
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import com.wynntils.core.components.Services;
 import com.wynntils.core.events.MixinHelper;
 import com.wynntils.mc.event.DisplayResizeEvent;
 import com.wynntils.mc.event.ScreenClosedEvent;

@@ -5,6 +5,7 @@
 package com.wynntils.mc.mixin;
 
 import com.google.common.hash.Hashing;
+import com.wynntils.core.components.Managers;
 import com.wynntils.core.events.MixinHelper;
 import com.wynntils.mc.event.ConnectionEvent;
 import com.wynntils.mc.event.ServerResourcePackEvent;
@@ -46,7 +47,12 @@ public abstract class ClientCommonPacketListenerImplMixin {
             method = "handleDisconnect(Lnet/minecraft/network/protocol/common/ClientboundDisconnectPacket;)V",
             at = @At("HEAD"))
     private void handleDisconnectPre(ClientboundDisconnectPacket packet, CallbackInfo ci) {
-        // Unexpected disconnect
-        MixinHelper.postAlways(new ConnectionEvent.DisconnectedEvent());
+        // Unexpected disconnect.
+        // NOTE: This will happen on a Netty thread instead of the main thread, but all other
+        // ConnectionEvents are sent on the main thread, so let's do so with this one too.
+        if (Managers.TickScheduler == null) return;
+
+        Managers.TickScheduler.scheduleNextTick(
+                () -> MixinHelper.postAlways(new ConnectionEvent.UnexpectedDisconnectedEvent()));
     }
 }

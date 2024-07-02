@@ -3,13 +3,11 @@
     "Team Wynntils"
   ],
   "breaks": {
-    "exordium": "*",
-    "memoryleakfix": "<1.1.2"
+    "exordium": "*"
   },
   "conflicts": {
     "avomod": "*",
-    "chatpatches": "*",
-    "weirdchat": "*"
+    "chatpatches": "*"
   },
   "contact": {
     "homepage": "https://wynntils.com",

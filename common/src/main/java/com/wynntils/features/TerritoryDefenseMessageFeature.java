@@ -15,6 +15,7 @@ import com.wynntils.utils.mc.LoreUtils;
 import com.wynntils.utils.mc.McUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -23,6 +24,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 public class TerritoryDefenseMessageFeature extends Feature {
     private static final Pattern ATTACK_SCREEN_TITLE = Pattern.compile("Attacking: (.+)");
     private static final Pattern TERRITORY_DEFENSE_PATTERN = Pattern.compile("Territory Defences: (.+)");
+    private static final Pattern TOO_MANY_ATTACKS =
+            Pattern.compile("§cYou can only attack \\w+ ?territor(?:y|ies) at a time\\.");
 
     @SubscribeEvent
     public void onInventoryClick(InventoryMouseClickedEvent event) {
@@ -33,12 +36,17 @@ public class TerritoryDefenseMessageFeature extends Feature {
 
         ItemStack itemStack = event.getHoveredSlot().getItem();
 
+        Matcher tooManyAttacksMatcher =
+                TOO_MANY_ATTACKS.matcher(LoreUtils.getStringLore(itemStack).getString());
+        if (tooManyAttacksMatcher.find()) return; // invalid attack, don't send defence info
+
         for (Component tooltipLine : LoreUtils.getTooltipLines(itemStack)) {
             Matcher matcher = StyledText.fromComponent(tooltipLine)
                     .getMatcher(TERRITORY_DEFENSE_PATTERN, PartStyle.StyleType.NONE);
             if (matcher.matches()) {
-                Handlers.Command.sendCommandImmediately(
-                        "g %s defense is %s".formatted(titleMatcher.group(1), matcher.group(1)));
+                String message = I18n.get(
+                        "feature.wynntils.territoryDefenseMessage.message", titleMatcher.group(1), matcher.group(1));
+                Handlers.Command.sendCommandImmediately("g " + message);
                 return;
             }
         }

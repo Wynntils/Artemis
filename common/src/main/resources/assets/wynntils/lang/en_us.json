@@ -1205,6 +1205,7 @@
   "feature.wynntils.territoryAttackTimerOverlay.overlay.territoryAttackTimer.textShadow.description": "What should the text shadow look like?",
   "feature.wynntils.territoryAttackTimerOverlay.overlay.territoryAttackTimer.textShadow.name": "Text Shadow",
   "feature.wynntils.territoryDefenseMessage.description": "Sends the territory defense message when you attack a territory.",
+  "feature.wynntils.territoryDefenseMessage.message": "%s defense is %s",
   "feature.wynntils.territoryDefenseMessage.name": "Send Territory Defenses",
   "feature.wynntils.territoryMessageRedirect.description": "Adds the ability to redirect territory messages to the game update overlay.",
   "feature.wynntils.territoryMessageRedirect.name": "Territory Messages",

@@ -1,10 +1,11 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.leaderboard;
 
 import com.google.gson.JsonElement;
+import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Managers;
 import com.wynntils.core.components.Service;
 import com.wynntils.core.net.Download;
@@ -12,6 +13,7 @@ import com.wynntils.core.net.UrlId;
 import com.wynntils.models.worlds.event.WorldStateEvent;
 import com.wynntils.models.worlds.type.WorldState;
 import com.wynntils.services.leaderboard.type.LeaderboardBadge;
+import com.wynntils.services.leaderboard.type.LeaderboardType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,8 +63,14 @@ public class LeaderboardService extends Service {
                         .entrySet();
 
                 for (Map.Entry<String, JsonElement> rank : ranks) {
-                    list.add(
-                            LeaderboardBadge.from(rank.getKey(), rank.getValue().getAsInt()));
+                    LeaderboardType type = LeaderboardType.fromKey(rank.getKey());
+
+                    if (type == null) {
+                        WynntilsMod.error("Unexpected leaderboard type: " + rank.getKey());
+                        continue;
+                    }
+
+                    list.add(LeaderboardBadge.from(type, rank.getValue().getAsInt()));
                 }
 
                 map.put(id, list);

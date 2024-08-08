@@ -42,6 +42,5 @@
   "feature.wynntils.chatRedirect.notEnoughMana.description": "Wie sollen Mitteilungen über zu wenig Mana zum Ausführen eines Zaubers aussehen?",
   "feature.wynntils.chatRedirect.notEnoughMana.name": "Mana Mitteilungsfilterung",
   "feature.wynntils.chatRedirect.potion.description": "Wie sollen Mitteilungen über deine Heiltränke aussehen?",
-  "feature.wynntils.mainMap.name": "Karte",
-  "screens.wynntils.overlaySelection.overlays": "Overlays"
+  "feature.wynntils.mainMap.name": "Karte"
 }

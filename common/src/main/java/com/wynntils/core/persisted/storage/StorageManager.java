@@ -35,7 +35,7 @@ public final class StorageManager extends Manager {
 
     private static final File STORAGE_DIR = WynntilsMod.getModStorageDir("storage");
     private static final String FILE_SUFFIX = ".data.json";
-    private final File userStorageFile;
+    private File userStorageFile;
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private final Map<String, Storage<?>> storages = new TreeMap<>();
@@ -169,5 +169,11 @@ public final class StorageManager extends Manager {
         });
 
         Managers.Json.savePreciousJson(userStorageFile, storageJson);
+    }
+
+    public void reloadAll() {
+        userStorageFile = new File(
+                STORAGE_DIR, UndashedUuid.toString(McUtils.mc().getUser().getProfileId()) + FILE_SUFFIX);
+        initFeatures();
     }
 }

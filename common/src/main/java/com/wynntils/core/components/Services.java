@@ -4,6 +4,7 @@
  */
 package com.wynntils.core.components;
 
+import com.wynntils.services.accountswitchdetection.AccountSwitchDetectionService;
 import com.wynntils.services.athena.UpdateService;
 import com.wynntils.services.athena.WynntilsAccountService;
 import com.wynntils.services.chat.ChatTabService;
@@ -27,6 +28,7 @@ import com.wynntils.services.stopwatch.StopwatchService;
 import com.wynntils.services.translation.TranslationService;
 
 public final class Services {
+    public static final AccountSwitchDetectionService AccountSwitchDetection = new AccountSwitchDetectionService();
     public static final ChatTabService ChatTab = new ChatTabService();
     public static final CosmeticsService Cosmetics = new CosmeticsService();
     public static final DestinationService Destination = new DestinationService();

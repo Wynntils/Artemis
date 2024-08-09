@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.debug;
@@ -46,8 +46,8 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.stream.Collectors;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 // Note: To run this sucessfully, you have to have a class with all content trackable in the content book

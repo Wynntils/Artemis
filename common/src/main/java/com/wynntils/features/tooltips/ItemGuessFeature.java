@@ -27,7 +27,7 @@ import java.util.TreeMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.TOOLTIPS)
 public class ItemGuessFeature extends Feature {
@@ -99,7 +99,7 @@ public class ItemGuessFeature extends Feature {
             guesses.append(StyledText.fromString("§7: ").getComponent());
 
             MutableComponent itemsComponent = Component.empty();
-            itemsComponent.append(itemsForLevel.get(0));
+            itemsComponent.append(itemsForLevel.getFirst());
             itemsForLevel.stream().skip(1).forEach(i -> itemsComponent
                     .append(Component.literal(", ").withStyle(ChatFormatting.GRAY))
                     .append(i));

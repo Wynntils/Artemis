@@ -14,7 +14,6 @@ jobs:
       skipped: ${{ steps.changelog.outputs.skipped }}
       clean_changelog: ${{ steps.changelog.outputs.clean_changelog }}
       changelog: ${{ steps.changelog.outputs.changelog }}
-      release_id: ${{ steps.release.outputs.id }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,16 +44,6 @@ jobs:
           skip-git-pull: true
           pre-release: false
           release-count: 5
-
-      - name: Create release
-        if: ${{ steps.changelog.outputs.skipped != 'true' }}
-        id: release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.changelog.outputs.tag }}
-          body: ${{ steps.changelog.outputs.clean_changelog }}
-          draft: true
-          prerelease: false
 
       - name: Upload version information
         uses: actions/upload-artifact@v4
@@ -91,37 +80,67 @@ jobs:
         with:
           arguments: buildDependents -x spotlessCheck -x test
 
-      - name: Upload files to release
-        uses: softprops/action-gh-release@v2
-        if: ${{ needs.changelog.outputs.skipped != 'true' }}
-        with:
-          tag_name: ${{ needs.changelog.outputs.tag }}
-          draft: true
-          prerelease: false
-          files: |
-            **/build/libs/*-fabric+MC-*.jar
-            **/build/libs/*-forge+MC-*.jar
-
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
           name: build
           path: |
             **/build/libs/*-fabric+MC-*.jar
-            **/build/libs/*-forge+MC-*.jar
+            **/build/libs/*-neoforge+MC-*.jar
           if-no-files-found: error
           overwrite: true
 
-  release:
+  release-github:
+    name: Release to Github
+    if: ${{ needs.changelog.outputs.skipped != 'true' }}
+    runs-on: ubuntu-latest
+    needs: [ build, changelog ]
+    steps:
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+
+      - name: Create release and upload files
+        if: ${{ needs.changelog.outputs.skipped != 'true' }}
+        id: release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.changelog.outputs.tag }}
+          body: ${{ needs.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+          files: |
+            **/build/libs/*-fabric+MC-*.jar
+            **/build/libs/*-neoforge+MC-*.jar
+
+      - name: Set current date
+        id: date
+        run: |
+          echo "::set-output name=short::$(date +'%Y-%m-%d')"
+          echo "::set-output name=long::$(date +'%Y-%m-%d %H:%M')"
+            
+      - name: Post release on Discord
+        uses: tsickert/discord-webhook@v6.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
+          embed-color: "9498256"
+          embed-title: ${{format('Wynntils {0}', needs.changelog.outputs.tag)}}
+          embed-description: ${{ needs.changelog.outputs.changelog }}
+          embed-url: ${{ steps.release.outputs.url }}
+          embed-timestamp: ${{ steps.date.outputs.long }}
+
+  release-external:
     name: Release to Modrinth and CurseForge
     if: ${{ needs.changelog.outputs.skipped != 'true' }}
     strategy:
       matrix:
-        modloader: [fabric, forge]
+        modloader: [fabric, neoforge]
     runs-on: ubuntu-latest
     needs: [build, changelog]
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download build
+        uses: actions/download-artifact@v4
         with:
           name: build
 
@@ -137,25 +156,11 @@ jobs:
 
           files: "**/build/libs/*-${{ matrix.modloader }}*.jar"
 
-          name: Wynntils Artemis (${{ matrix.modloader }}) ${{ needs.changelog.outputs.tag }}
+          name: Wynntils (${{ matrix.modloader }}) ${{ needs.changelog.outputs.tag }}
           version: ${{ needs.changelog.outputs.tag }}
           version-type: release
-          game-versions: 1.20.2
+          game-versions: 1.21
           changelog: ${{ needs.changelog.outputs.changelog }}
 
           loaders: ${{ matrix.modloader }}
-          java: 17
-
-
-  release-gh:
-    name: Release Github
-    if: ${{ needs.changelog.outputs.skipped != 'true' }}
-    runs-on: ubuntu-latest
-    needs: [build, changelog]
-    steps:
-      - name: Publish Release
-        uses: eregon/publish-release@v1.0.6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ needs.changelog.outputs.release_id }}
+          java: 21

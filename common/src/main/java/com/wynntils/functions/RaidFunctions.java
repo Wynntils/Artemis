@@ -9,6 +9,7 @@ import com.wynntils.core.consumers.functions.Function;
 import com.wynntils.core.consumers.functions.arguments.FunctionArguments;
 import com.wynntils.models.raid.type.RaidKind;
 import com.wynntils.models.raid.type.RaidRoomType;
+import com.wynntils.utils.type.CappedValue;
 import java.util.List;
 
 public class RaidFunctions {
@@ -67,6 +68,13 @@ public class RaidFunctions {
         }
     }
 
+    public static class RaidChallengesFunction extends Function<CappedValue> {
+        @Override
+        public CappedValue getValue(FunctionArguments arguments) {
+            return Models.Raid.getChallenges();
+        }
+    }
+
     public static class RaidIntermissionTimeFunction extends Function<Long> {
         @Override
         public Long getValue(FunctionArguments arguments) {
@@ -116,6 +124,13 @@ public class RaidFunctions {
         @Override
         protected List<String> getAliases() {
             return List.of("raid_pb");
+        }
+    }
+
+    public static class RaidTimeRemainingFunction extends Function<Integer> {
+        @Override
+        public Integer getValue(FunctionArguments arguments) {
+            return Models.Raid.getTimeLeft();
         }
     }
 }

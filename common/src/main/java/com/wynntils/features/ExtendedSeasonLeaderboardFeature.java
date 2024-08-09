@@ -8,9 +8,9 @@ import com.wynntils.core.components.Models;
 import com.wynntils.core.consumers.features.Feature;
 import com.wynntils.core.persisted.Persisted;
 import com.wynntils.core.persisted.config.Config;
-import com.wynntils.handlers.labels.event.EntityLabelChangedEvent;
 import com.wynntils.handlers.labels.event.LabelIdentifiedEvent;
 import com.wynntils.handlers.labels.event.LabelsRemovedEvent;
+import com.wynntils.handlers.labels.event.TextDisplayChangedEvent;
 import com.wynntils.handlers.labels.type.LabelInfo;
 import com.wynntils.models.players.label.GuildSeasonLeaderboardHeaderLabelInfo;
 import com.wynntils.models.players.label.GuildSeasonLeaderboardLabelInfo;
@@ -24,7 +24,7 @@ import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class ExtendedSeasonLeaderboardFeature extends Feature {
     private final Map<Integer, GuildSeasonLeaderboardLabelInfo> labelInfos = new HashMap<>();
@@ -40,14 +40,26 @@ public class ExtendedSeasonLeaderboardFeature extends Feature {
     }
 
     @SubscribeEvent
-    public void onLabelChanged(EntityLabelChangedEvent event) {
+    public void onLabelsRemoved(LabelsRemovedEvent event) {
+        event.getRemovedLabels().stream()
+                .filter(labelInfo -> labelInfo instanceof GuildSeasonLeaderboardLabelInfo)
+                .forEach(labelInfo -> labelInfos.remove(((GuildSeasonLeaderboardLabelInfo) labelInfo).getPlace()));
+    }
+
+    @SubscribeEvent
+    public void onWorldStateChange(WorldStateEvent event) {
+        labelInfos.clear();
+    }
+
+    @SubscribeEvent
+    public void onLabelChanged(TextDisplayChangedEvent.Text event) {
         if (event.getLabelInfo().isEmpty()) return;
 
         LabelInfo labelInfo = event.getLabelInfo().get();
 
         if (labelInfo instanceof GuildSeasonLeaderboardHeaderLabelInfo) {
             // Reset every label that is for a place higher than 10
-            // A page only has 10 entries, the header only changes when we switch seasons
+            // A page only has 10 entries, the header only changes when we switch seasons,
             // so we do this to make sure the 10th place is not calculated from the old 11th place data
             List<GuildSeasonLeaderboardLabelInfo> labelsToRemove = labelInfos.values().stream()
                     .filter(info -> info.getPlace() > 10)
@@ -146,17 +158,5 @@ public class ExtendedSeasonLeaderboardFeature extends Feature {
                         .withStyle(ChatFormatting.GREEN));
 
         guildSeasonLeaderboardLabelInfo.getEntity().setCustomName(newLabel);
-    }
-
-    @SubscribeEvent
-    public void onLabelsRemoved(LabelsRemovedEvent event) {
-        event.getRemovedLabels().stream()
-                .filter(labelInfo -> labelInfo instanceof GuildSeasonLeaderboardLabelInfo)
-                .forEach(labelInfo -> labelInfos.remove(((GuildSeasonLeaderboardLabelInfo) labelInfo).getPlace()));
-    }
-
-    @SubscribeEvent
-    public void onWorldStateChange(WorldStateEvent event) {
-        labelInfos.clear();
     }
 }

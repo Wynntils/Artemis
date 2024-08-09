@@ -9,26 +9,24 @@ import com.wynntils.core.components.Models;
 import com.wynntils.core.persisted.Persisted;
 import com.wynntils.core.persisted.storage.Storage;
 import com.wynntils.core.text.StyledText;
+import com.wynntils.mc.event.ContainerSetContentEvent;
 import com.wynntils.mc.event.ScreenClosedEvent;
 import com.wynntils.mc.event.ScreenInitEvent;
 import com.wynntils.models.containers.containers.personal.PersonalStorageContainer;
 import com.wynntils.models.containers.type.PersonalStorageType;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class BankModel extends Model {
-    // When storage supports upfixing, change to finalAccountBankPage
     @Persisted
-    private final Storage<Integer> finalBankPage = new Storage<>(21);
+    private final Storage<Integer> finalAccountBankPage = new Storage<>(21);
 
     @Persisted
     private final Storage<Integer> finalBlockBankPage = new Storage<>(12);
@@ -42,9 +40,8 @@ public class BankModel extends Model {
     @Persisted
     private final Storage<Map<String, Integer>> finalCharacterBankPages = new Storage<>(new TreeMap<>());
 
-    // When storage supports upfixing, change to customAccountBankPageNames
     @Persisted
-    private final Storage<Map<Integer, String>> customBankPageNames = new Storage<>(new TreeMap<>());
+    private final Storage<Map<Integer, String>> customAccountBankPageNames = new Storage<>(new TreeMap<>());
 
     @Persisted
     private final Storage<Map<Integer, String>> customBlockBankPageNames = new Storage<>(new TreeMap<>());
@@ -59,17 +56,15 @@ public class BankModel extends Model {
     private final Storage<Map<String, Map<Integer, String>>> customCharacterBankPagesNames =
             new Storage<>(new TreeMap<>());
 
-    public static final int LAST_BANK_PAGE_SLOT = 8;
-    public static final int QUICK_JUMP_FIRST_PAGE_SLOT = 7;
+    public static final int QUICK_JUMP_SLOT = 7;
+    public static final String FINAL_PAGE_NAME = "\uDB3F\uDFFF";
 
-    // Test in BankModel_PERSONAL_STORAGE_PATTERN
-    private static final Pattern PERSONAL_STORAGE_PATTERN =
-            Pattern.compile("^§0\\[Pg\\. (\\d+)\\] §8[a-zA-Z0-9_ ]+'s?§0 (.*)$");
     private static final int MAX_CHARACTER_BANK_PAGES = 10;
     private static final StyledText LAST_BANK_PAGE_STRING = StyledText.fromString(">§4>§c>§4>§c>");
 
     private boolean editingName;
     private int currentPage = 1;
+    private PersonalStorageContainer personalStorageContainer = null;
     private PersonalStorageType storageContainerType = null;
 
     public BankModel() {
@@ -80,14 +75,14 @@ public class BankModel extends Model {
     public void onScreenInit(ScreenInitEvent e) {
         storageContainerType = null;
 
-        if (!(e.getScreen() instanceof AbstractContainerScreen<?> screen)) return;
-        if (!(Models.Container.getCurrentContainer() instanceof PersonalStorageContainer personalStorageContainer)) {
+        if (!(e.getScreen() instanceof AbstractContainerScreen<?>)) return;
+        if (!(Models.Container.getCurrentContainer() instanceof PersonalStorageContainer container)) {
             return;
         }
 
-        storageContainerType = personalStorageContainer.getPersonalStorageType();
+        personalStorageContainer = container;
 
-        currentPage = getCurrentBankPage(screen);
+        storageContainerType = personalStorageContainer.getPersonalStorageType();
 
         editingName = false;
     }
@@ -99,31 +94,44 @@ public class BankModel extends Model {
         editingName = false;
     }
 
-    public int getCurrentBankPage(Screen screen) {
-        Matcher matcher = StyledText.fromComponent(screen.getTitle()).getMatcher(PERSONAL_STORAGE_PATTERN);
-        if (!matcher.matches()) return 0;
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onContainerSetContent(ContainerSetContentEvent.Pre event) {
+        if (storageContainerType == null) return;
 
-        return Integer.parseInt(matcher.group(1));
+        ItemStack previousPageItem = event.getItems().get(personalStorageContainer.getPreviousItemSlot());
+        Matcher previousPageMatcher = StyledText.fromComponent(previousPageItem.getHoverName())
+                .getMatcher(personalStorageContainer.getPreviousItemPattern());
+
+        if (previousPageMatcher.matches()) {
+            currentPage = Integer.parseInt(previousPageMatcher.group(1)) + 1;
+        }
+
+        ItemStack nextPageItem = event.getItems().get(personalStorageContainer.getNextItemSlot());
+        Matcher nextPageMatcher = StyledText.fromComponent(nextPageItem.getHoverName())
+                .getMatcher(personalStorageContainer.getNextItemPattern());
+
+        if (nextPageMatcher.matches()) {
+            currentPage = Integer.parseInt(nextPageMatcher.group(1)) - 1;
+        }
+
+        if (isItemIndicatingLastBankPage(nextPageItem)) {
+            updateFinalPage();
+        }
     }
 
-    public boolean isItemIndicatingLastBankPage(ItemStack item) {
-        return StyledText.fromComponent(item.getHoverName()).endsWith(LAST_BANK_PAGE_STRING)
-                || item.getHoverName().getString().equals(" ");
-    }
-
-    public Optional<String> getPageName(int page) {
+    public String getPageName(int page) {
         Map<Integer, String> pageNamesMap = getCurrentNameMap();
 
-        if (pageNamesMap == null) return Optional.empty();
+        if (pageNamesMap == null) return I18n.get("feature.wynntils.personalStorageUtilities.page", page);
 
-        return Optional.ofNullable(pageNamesMap.get(page));
+        return pageNamesMap.getOrDefault(page, I18n.get("feature.wynntils.personalStorageUtilities.page", page));
     }
 
     public void saveCurrentPageName(String nameToSet) {
         switch (storageContainerType) {
             case ACCOUNT_BANK -> {
-                customBankPageNames.get().put(currentPage, nameToSet);
-                customBankPageNames.touched();
+                customAccountBankPageNames.get().put(currentPage, nameToSet);
+                customAccountBankPageNames.touched();
             }
             case BLOCK_BANK -> {
                 customBlockBankPageNames.get().put(currentPage, nameToSet);
@@ -156,8 +164,8 @@ public class BankModel extends Model {
     public void resetCurrentPageName() {
         switch (storageContainerType) {
             case ACCOUNT_BANK -> {
-                customBankPageNames.get().remove(currentPage);
-                customBankPageNames.touched();
+                customAccountBankPageNames.get().remove(currentPage);
+                customAccountBankPageNames.touched();
             }
             case BLOCK_BANK -> {
                 customBlockBankPageNames.get().remove(currentPage);
@@ -185,7 +193,7 @@ public class BankModel extends Model {
 
     public int getFinalPage() {
         return switch (storageContainerType) {
-            case ACCOUNT_BANK -> finalBankPage.get();
+            case ACCOUNT_BANK -> finalAccountBankPage.get();
             case BLOCK_BANK -> finalBlockBankPage.get();
             case BOOKSHELF -> finalBookshelfPage.get();
             case CHARACTER_BANK -> finalCharacterBankPages
@@ -195,10 +203,31 @@ public class BankModel extends Model {
         };
     }
 
-    public void updateFinalPage() {
+    public PersonalStorageType getStorageContainerType() {
+        return storageContainerType;
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public boolean isEditingName() {
+        return editingName;
+    }
+
+    public void toggleEditingName(boolean editingName) {
+        this.editingName = editingName;
+    }
+
+    private boolean isItemIndicatingLastBankPage(ItemStack item) {
+        return StyledText.fromComponent(item.getHoverName()).endsWith(LAST_BANK_PAGE_STRING)
+                || item.getHoverName().getString().equals(FINAL_PAGE_NAME);
+    }
+
+    private void updateFinalPage() {
         switch (storageContainerType) {
             case ACCOUNT_BANK -> {
-                finalBankPage.store(currentPage);
+                finalAccountBankPage.store(currentPage);
             }
             case BLOCK_BANK -> {
                 if (currentPage > finalBlockBankPage.get()) {
@@ -218,25 +247,9 @@ public class BankModel extends Model {
         }
     }
 
-    public PersonalStorageType getStorageContainerType() {
-        return storageContainerType;
-    }
-
-    public int getCurrentPage() {
-        return currentPage;
-    }
-
-    public boolean isEditingName() {
-        return editingName;
-    }
-
-    public void toggleEditingName(boolean editingName) {
-        this.editingName = editingName;
-    }
-
     private Map<Integer, String> getCurrentNameMap() {
         return switch (storageContainerType) {
-            case ACCOUNT_BANK -> customBankPageNames.get();
+            case ACCOUNT_BANK -> customAccountBankPageNames.get();
             case BLOCK_BANK -> customBlockBankPageNames.get();
             case BOOKSHELF -> customBookshelfPageNames.get();
             case CHARACTER_BANK -> customCharacterBankPagesNames

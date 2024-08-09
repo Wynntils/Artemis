@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class BombBellOverlay extends Overlay {
@@ -72,7 +73,7 @@ public class BombBellOverlay extends Overlay {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         BufferedFontRenderer.getInstance()
                 .renderTextsWithAlignment(
                         poseStack,
@@ -97,7 +98,8 @@ public class BombBellOverlay extends Overlay {
     }
 
     @Override
-    public void renderPreview(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void renderPreview(
+            PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         BufferedFontRenderer.getInstance()
                 .renderTextsWithAlignment(
                         poseStack,

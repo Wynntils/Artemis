@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Pattern;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class NpcDialogueModel extends Model {
     private static final Pattern NEW_QUEST_STARTED = Pattern.compile("^§6§lNew Quest Started: §e§l(.*)$");
@@ -121,10 +121,10 @@ public class NpcDialogueModel extends Model {
         }
 
         if (!chatMessage.isEmpty()
-                && chatMessage.get(0).getMatcher(NEW_QUEST_STARTED).find()) {
+                && chatMessage.getFirst().getMatcher(NEW_QUEST_STARTED).find()) {
             // TODO: Show nice banner notification instead
             // but then we'd also need to confirm it with a sneak
-            Managers.Notification.queueMessage(chatMessage.get(0));
+            Managers.Notification.queueMessage(chatMessage.getFirst());
         }
 
         NpcDialogueProcessingEvent.Pre event = new NpcDialogueProcessingEvent.Pre(dialogue);

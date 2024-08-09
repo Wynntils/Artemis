@@ -4,7 +4,7 @@
  */
 package com.wynntils.models.lootrun.event;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class LootrunFinishedEvent extends Event {
     protected final int challengesCompleted;

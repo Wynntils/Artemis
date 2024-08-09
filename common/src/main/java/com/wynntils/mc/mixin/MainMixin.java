@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.mixin;
@@ -30,7 +30,7 @@ public abstract class MainMixin {
         // see https://github.com/BuiltBrokenModding/SBM-SheepMetal/issues/2
         if (!SystemUtils.isMac()) {
             // Do NOT use logger here. If we reference the WynntilsMod class, we will crash.
-            System.out.println("[Wynntils/Artemis] Setting java.awt.headless to false");
+            System.out.println("[Wynntils] Setting java.awt.headless to false");
             System.setProperty("java.awt.headless", "false");
 
             // Test that the mixin was run properly
@@ -40,7 +40,7 @@ public abstract class MainMixin {
                 Toolkit.getDefaultToolkit().getSystemClipboard();
             } catch (HeadlessException e) {
                 // Do NOT use logger here. If we reference the WynntilsMod class, we will crash.
-                System.out.println("[Wynntils/Artemis] java.awt.headless property was not set properly!");
+                System.out.println("[Wynntils] java.awt.headless property was not set properly!");
             }
         }
     }

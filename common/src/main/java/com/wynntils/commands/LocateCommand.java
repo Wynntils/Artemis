@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.commands;
@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -42,7 +43,7 @@ public class LocateCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         return base.then(Commands.literal("service")
                         .then(Commands.argument("name", StringArgumentType.greedyString())
                                 .suggests(LocateCommand.SERVICE_SUGGESTION_PROVIDER)
@@ -92,7 +93,7 @@ public class LocateCommand extends Command {
         }
 
         // Got exactly one match
-        return matchedKinds.get(0);
+        return matchedKinds.getFirst();
     }
 
     private int locateService(CommandContext<CommandSourceStack> context) {

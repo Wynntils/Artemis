@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.embellishments;
@@ -15,14 +15,16 @@ import com.wynntils.handlers.chat.type.RecipientType;
 import com.wynntils.utils.mc.McUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.EMBELLISHMENTS)
 public class WybelSoundFeature extends Feature {
-    private static final ResourceLocation WYBEL_SQUEAK_ID = new ResourceLocation("wynntils:wybel.squeak");
+    private static final ResourceLocation WYBEL_SQUEAK_ID =
+            ResourceLocation.fromNamespaceAndPath("wynntils", "wybel.squeak");
     private static final SoundEvent WYBEL_SQUEAK_SOUND = SoundEvent.createVariableRangeEvent(WYBEL_SQUEAK_ID);
 
-    private static final ResourceLocation WYBEL_PURR_ID = new ResourceLocation("wynntils:wybel.purr");
+    private static final ResourceLocation WYBEL_PURR_ID =
+            ResourceLocation.fromNamespaceAndPath("wynntils", "wybel.purr");
     private static final SoundEvent WYBEL_PURR_SOUND = SoundEvent.createVariableRangeEvent(WYBEL_PURR_ID);
 
     @Persisted

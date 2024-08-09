@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2021-2023.
+ * Copyright © Wynntils 2021-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.emeralds;
@@ -15,14 +15,13 @@ import com.wynntils.models.items.properties.EmeraldValuedItemProperty;
 import com.wynntils.models.worlds.event.WorldStateEvent;
 import com.wynntils.models.worlds.type.WorldState;
 import com.wynntils.utils.mc.McUtils;
-import com.wynntils.utils.wynn.WynnUtils;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class EmeraldModel extends Model {
     public static final int EMERALD_BLOCK_VALUE = 64;
@@ -41,7 +40,6 @@ public final class EmeraldModel extends Model {
 
     private int inventoryEmeralds = 0;
     private int containerEmeralds = 0;
-    private int pouchContainerId = -1;
 
     public EmeraldModel() {
         super(List.of());
@@ -79,19 +77,8 @@ public final class EmeraldModel extends Model {
     }
 
     @SubscribeEvent
-    public void onMenuOpened(MenuEvent.MenuOpenedEvent e) {
-        String title = WynnUtils.normalizeBadString(e.getTitle().getString());
-        if (title.equals("Emerald Pouch")) {
-            pouchContainerId = e.getContainerId();
-        } else {
-            pouchContainerId = -1;
-        }
-    }
-
-    @SubscribeEvent
     public void onMenuClosed(MenuEvent.MenuClosedEvent e) {
         containerEmeralds = 0;
-        pouchContainerId = -1;
     }
 
     @SubscribeEvent

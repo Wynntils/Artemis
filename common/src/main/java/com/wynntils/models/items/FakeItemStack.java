@@ -16,6 +16,7 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
@@ -26,7 +27,7 @@ public class FakeItemStack extends ItemStack {
 
     public FakeItemStack(WynnItem wynnItem, ItemStack itemStack, String source) {
         super(itemStack.getItem(), 1);
-        this.setTag(itemStack.getTag());
+        this.applyComponents(itemStack.getComponentsPatch());
 
         if (wynnItem instanceof NamedItemProperty namedItemProperty) {
             Handlers.Item.updateItem(this, wynnItem, StyledText.fromString(namedItemProperty.getName()));
@@ -46,7 +47,7 @@ public class FakeItemStack extends ItemStack {
     }
 
     @Override
-    public List<Component> getTooltipLines(Player player, TooltipFlag isAdvanced) {
+    public List<Component> getTooltipLines(Item.TooltipContext context, Player player, TooltipFlag isAdvanced) {
         TooltipBuilder tooltipBuilder = null;
         if (wynnItem instanceof IdentifiableItemProperty<?, ?> identifiableItem) {
             tooltipBuilder = Handlers.Tooltip.buildNew(identifiableItem, false, true);

@@ -24,7 +24,7 @@ import java.util.Optional;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class InventoryModel extends Model {
     private static final String EMPTY_ACCESSORY_SLOT = "§7Accessory Slot";

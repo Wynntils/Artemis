@@ -6,7 +6,7 @@ package com.wynntils.models.raid.event;
 
 import com.wynntils.models.raid.type.RaidKind;
 import java.util.List;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class RaidEndedEvent extends Event {
     private final RaidKind raidKind;

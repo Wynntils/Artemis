@@ -19,8 +19,9 @@ import com.wynntils.utils.render.type.HorizontalAlignment;
 import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.render.type.VerticalAlignment;
 import com.wynntils.utils.wynn.ItemUtils;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class SpellCastMessageOverlay extends Overlay {
     private static final int SPELL_MESSAGE_TICKS = 40;
@@ -72,7 +73,7 @@ public class SpellCastMessageOverlay extends Overlay {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         if (spellMessageTimer <= 0) return;
 
         // Render it the same way vanilla renders item changes

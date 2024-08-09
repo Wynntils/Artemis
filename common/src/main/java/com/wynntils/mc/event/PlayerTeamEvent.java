@@ -1,15 +1,14 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public abstract class PlayerTeamEvent extends Event {
+public abstract class PlayerTeamEvent extends Event implements ICancellableEvent {
     private final String username;
     private final PlayerTeam playerTeam;
 

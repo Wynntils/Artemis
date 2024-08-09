@@ -1,9 +1,10 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.overlays.gamebars;
 
+import com.wynntils.core.components.Managers;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.consumers.overlays.OverlayPosition;
 import com.wynntils.core.consumers.overlays.OverlaySize;
@@ -25,8 +26,8 @@ public class HealthBarOverlay extends OverflowableBarOverlay {
     public HealthBarOverlay() {
         this(
                 new OverlayPosition(
-                        -29,
-                        -52,
+                        -34,
+                        -67,
                         VerticalAlignment.BOTTOM,
                         HorizontalAlignment.CENTER,
                         OverlayPosition.AnchorSection.BOTTOM_MIDDLE),
@@ -35,6 +36,7 @@ public class HealthBarOverlay extends OverflowableBarOverlay {
 
     protected HealthBarOverlay(OverlayPosition overlayPosition, OverlaySize overlaySize) {
         super(overlayPosition, overlaySize, CommonColors.RED);
+        this.userEnabled.store(false);
     }
 
     @Override
@@ -49,12 +51,12 @@ public class HealthBarOverlay extends OverflowableBarOverlay {
 
     @Override
     public boolean isActive() {
-        return true;
+        return Models.CharacterStats.getHealth() != CappedValue.EMPTY;
     }
 
     @Override
     protected void onConfigUpdate(Config<?> config) {
-        Models.CharacterStats.hideHealth(!this.shouldDisplayOriginal.get());
+        Models.CharacterStats.setHideHealth(Managers.Overlay.isEnabled(this) && !this.shouldDisplayOriginal.get());
     }
 
     @Override

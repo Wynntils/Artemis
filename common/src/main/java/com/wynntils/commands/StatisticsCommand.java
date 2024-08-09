@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -41,7 +42,7 @@ public class StatisticsCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         RequiredArgumentBuilder<CommandSourceStack, String> characterStatisticsBuilder = Commands.argument(
                         "statistic", StringArgumentType.greedyString())
                 .suggests(STATISTIC_SUGGESTION_PROVIDER)

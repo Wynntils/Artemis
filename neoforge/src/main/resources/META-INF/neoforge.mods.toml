@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+issueTrackerURL = "https://github.com/Wynntils/Wynntils/issues"
+license = "LGPL-3.0-only"
+
+[[mods]]
+modId = "wynntils"
+version = "${mod_version}"
+displayName = "Wynntils"
+authors = "Team Wynntils"
+description = "The best Wynncraft mod you'll probably find!"
+displayURL = "wynntils.com"
+logoFile = "assets/wynntils/logo.png"
+
+[[dependencies.wynntils]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${minecraft_version}]"
+
+[[dependencies.wynntils]]
+modId = "neoforge"
+mandatory = true
+versionRange = "${neoforge_version_range}"
+
+[[mixins]]
+config = "wynntils.mixins.json"
+
+[[mixins]]
+config = "wynntils.mixins.neoforge.json"

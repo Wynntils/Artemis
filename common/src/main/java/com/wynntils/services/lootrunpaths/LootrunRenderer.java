@@ -5,9 +5,10 @@
 package com.wynntils.services.lootrunpaths;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.wynntils.core.components.Managers;
 import com.wynntils.features.LootrunFeature;
 import com.wynntils.services.lootrunpaths.type.BlockValidness;
@@ -43,7 +44,7 @@ import org.joml.Vector3f;
 
 public final class LootrunRenderer {
     private static final MultiBufferSource.BufferSource BUFFER_SOURCE =
-            MultiBufferSource.immediate(new BufferBuilder(256));
+            MultiBufferSource.immediate(new ByteBufferBuilder(256));
 
     public static void renderLootrun(PoseStack poseStack, LootrunPathInstance lootrun, int color) {
         if (lootrun == null) {
@@ -59,6 +60,9 @@ public final class LootrunRenderer {
         poseStack.pushPose();
 
         Camera camera = McUtils.mc().gameRenderer.getMainCamera();
+
+        poseStack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(camera.getYRot() + 180.0F));
 
         poseStack.translate(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
 
@@ -295,10 +299,9 @@ public final class LootrunRenderer {
     private static void renderPoint(VertexConsumer consumer, Matrix4f lastMatrix, ColoredPosition coloredPosition) {
         Position position = coloredPosition.position();
         int pathColor = coloredPosition.color();
-        consumer.vertex(lastMatrix, (float) position.x(), (float) position.y(), (float) position.z())
-                .color(pathColor)
-                .normal(0, 0, 1)
-                .endVertex();
+        consumer.addVertex(lastMatrix, (float) position.x(), (float) position.y(), (float) position.z())
+                .setColor(pathColor)
+                .setNormal(0, 0, 1);
     }
 
     private static void renderTexturedQueuedPoints(
@@ -354,24 +357,20 @@ public final class LootrunRenderer {
         pos4 = pos4.add(startVec).sub(camPos);
 
         vertexConsumer
-                .vertex(poseStack.last().pose(), pos1.x, pos1.y, pos1.z)
-                .color(color)
-                .uv(0, 1)
-                .endVertex();
+                .addVertex(poseStack.last().pose(), pos1.x, pos1.y, pos1.z)
+                .setUv(0, 1)
+                .setColor(color);
         vertexConsumer
-                .vertex(poseStack.last().pose(), pos2.x, pos2.y, pos2.z)
-                .color(color)
-                .uv(0, 0)
-                .endVertex();
+                .addVertex(poseStack.last().pose(), pos2.x, pos2.y, pos2.z)
+                .setUv(0, 0)
+                .setColor(color);
         vertexConsumer
-                .vertex(poseStack.last().pose(), pos3.x, pos3.y, pos3.z)
-                .color(color)
-                .uv(1, 0)
-                .endVertex();
+                .addVertex(poseStack.last().pose(), pos3.x, pos3.y, pos3.z)
+                .setUv(1, 0)
+                .setColor(color);
         vertexConsumer
-                .vertex(poseStack.last().pose(), pos4.x, pos4.y, pos4.z)
-                .color(color)
-                .uv(1, 1)
-                .endVertex();
+                .addVertex(poseStack.last().pose(), pos4.x, pos4.y, pos4.z)
+                .setUv(1, 1)
+                .setColor(color);
     }
 }

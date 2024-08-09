@@ -6,8 +6,8 @@ package com.wynntils.features.map;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.consumers.features.Feature;
 import com.wynntils.core.persisted.Persisted;
@@ -35,7 +35,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Position;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
@@ -44,6 +44,8 @@ import org.joml.Vector4f;
 
 @ConfigCategory(Category.MAP)
 public class WorldWaypointDistanceFeature extends Feature {
+    private static final MultiBufferSource.BufferSource BUFFER_SOURCE =
+            MultiBufferSource.immediate(new ByteBufferBuilder(256));
     private static final WaypointPoi DUMMY_WAYPOINT = new WaypointPoi(() -> null, "");
 
     @Persisted
@@ -208,13 +210,11 @@ public class WorldWaypointDistanceFeature extends Feature {
                 poseStack.mulPose(new Quaternionf().rotationXYZ(0, 0, (float) Math.toRadians(angle)));
                 poseStack.translate(-pointerDisplayPositionX, -pointerDisplayPositionY, 0);
 
-                MultiBufferSource.BufferSource bufferSource =
-                        MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
                 DUMMY_WAYPOINT
                         .getPointerPoi()
                         .renderAt(
                                 poseStack,
-                                bufferSource,
+                                BUFFER_SOURCE,
                                 pointerDisplayPositionX,
                                 pointerDisplayPositionY,
                                 false,
@@ -222,7 +222,7 @@ public class WorldWaypointDistanceFeature extends Feature {
                                 1,
                                 50,
                                 true);
-                bufferSource.endBatch();
+                BUFFER_SOURCE.endBatch();
                 poseStack.popPose();
             }
         }

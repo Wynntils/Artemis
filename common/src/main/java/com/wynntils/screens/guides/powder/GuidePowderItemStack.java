@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.guides.powder;
@@ -18,6 +18,7 @@ import java.util.Locale;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -47,7 +48,7 @@ public final class GuidePowderItemStack extends GuideItemStack {
     }
 
     @Override
-    public List<Component> getTooltipLines(Player player, TooltipFlag flag) {
+    public List<Component> getTooltipLines(Item.TooltipContext context, Player player, TooltipFlag flag) {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(getHoverName());
         tooltip.addAll(generatedTooltip);

@@ -11,6 +11,7 @@ import com.wynntils.core.WynntilsMod;
 import com.wynntils.services.lootrunpaths.type.LootrunNote;
 import com.wynntils.services.lootrunpaths.type.LootrunPath;
 import com.wynntils.services.lootrunpaths.type.LootrunSaveResult;
+import com.wynntils.utils.mc.McUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -62,7 +63,7 @@ public final class LootrunPathFileParser {
                 JsonObject positionJson = noteJson.getAsJsonObject("position");
 
                 // Artemis builds, until this point have used a slightly different format for notes
-                // This perserves support for those files, as this commit fixes the format to match legacy
+                // This preserves support for those files, as this commit fixes the format to match legacy
                 if (positionJson == null) {
                     positionJson = noteJson.getAsJsonObject("location");
                 }
@@ -71,7 +72,8 @@ public final class LootrunPathFileParser {
                         positionJson.get("x").getAsDouble(),
                         positionJson.get("y").getAsDouble(),
                         positionJson.get("z").getAsDouble());
-                Component component = Component.Serializer.fromJson(noteJson.get("note"));
+                Component component = Component.Serializer.fromJson(
+                        noteJson.get("note"), McUtils.mc().player.registryAccess());
                 LootrunNote note = new LootrunNote(position, component);
                 notes.add(note);
             }
@@ -119,7 +121,10 @@ public final class LootrunPathFileParser {
                 locationJson.addProperty("z", position.z());
                 noteJson.add("location", locationJson);
 
-                noteJson.add("note", Component.Serializer.toJsonTree(note.component()));
+                noteJson.addProperty(
+                        "note",
+                        Component.Serializer.toJson(
+                                note.component(), McUtils.mc().player.registryAccess()));
                 notes.add(noteJson);
             }
             json.add("notes", notes);

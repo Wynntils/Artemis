@@ -59,8 +59,6 @@ public class LootrunPathButton extends WynntilsButton {
                         this.getX() + 2,
                         this.getY() + 1,
                         this.width - 3,
-                        screen.getTranslationX(),
-                        screen.getTranslationY(),
                         CommonColors.BLACK,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.TOP,
@@ -101,7 +99,7 @@ public class LootrunPathButton extends WynntilsButton {
             }
 
             LootrunPath path = lootrun.path();
-            Position start = path.points().get(0);
+            Position start = path.points().getFirst();
 
             McUtils.mc().setScreen(MainMapScreen.create((float) start.x(), (float) start.z()));
             return true;

@@ -6,7 +6,7 @@ package com.wynntils.models.raid.event;
 
 import com.wynntils.models.raid.type.RaidKind;
 import com.wynntils.models.raid.type.RaidRoomType;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class RaidChallengeEvent extends Event {
     private final RaidKind raidKind;

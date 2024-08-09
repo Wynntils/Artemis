@@ -53,25 +53,23 @@ public class DiscoveryButton extends WynntilsButton implements TooltipProvider {
         FontRenderer.getInstance()
                 .renderScrollingText(
                         poseStack,
-                        StyledText.fromString(discoveryInfo.getName()),
+                        StyledText.fromString(discoveryInfo.name()),
                         this.getX() + 14,
                         this.getY() + 1,
                         this.width - 15,
-                        discoveriesScreen.getTranslationX(),
-                        discoveriesScreen.getTranslationY(),
                         CommonColors.BLACK,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.TOP,
                         TextShadow.NONE,
                         1f);
 
-        Texture stateTexture = discoveryInfo.isDiscovered()
-                ? switch (discoveryInfo.getType()) {
+        Texture stateTexture = discoveryInfo.discovered()
+                ? switch (discoveryInfo.type()) {
                     case TERRITORY -> Texture.DISCOVERED_TERRITORY_ICON;
                     case WORLD -> Texture.DISCOVERED_WORLD_ICON;
                     case SECRET -> Texture.DISCOVERED_SECRET_ICON;
                 }
-                : switch (discoveryInfo.getType()) {
+                : switch (discoveryInfo.type()) {
                     case TERRITORY -> Texture.UNDISCOVERED_TERRITORY_ICON;
                     case WORLD -> Texture.UNDISCOVERED_WORLD_ICON;
                     case SECRET -> Texture.UNDISCOVERED_SECRET_ICON;
@@ -94,7 +92,7 @@ public class DiscoveryButton extends WynntilsButton implements TooltipProvider {
             Models.Discovery.setDiscoveryCompass(discoveryInfo);
         } else if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
             Models.Discovery.openDiscoveryOnMap(discoveryInfo);
-        } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && discoveryInfo.getType() == DiscoveryType.SECRET) {
+        } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && discoveryInfo.type() == DiscoveryType.SECRET) {
             Models.Discovery.openSecretDiscoveryWiki(discoveryInfo);
         }
 
@@ -107,13 +105,13 @@ public class DiscoveryButton extends WynntilsButton implements TooltipProvider {
 
     @Override
     public List<Component> getTooltipLines() {
-        List<Component> lines = new ArrayList<>(discoveryInfo.getLore());
+        List<Component> lines = new ArrayList<>(discoveryInfo.displayLore());
 
         // We need to inject requirements into lore here, as we only have updated discovery info here.
-        if (!discoveryInfo.getRequirements().isEmpty()) {
-            List<String> unmet = discoveryInfo.getRequirements().stream()
+        if (!discoveryInfo.requirements().isEmpty()) {
+            List<String> unmet = discoveryInfo.requirements().stream()
                     .filter(requirement -> Models.Discovery.getAllCompletedDiscoveries(ActivitySortOrder.ALPHABETIC)
-                            .noneMatch(discovery -> discovery.getName().equals(requirement)))
+                            .noneMatch(discovery -> discovery.name().equals(requirement)))
                     .toList();
 
             if (!unmet.isEmpty()) {
@@ -126,8 +124,8 @@ public class DiscoveryButton extends WynntilsButton implements TooltipProvider {
             }
         }
 
-        if (discoveryInfo.getType() == DiscoveryType.SECRET
-                || Models.Territory.getTerritoryProfile(discoveryInfo.getName()) != null) {
+        if (discoveryInfo.type() == DiscoveryType.SECRET
+                || Models.Territory.getTerritoryProfile(discoveryInfo.name()) != null) {
             lines.add(Component.empty());
             lines.add(Component.translatable("screens.wynntils.wynntilsDiscoveries.leftClickToSetCompass")
                     .withStyle(ChatFormatting.BOLD)
@@ -137,7 +135,7 @@ public class DiscoveryButton extends WynntilsButton implements TooltipProvider {
                     .withStyle(ChatFormatting.YELLOW));
         }
 
-        if (discoveryInfo.getType() == DiscoveryType.SECRET) {
+        if (discoveryInfo.type() == DiscoveryType.SECRET) {
             lines.add(Component.translatable("screens.wynntils.wynntilsDiscoveries.rightClickToOpenWiki")
                     .withStyle(ChatFormatting.BOLD)
                     .withStyle(ChatFormatting.GOLD));

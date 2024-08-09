@@ -17,7 +17,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class StatisticsService extends Service {
     private final StatisticsCollectors collectors = new StatisticsCollectors();
@@ -60,7 +60,7 @@ public final class StatisticsService extends Service {
         addToStatistics(kind, 1);
     }
 
-    public void addToStatistics(StatisticKind kind, int amount) {
+    public void addToStatistics(StatisticKind kind, long amount) {
         StatisticEntry newValue = currentStatistics.containsKey(kind)
                 ? currentStatistics.get(kind).getUpdatedEntry(amount)
                 : new StatisticEntry(amount, 1, amount, amount, System.currentTimeMillis(), System.currentTimeMillis());

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.commands;
@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -36,7 +37,7 @@ public class MapCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         return Commands.literal("map")
                 .then(Commands.literal("poiProvider")
                         .then(Commands.literal("add")

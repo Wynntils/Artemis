@@ -27,7 +27,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class ChatTabService extends Service {
     private ChatComponent fallbackChat;
@@ -79,6 +79,11 @@ public final class ChatTabService extends Service {
 
     public int getNextFocusedTab() {
         return (getTabIndex(getFocusedTab()) + 1) % getTabCount();
+    }
+
+    public int getPreviousFocusedTab() {
+        int tabIndex = getTabIndex(getFocusedTab());
+        return (tabIndex - 1 + getTabCount()) % getTabCount();
     }
 
     public void refocusFirstTab() {

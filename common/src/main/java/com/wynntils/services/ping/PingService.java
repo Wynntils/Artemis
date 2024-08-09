@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.ping;
@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket;
 import net.minecraft.network.protocol.game.ServerboundCommandSuggestionPacket;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class PingService extends Service {
     private static final int MS_PER_PING = 1000;
@@ -40,8 +40,9 @@ public class PingService extends Service {
 
     // We are specifically looking for the packet itself, not it's processing. This is why we are using the PacketEvent.
     @SubscribeEvent
-    public void onCommandSuggestions(PacketEvent.PacketReceivedEvent<ClientboundCommandSuggestionsPacket> event) {
-        if (event.getPacket().getId() != -1) return;
+    public void onCommandSuggestions(PacketEvent.PacketReceivedEvent<?> event) {
+        if (!(event.getPacket() instanceof ClientboundCommandSuggestionsPacket packet)) return;
+        if (packet.id() != -1) return;
 
         lastPing = (int) (System.currentTimeMillis() - lastPingSent);
 

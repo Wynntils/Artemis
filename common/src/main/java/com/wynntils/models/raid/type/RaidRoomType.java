@@ -6,12 +6,15 @@ package com.wynntils.models.raid.type;
 
 public enum RaidRoomType {
     INTRO,
+    INSTRUCTIONS_1,
     CHALLENGE_1,
-    POWERUP_1,
+    BUFF_1,
+    INSTRUCTIONS_2,
     CHALLENGE_2,
-    POWERUP_2,
+    BUFF_2,
+    INSTRUCTIONS_3,
     CHALLENGE_3,
-    POWERUP_3,
+    BUFF_3,
     BOSS_INTERMISSION,
     BOSS_FIGHT;
 

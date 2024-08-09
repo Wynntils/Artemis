@@ -41,6 +41,7 @@ import com.wynntils.utils.type.BoundingCircle;
 import com.wynntils.utils.type.BoundingShape;
 import java.util.List;
 import java.util.stream.Stream;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 
@@ -114,7 +115,7 @@ public class MinimapOverlay extends Overlay {
     // FIXME: This is the only overlay not to use buffer sources for rendering. This is due to `createMask`
     // currently not working with buffer sources.
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         if (!Models.WorldState.onWorld()) return;
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

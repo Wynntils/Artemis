@@ -12,12 +12,11 @@ import com.wynntils.core.components.Models;
 import com.wynntils.core.consumers.commands.Command;
 import com.wynntils.models.worlds.profile.ServerProfile;
 import com.wynntils.utils.StringUtils;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ClickEvent;
@@ -40,7 +39,7 @@ public class ServersCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         LiteralCommandNode<CommandSourceStack> listBuilder = Commands.literal("list")
                 .then(Commands.literal("up").executes(this::serverUptimeList))
                 .executes(this::serverList)
@@ -55,17 +54,11 @@ public class ServersCommand extends Command {
                 .then(Commands.argument("server", StringArgumentType.word()).executes(this::serverInfo))
                 .executes(this::serverInfo);
 
-        LiteralCommandNode<CommandSourceStack> soulpointsBuilder = Commands.literal("soulpoints")
-                .executes(this::serverSoulpointsList)
-                .build();
-
         return base.then(listBuilder)
                 .then(infoBuilder)
                 .then(Commands.literal("l").executes(this::serverList))
                 .then(Commands.literal("ul").executes(this::serverUptimeList))
                 .then(Commands.literal("up").executes(this::serverUptimeList))
-                .then(Commands.literal("soul").executes(this::serverSoulpointsList))
-                .then(Commands.literal("s").executes(this::serverSoulpointsList))
                 .then(infoAliasBuilder)
                 .executes(this::syntaxError);
     }
@@ -133,7 +126,7 @@ public class ServersCommand extends Command {
                             StringUtils.capitalizeFirst(serverType) + " (" + currentTypeServers.size() + "):\n")
                     .withStyle(ChatFormatting.GOLD));
 
-            String lastServer = currentTypeServers.get(currentTypeServers.size() - 1);
+            String lastServer = currentTypeServers.getLast();
             for (String server : currentTypeServers) {
                 message.append(getServerComponent(server).withStyle(ChatFormatting.AQUA));
 
@@ -159,37 +152,6 @@ public class ServersCommand extends Command {
                     .append(Component.literal(
                                     ": " + Models.ServerList.getServer(server).getUptime())
                             .withStyle(ChatFormatting.AQUA)));
-        }
-
-        context.getSource().sendSuccess(() -> message, false);
-
-        return 1;
-    }
-
-    private int serverSoulpointsList(CommandContext<CommandSourceStack> context) {
-        List<ServerProfile> soulPointServers = Models.ServerList.getServersSortedOnUptime().stream()
-                .map(Models.ServerList::getServer)
-                .filter(Objects::nonNull)
-                .filter(server -> server.getUptimeInMinutes() % 20 >= 10)
-                .sorted(Comparator.comparing(server -> 20 - (server.getUptimeInMinutes() % 20)))
-                .toList();
-
-        MutableComponent message = Component.literal("Soul point server list:").withStyle(ChatFormatting.GOLD);
-        for (ServerProfile server : soulPointServers) {
-            int minutesUntilSoulPoint = 20 - (server.getUptimeInMinutes() % 20);
-
-            // 1-2 minutes before - Green
-            // 3-4 minutes before - Yellow
-            // 5+ minutes before - Red
-            ChatFormatting timeColor = minutesUntilSoulPoint <= 2
-                    ? ChatFormatting.GREEN
-                    : (minutesUntilSoulPoint <= 4 ? ChatFormatting.YELLOW : ChatFormatting.RED);
-
-            message.append("\n");
-            message.append(getServerComponent(server.getServerName())
-                    .withStyle(ChatFormatting.DARK_AQUA)
-                    .append(Component.literal(": In " + minutesUntilSoulPoint + "m")
-                            .withStyle(timeColor)));
         }
 
         context.getSource().sendSuccess(() -> message, false);

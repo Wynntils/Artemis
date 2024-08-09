@@ -4,7 +4,7 @@
  */
 package com.wynntils.models.war.event;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class GuildWarTowerEffectEvent extends Event {
     public static class AuraSpawned extends GuildWarTowerEffectEvent {}

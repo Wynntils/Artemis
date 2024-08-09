@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.lootrun.particle;
@@ -37,7 +37,7 @@ public class LootrunTaskParticleVerifier implements ParticleVerifier {
         // 8. Bottom to Right particles (4)
 
         // We verify particles by checking if they are in the radius of the circle
-        Position rightParticle = positions.get(0);
+        Position rightParticle = positions.getFirst();
 
         Vec3 circleCenter = new Vec3(rightParticle.x() - RADIUS, rightParticle.y(), rightParticle.z());
 
@@ -87,7 +87,7 @@ public class LootrunTaskParticleVerifier implements ParticleVerifier {
 
     @Override
     public Particle getParticle(List<Position> positions) {
-        Position rightParticle = positions.get(0);
+        Position rightParticle = positions.getFirst();
 
         Position verifiedParticlePosition = new Vec3(rightParticle.x() - RADIUS, rightParticle.y(), rightParticle.z());
         return new Particle(verifiedParticlePosition, ParticleType.LOOTRUN_TASK);

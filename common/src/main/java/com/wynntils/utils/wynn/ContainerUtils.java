@@ -82,6 +82,22 @@ public final class ContainerUtils {
                 changedSlots));
     }
 
+    public static void pressKeyOnSlot(int clickedSlot, int containerId, int buttonNum, List<ItemStack> items) {
+        Int2ObjectMap<ItemStack> changedSlots = new Int2ObjectOpenHashMap<>();
+        changedSlots.put(clickedSlot, new ItemStack(Items.AIR));
+
+        int transactionId = 0;
+
+        McUtils.sendPacket(new ServerboundContainerClickPacket(
+                containerId,
+                transactionId,
+                clickedSlot,
+                buttonNum,
+                ClickType.SWAP,
+                items.get(clickedSlot),
+                changedSlots));
+    }
+
     public static void closeContainer(int containerId) {
         McUtils.sendPacket(new ServerboundContainerClosePacket(containerId));
     }

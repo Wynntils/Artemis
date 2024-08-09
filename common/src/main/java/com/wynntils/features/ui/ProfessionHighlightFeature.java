@@ -17,6 +17,7 @@ import com.wynntils.mc.event.ScreenInitEvent;
 import com.wynntils.mc.event.SlotRenderEvent;
 import com.wynntils.models.containers.Container;
 import com.wynntils.models.containers.containers.CraftingStationContainer;
+import com.wynntils.models.containers.containers.personal.PersonalStorageContainer;
 import com.wynntils.models.containers.type.HighlightableProfessionProperty;
 import com.wynntils.models.items.properties.ProfessionItemProperty;
 import com.wynntils.models.profession.type.ProfessionType;
@@ -32,8 +33,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 @ConfigCategory(Category.UI)
@@ -56,8 +57,7 @@ public class ProfessionHighlightFeature extends Feature {
 
         if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) return;
 
-        if (!(Models.Container.getCurrentContainer()
-                instanceof HighlightableProfessionProperty highlightableProfessionProperty)) {
+        if (!(Models.Container.getCurrentContainer() instanceof HighlightableProfessionProperty)) {
             return;
         }
 
@@ -148,9 +148,16 @@ public class ProfessionHighlightFeature extends Feature {
     }
 
     private void addWidgets(AbstractContainerScreen<?> containerScreen, int renderX, int renderY) {
+        renderX += containerScreen.imageWidth + 2;
+
+        if (Models.Container.getCurrentContainer() instanceof PersonalStorageContainer) {
+            // Personal storage container textures extend past the normal renderX
+            // so the widgets need to be shifted more to the right
+            renderX += 10;
+        }
+
         // Add the button to the top right side of the container
-        containerScreen.addRenderableWidget(
-                new ProfessionHighlightButton(renderX + containerScreen.imageWidth + 2, renderY, 20, 20));
+        containerScreen.addRenderableWidget(new ProfessionHighlightButton(renderX, renderY, 20, 20));
     }
 
     private static final class ProfessionHighlightButton extends WynntilsButton {
@@ -207,7 +214,7 @@ public class ProfessionHighlightFeature extends Feature {
             // Left click increases the profession type
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 if (profession == null) {
-                    profession = ProfessionType.craftingProfessionTypes().get(0);
+                    profession = ProfessionType.craftingProfessionTypes().getFirst();
                 } else {
                     int nextIndex = (ProfessionType.craftingProfessionTypes().indexOf(profession) + 1)
                             % ProfessionType.craftingProfessionTypes().size();
@@ -226,8 +233,7 @@ public class ProfessionHighlightFeature extends Feature {
             // Right click decreases the profession type
             if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
                 if (profession == null) {
-                    profession = ProfessionType.craftingProfessionTypes()
-                            .get(ProfessionType.craftingProfessionTypes().size() - 1);
+                    profession = ProfessionType.craftingProfessionTypes().getLast();
                 } else {
                     int nextIndex = (ProfessionType.craftingProfessionTypes().indexOf(profession) - 1)
                             % ProfessionType.craftingProfessionTypes().size();

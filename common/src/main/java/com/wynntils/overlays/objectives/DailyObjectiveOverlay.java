@@ -24,9 +24,10 @@ import com.wynntils.utils.render.buffered.BufferedRenderUtils;
 import com.wynntils.utils.render.type.HorizontalAlignment;
 import com.wynntils.utils.render.type.VerticalAlignment;
 import java.util.List;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class DailyObjectiveOverlay extends ObjectiveOverlayBase {
     @Persisted
@@ -58,7 +59,7 @@ public class DailyObjectiveOverlay extends ObjectiveOverlayBase {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         List<WynnObjective> objectives = Models.Objectives.getPersonalObjectives();
 
         if (objectives.isEmpty()) return;

@@ -126,9 +126,10 @@ public class ItemSearchHelperWidget extends BasicTexturedButton {
 
             // Header
             if (i < filterPageCount) {
-                tooltipPage.add(0, Component.translatable("screens.wynntils.itemSearchHelperWidget.availableFilters"));
+                tooltipPage.addFirst(
+                        Component.translatable("screens.wynntils.itemSearchHelperWidget.availableFilters"));
             } else {
-                tooltipPage.add(0, Component.translatable("screens.wynntils.itemSearchHelperWidget.availableStats"));
+                tooltipPage.addFirst(Component.translatable("screens.wynntils.itemSearchHelperWidget.availableStats"));
             }
 
             // Footer

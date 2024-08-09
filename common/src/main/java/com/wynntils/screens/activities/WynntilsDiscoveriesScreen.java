@@ -41,7 +41,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class WynntilsDiscoveriesScreen extends WynntilsListScreen<DiscoveryInfo, DiscoveryButton>
         implements SortableActivityScreen {
@@ -347,19 +347,19 @@ public final class WynntilsDiscoveriesScreen extends WynntilsListScreen<Discover
         // We need to filter duplicates
         elements.addAll(Stream.concat(
                         Models.Discovery.getAllDiscoveries(activitySortOrder)
-                                .filter(discoveryInfo -> !discoveryInfo.isDiscovered())
-                                .filter(discoveryInfo -> switch (discoveryInfo.getType()) {
+                                .filter(discoveryInfo -> !discoveryInfo.discovered())
+                                .filter(discoveryInfo -> switch (discoveryInfo.type()) {
                                     case TERRITORY -> isShowingUndiscoveredTerritory();
                                     case WORLD -> isShowingUndiscoveredWorld();
                                     case SECRET -> isShowingUndiscoveredSecrets();
                                 }),
                         Models.Discovery.getAllCompletedDiscoveries(activitySortOrder)
-                                .filter(discoveryInfo -> switch (discoveryInfo.getType()) {
+                                .filter(discoveryInfo -> switch (discoveryInfo.type()) {
                                     case TERRITORY -> isShowingTerritory();
                                     case WORLD -> isShowingWorld();
                                     case SECRET -> isShowingSecrets();
                                 }))
-                .filter(info -> StringUtils.partialMatch(info.getName(), searchTerm))
+                .filter(info -> StringUtils.partialMatch(info.name(), searchTerm))
                 .toList());
     }
 

@@ -7,7 +7,7 @@ package com.wynntils.services.statistics.type;
 public record StatisticEntry(long total, long count, long min, long max, long firstModified, long lastModified) {
     public static final StatisticEntry EMPTY = new StatisticEntry(0, 0, 0, 0, 0, 0);
 
-    public StatisticEntry getUpdatedEntry(int amount) {
+    public StatisticEntry getUpdatedEntry(long amount) {
         return new StatisticEntry(
                 total + amount,
                 count + 1,

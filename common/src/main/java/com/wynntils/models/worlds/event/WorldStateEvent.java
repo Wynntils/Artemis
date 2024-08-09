@@ -1,11 +1,11 @@
 /*
- * Copyright © Wynntils 2021-2023.
+ * Copyright © Wynntils 2021-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.worlds.event;
 
 import com.wynntils.models.worlds.type.WorldState;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class WorldStateEvent extends Event {
     private final WorldState newState;

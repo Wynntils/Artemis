@@ -431,9 +431,15 @@ public class TerritoryManagementScreen extends WynntilsScreen implements Wrapped
     @Override
     public boolean doMouseClicked(double mouseX, double mouseY, int button) {
         // Render area widgets need to handle the scroll offset
-        for (AbstractWidget widget : renderAreaWidgets) {
-            if (widget.isMouseOver(mouseX, mouseY + scrollOffset)) {
-                return widget.mouseClicked(mouseX, mouseY + scrollOffset, button);
+        // Check if mouse is over the render area
+        if (mouseX >= getRenderX() + RENDER_AREA_POSITION.a()
+                && mouseX <= getRenderX() + RENDER_AREA_POSITION.a() + RENDER_AREA_SIZE.a()
+                && mouseY >= getRenderY() + RENDER_AREA_POSITION.b()
+                && mouseY <= getRenderY() + RENDER_AREA_POSITION.b() + RENDER_AREA_SIZE.b()) {
+            for (AbstractWidget widget : renderAreaWidgets) {
+                if (widget.isMouseOver(mouseX, mouseY + scrollOffset)) {
+                    return widget.mouseClicked(mouseX, mouseY + scrollOffset, button);
+                }
             }
         }
 

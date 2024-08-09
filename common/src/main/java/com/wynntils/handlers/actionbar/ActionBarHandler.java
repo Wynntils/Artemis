@@ -8,35 +8,31 @@ import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Handler;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.text.StyledText;
-import com.wynntils.handlers.actionbar.type.ActionBarPosition;
+import com.wynntils.handlers.actionbar.event.ActionBarRenderEvent;
+import com.wynntils.handlers.actionbar.event.ActionBarUpdatedEvent;
 import com.wynntils.mc.event.ChatPacketReceivedEvent;
+import com.wynntils.models.worlds.event.WorldStateEvent;
+import com.wynntils.utils.type.IterationDecision;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class ActionBarHandler extends Handler {
-    private static final String VANILLA_PADDING = "\\s{4,}";
-    private static final StyledText CENTER_PADDING = StyledText.fromString("§0               ");
-    private static final String STANDARD_PADDING = "    ";
+    private static final ResourceLocation ACTION_BAR_FONT = ResourceLocation.withDefaultNamespace("hud/default/center");
+    private static final ResourceLocation COORDINATES_FONT =
+            ResourceLocation.withDefaultNamespace("hud/default/top_right");
 
-    private static final Map<ActionBarPosition, List<ActionBarSegment>> ALL_SEGMENTS = Map.of(
-            ActionBarPosition.LEFT,
-            new ArrayList<>(),
-            ActionBarPosition.CENTER,
-            new ArrayList<>(),
-            ActionBarPosition.RIGHT,
-            new ArrayList<>());
-    private final Map<ActionBarPosition, ActionBarSegment> lastSegments = new HashMap<>();
-    private StyledText previousRawContent = null;
-    private StyledText previousProcessedContent;
+    private static final FallBackSegmentMatcher FALLBACK_SEGMENT_MATCHER = new FallBackSegmentMatcher();
 
-    public void registerSegment(ActionBarSegment segment) {
-        ALL_SEGMENTS.get(segment.getPosition()).add(segment);
+    private final List<ActionBarSegmentMatcher> segmentMatchers = new ArrayList<>();
+
+    private StyledText lastParsedActionBarText = StyledText.EMPTY;
+    private List<ActionBarSegment> lastMatchedSegments = new ArrayList<>();
+
+    public void registerSegment(ActionBarSegmentMatcher segmentMatcher) {
+        segmentMatchers.add(segmentMatcher);
     }
 
     @SubscribeEvent
@@ -44,86 +40,125 @@ public final class ActionBarHandler extends Handler {
         // FIXME: Reverse dependency!
         if (!Models.WorldState.onWorld()) return;
 
-        StyledText content = StyledText.fromComponent(event.getMessage());
-        if (content.equals(previousRawContent)) {
-            // No changes, skip parsing
-            if (!content.equals(previousProcessedContent)) {
-                event.setMessage(previousProcessedContent.getComponent());
+        StyledText packetText = StyledText.fromComponent(event.getMessage());
+
+        // Separate the action bar text from the coordinates
+        StyledText actionBarText = packetText.iterate((part, changes) -> {
+            if (!ACTION_BAR_FONT.equals(part.getPartStyle().getFont())) {
+                changes.remove(part);
             }
+
+            return IterationDecision.CONTINUE;
+        });
+
+        StyledText coordinatesText = packetText.iterate((part, changes) -> {
+            if (!COORDINATES_FONT.equals(part.getPartStyle().getFont())) {
+                changes.remove(part);
+            }
+
+            return IterationDecision.CONTINUE;
+        });
+
+        if (actionBarText.isEmpty()) {
+            WynntilsMod.warn("Failed to find action bar text in packet: " + packetText.getString());
             return;
         }
-        previousRawContent = content;
 
-        StyledText[] contentGroups = content.split(VANILLA_PADDING);
+        List<ActionBarSegment> matchedSegments;
 
-        // Create map of position -> matching part of the content
-        Map<ActionBarPosition, StyledText> positionMatches = new EnumMap<>(ActionBarPosition.class);
-        switch (contentGroups.length) {
-            case 3:
-                // normal case
-                Arrays.stream(ActionBarPosition.values())
-                        .forEach(pos -> positionMatches.put(pos, contentGroups[pos.ordinal()]));
-                break;
-            case 2:
-                // missing center
-                WynntilsMod.warn("Only 2 segments in action bar: " + content);
-                positionMatches.put(ActionBarPosition.LEFT, contentGroups[0]);
-                positionMatches.put(ActionBarPosition.RIGHT, contentGroups[1]);
-                break;
-            case 1:
-                // only center
-                WynntilsMod.warn("Only 1 segment in action bar: " + content);
-                positionMatches.put(ActionBarPosition.CENTER, contentGroups[0]);
-                break;
-            default:
-                WynntilsMod.warn("0 or more than 3 segments in action bar: " + content);
-                return;
-        }
-
-        Arrays.stream(ActionBarPosition.values()).forEach(pos -> processPosition(pos, positionMatches));
-
-        StyledText newContentBuilder = StyledText.EMPTY;
-        // vanilla segments have three spaces between each segment, regardless of content
-        if (!lastSegments.get(ActionBarPosition.LEFT).isHidden()) {
-            newContentBuilder = newContentBuilder.append(positionMatches.get(ActionBarPosition.LEFT));
-        }
-        if (!lastSegments.get(ActionBarPosition.CENTER).isHidden()) {
-            newContentBuilder = newContentBuilder.append(STANDARD_PADDING);
-            newContentBuilder = newContentBuilder.append(positionMatches.get(ActionBarPosition.CENTER));
-            newContentBuilder = newContentBuilder.append(STANDARD_PADDING);
+        // Skip parsing if the action bar text is the same as the last parsed one
+        if (lastParsedActionBarText.equals(packetText)) {
+            matchedSegments = lastMatchedSegments;
         } else {
-            // Add padding
-            newContentBuilder = newContentBuilder.append(CENTER_PADDING);
+            matchedSegments = parseActionBarSegments(actionBarText);
+
+            lastParsedActionBarText = packetText;
+            lastMatchedSegments = matchedSegments;
+
+            if (WynntilsMod.isDevelopmentBuild() || WynntilsMod.isDevelopmentEnvironment()) {
+                debugChecks(matchedSegments, actionBarText);
+            }
+
+            WynntilsMod.postEvent(new ActionBarUpdatedEvent(matchedSegments));
         }
-        if (!lastSegments.get(ActionBarPosition.RIGHT).isHidden()) {
-            newContentBuilder = newContentBuilder.append(positionMatches.get(ActionBarPosition.RIGHT));
+
+        ActionBarRenderEvent actionBarRenderEvent = new ActionBarRenderEvent(matchedSegments);
+        WynntilsMod.postEvent(actionBarRenderEvent);
+
+        // Remove disabled segments from the action bar text
+        for (ActionBarSegment disabledSegment : actionBarRenderEvent.getDisabledSegments()) {
+            actionBarText = actionBarText.replaceFirst(disabledSegment.getSegmentText(), "");
         }
-        newContentBuilder = newContentBuilder.trim(); // In case either left or right is hidden
-        previousProcessedContent = newContentBuilder;
-        if (!content.equals(newContentBuilder)) {
-            event.setMessage(newContentBuilder.getComponent());
+
+        StyledText renderedText = actionBarText;
+
+        // Append coordinates if needed
+        if (actionBarRenderEvent.shouldRenderCoordinates()) {
+            renderedText = actionBarText.append(coordinatesText);
+        }
+
+        event.setMessage(renderedText.getComponent());
+    }
+
+    @SubscribeEvent
+    public void onWorldStateChange(WorldStateEvent event) {
+        lastParsedActionBarText = StyledText.EMPTY;
+        lastMatchedSegments = new ArrayList<>();
+    }
+
+    public List<ActionBarSegment> parseActionBarSegments(StyledText actionBarText) {
+        List<ActionBarSegment> matchedSegments = new ArrayList<>();
+
+        for (ActionBarSegmentMatcher segmentMatcher : segmentMatchers) {
+            ActionBarSegment parsedSegment =
+                    segmentMatcher.parse(actionBarText.getString().replaceAll("%", ""));
+            if (parsedSegment == null) continue;
+
+            matchedSegments.add(parsedSegment);
+            actionBarText = actionBarText.replaceFirst(parsedSegment.getSegmentText(), "%");
+        }
+
+        // Check if there is any leftover text, add them as separate fallback segments
+        // (as we could be missing a segment matcher in separate, not continuous parts of the action bar text)
+        Arrays.stream(actionBarText.split("%"))
+                .filter(text -> !text.isEmpty())
+                .forEach(part -> matchedSegments.add(FALLBACK_SEGMENT_MATCHER.parse(part.getString())));
+
+        return matchedSegments;
+    }
+
+    private static void debugChecks(List<ActionBarSegment> matchedSegments, StyledText actionBarText) {
+        List<ActionBarSegment> fallbackSegments = matchedSegments.stream()
+                .filter(segment -> segment instanceof FallbackSegment)
+                .toList();
+
+        fallbackSegments.forEach(segment ->
+                WynntilsMod.warn("Failed to match a portion of the action bar text, using a fallback: " + segment));
+
+        if (!fallbackSegments.isEmpty()) {
+            WynntilsMod.warn("Action bar text: " + actionBarText.getString());
         }
     }
 
-    private void processPosition(ActionBarPosition pos, Map<ActionBarPosition, StyledText> positionMatches) {
-        List<ActionBarSegment> potentialSegments = ALL_SEGMENTS.get(pos);
-        for (ActionBarSegment segment : potentialSegments) {
-            Matcher m = positionMatches.get(pos).getMatcher(segment.getPattern());
-            if (m.matches()) {
-                ActionBarSegment lastSegment = lastSegments.get(pos);
-                if (segment != lastSegment) {
-                    // This is a new kind of segment, tell the old one it disappeared
-                    if (lastSegment != null) {
-                        lastSegment.removed();
-                    }
-                    lastSegments.put(pos, segment);
-                    segment.appeared(m);
-                } else {
-                    segment.update(m);
-                }
+    /**
+     * A fallback matcher that matches any action bar text that doesn't match any other segment.
+     * This is used to prevent the action bar text from being lost if it doesn't match any other segment.
+     */
+    private static final class FallBackSegmentMatcher implements ActionBarSegmentMatcher {
+        @Override
+        public ActionBarSegment parse(String actionBar) {
+            return new FallbackSegment(actionBar);
+        }
+    }
 
-                break;
-            }
+    private static final class FallbackSegment extends ActionBarSegment {
+        private FallbackSegment(String segmentText) {
+            super(segmentText);
+        }
+
+        @Override
+        public String toString() {
+            return "FallbackSegment{" + "segmentText='" + segmentText + '\'' + '}';
         }
     }
 }

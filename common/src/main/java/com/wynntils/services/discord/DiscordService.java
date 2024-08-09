@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.discord;
@@ -16,7 +16,7 @@ import com.wynntils.utils.mc.McUtils;
 import java.time.Instant;
 import java.util.List;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class DiscordService extends Service {
     private static final long DISCORD_APPLICATION_ID = 387266678607577088L;

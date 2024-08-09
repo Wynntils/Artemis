@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.commands;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -56,7 +57,7 @@ public class CompassCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         return base.then(Commands.literal("at")
                         .then(Commands.argument("location", Vec3Argument.vec3()).executes(this::compassAtVec3)))
                 .then(Commands.literal("share")
@@ -125,7 +126,7 @@ public class CompassCommand extends Command {
 
         String target = StringArgumentType.getString(context, "target");
 
-        LocationUtils.shareCompass(target, markers.get(0).location());
+        LocationUtils.shareCompass(target, markers.getFirst().location());
 
         return 1;
     }
@@ -234,7 +235,7 @@ public class CompassCommand extends Command {
             }
             place = exactMatch.get();
         } else {
-            place = places.get(0);
+            place = places.getFirst();
         }
 
         Models.Marker.USER_WAYPOINTS_PROVIDER.removeAllLocations();

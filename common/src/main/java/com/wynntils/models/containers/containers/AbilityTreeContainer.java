@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class AbilityTreeContainer extends Container
         implements ScrollableContainerProperty, FullscreenContainerProperty {
-    private static final Pattern TITLE_PATTERN = Pattern.compile("(?:Warrior|Shaman|Mage|Assassin|Archer) Abilities");
+    private static final Pattern TITLE_PATTERN = Pattern.compile("\uDAFF\uDFEA\uE000");
     private static final Pattern NEXT_PAGE_PATTERN = Pattern.compile("§7Next Page");
     private static final Pattern PREVIOUS_PAGE_PATTERN = Pattern.compile("§7Previous Page");
 

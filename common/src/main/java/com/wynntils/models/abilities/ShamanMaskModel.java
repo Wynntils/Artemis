@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class ShamanMaskModel extends Model {
     private static final Pattern AWAKENED_PATTERN = Pattern.compile("^§[0-9a-f]§lAwakened$");

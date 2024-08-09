@@ -11,6 +11,7 @@ import com.wynntils.handlers.item.ItemAnnotation;
 import com.wynntils.handlers.item.ItemAnnotator;
 import com.wynntils.handlers.item.ItemHandler;
 import com.wynntils.models.items.annotators.game.AmplifierAnnotator;
+import com.wynntils.models.items.annotators.game.AspectAnnotator;
 import com.wynntils.models.items.annotators.game.CharmAnnotator;
 import com.wynntils.models.items.annotators.game.CraftedConsumableAnnotator;
 import com.wynntils.models.items.annotators.game.CraftedGearAnnotator;
@@ -45,7 +46,6 @@ import com.wynntils.models.items.annotators.gui.SeaskipperDestinationAnnotator;
 import com.wynntils.models.items.annotators.gui.ServerAnnotator;
 import com.wynntils.models.items.annotators.gui.SkillCrystalAnnotator;
 import com.wynntils.models.items.annotators.gui.SkillPointAnnotator;
-import com.wynntils.models.items.annotators.gui.SoulPointAnnotator;
 import com.wynntils.models.items.annotators.gui.TerritoryAnnotator;
 import com.wynntils.models.items.annotators.gui.TerritoryUpgradeAnnotator;
 import java.util.List;
@@ -67,6 +67,7 @@ public class ItemModel extends Model {
 
         // Then alphabetically
         Handlers.Item.registerAnnotator(new AmplifierAnnotator());
+        Handlers.Item.registerAnnotator(new AspectAnnotator());
         Handlers.Item.registerAnnotator(new CraftedConsumableAnnotator());
         Handlers.Item.registerAnnotator(new CraftedGearAnnotator());
         Handlers.Item.registerAnnotator(new DungeonKeyAnnotator());
@@ -95,7 +96,6 @@ public class ItemModel extends Model {
         Handlers.Item.registerAnnotator(new ServerAnnotator());
         Handlers.Item.registerAnnotator(new SkillCrystalAnnotator());
         Handlers.Item.registerAnnotator(new SkillPointAnnotator());
-        Handlers.Item.registerAnnotator(new SoulPointAnnotator());
         Handlers.Item.registerAnnotator(new TerritoryAnnotator());
         Handlers.Item.registerAnnotator(new TerritoryUpgradeAnnotator());
 

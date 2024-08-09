@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.handlers.tooltip.impl.identifiable;
@@ -68,10 +68,9 @@ public final class TooltipIdentifications {
             delimiterNeeded = true;
         }
 
-        if (!identifications.isEmpty()
-                && identifications.get(identifications.size() - 1).getString().isEmpty()) {
+        if (!identifications.isEmpty() && identifications.getLast().getString().isEmpty()) {
             // Remove last line if it is a delimiter line
-            identifications.remove(identifications.size() - 1);
+            identifications.removeLast();
         }
 
         return identifications;

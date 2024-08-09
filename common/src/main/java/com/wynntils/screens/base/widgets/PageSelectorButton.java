@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.base.widgets;
@@ -15,7 +15,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
 public class PageSelectorButton extends WynntilsButton {
-    private static final ResourceLocation BOOK_TURN_PAGE_ID = new ResourceLocation("wynntils:ui.book.turn-page");
+    private static final ResourceLocation BOOK_TURN_PAGE_ID =
+            ResourceLocation.fromNamespaceAndPath("wynntils", "ui.book.turn-page");
     private static final SoundEvent BOOK_TURN_PAGE_SOUND = SoundEvent.createVariableRangeEvent(BOOK_TURN_PAGE_ID);
 
     private final boolean forward;

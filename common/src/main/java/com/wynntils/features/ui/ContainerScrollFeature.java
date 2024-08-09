@@ -17,7 +17,7 @@ import com.wynntils.utils.wynn.ContainerUtils;
 import java.util.Optional;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 @ConfigCategory(Category.UI)

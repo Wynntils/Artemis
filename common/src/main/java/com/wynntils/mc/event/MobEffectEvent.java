@@ -1,12 +1,12 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class MobEffectEvent extends Event {
     private final Entity entity;
@@ -26,16 +26,16 @@ public abstract class MobEffectEvent extends Event {
     }
 
     public static final class Update extends MobEffectEvent {
-        private final byte effectAmplifier;
+        private final int effectAmplifier;
         private final int effectDurationTicks;
 
-        public Update(Entity entity, MobEffect effect, byte effectAmplifier, int effectDurationTicks) {
+        public Update(Entity entity, MobEffect effect, int effectAmplifier, int effectDurationTicks) {
             super(entity, effect);
             this.effectAmplifier = effectAmplifier;
             this.effectDurationTicks = effectDurationTicks;
         }
 
-        public byte getEffectAmplifier() {
+        public int getEffectAmplifier() {
             return effectAmplifier;
         }
 

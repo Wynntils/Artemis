@@ -9,11 +9,13 @@ import com.wynntils.handlers.item.GameItemAnnotator;
 import com.wynntils.handlers.item.ItemAnnotation;
 import com.wynntils.models.items.items.game.GatheringToolItem;
 import com.wynntils.models.profession.type.ToolProfile;
+import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.type.CappedValue;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -39,7 +41,8 @@ public final class GatheringToolAnnotator implements GameItemAnnotator {
     }
 
     private CappedValue getDurability(ItemStack itemStack) {
-        List<Component> lore = itemStack.getTooltipLines(null, TooltipFlag.NORMAL);
+        List<Component> lore =
+                itemStack.getTooltipLines(Item.TooltipContext.of(McUtils.mc().level), null, TooltipFlag.NORMAL);
         for (Component line : lore) {
             Matcher matcher = DURABILITY_PATTERN.matcher(line.getString());
             if (!matcher.find()) continue;

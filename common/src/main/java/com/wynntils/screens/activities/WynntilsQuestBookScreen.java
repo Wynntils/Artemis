@@ -46,8 +46,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class WynntilsQuestBookScreen extends WynntilsListScreen<QuestInfo, QuestButton>
         implements SortableActivityScreen {
@@ -295,7 +295,7 @@ public final class WynntilsQuestBookScreen extends WynntilsListScreen<QuestInfo,
 
             tooltipLines.add(Component.literal(""));
 
-            if (questInfo.isTrackable()) {
+            if (questInfo.trackable()) {
                 if (questInfo.equals(Models.Activity.getTrackedQuestInfo())) {
                     tooltipLines.add(Component.literal("Left click to stop tracking it!")
                             .withStyle(ChatFormatting.RED)
@@ -380,7 +380,7 @@ public final class WynntilsQuestBookScreen extends WynntilsListScreen<QuestInfo,
     protected void reloadElementsList(String searchText) {
         List<QuestInfo> newQuests = getSortedQuests();
         elements = newQuests.stream()
-                .filter(questInfo -> StringUtils.partialMatch(questInfo.getName(), searchText))
+                .filter(questInfo -> StringUtils.partialMatch(questInfo.name(), searchText))
                 .collect(Collectors.toList());
 
         this.maxPage = Math.max(
@@ -457,12 +457,12 @@ public final class WynntilsQuestBookScreen extends WynntilsListScreen<QuestInfo,
             int maxLevel = i + 24;
 
             long count = elements.stream()
-                    .filter(questInfo -> questInfo.getSortLevel() >= minLevel && questInfo.getSortLevel() <= maxLevel)
+                    .filter(questInfo -> questInfo.sortLevel() >= minLevel && questInfo.sortLevel() <= maxLevel)
                     .count();
             long completedCount = elements.stream()
-                    .filter(questInfo -> questInfo.getStatus() == ActivityStatus.COMPLETED
-                            && questInfo.getSortLevel() >= minLevel
-                            && questInfo.getSortLevel() <= maxLevel)
+                    .filter(questInfo -> questInfo.status() == ActivityStatus.COMPLETED
+                            && questInfo.sortLevel() >= minLevel
+                            && questInfo.sortLevel() <= maxLevel)
                     .count();
 
             tooltipLines.add(Component.literal("- Lv. " + minLevel + "-" + maxLevel)
@@ -473,14 +473,13 @@ public final class WynntilsQuestBookScreen extends WynntilsListScreen<QuestInfo,
         }
 
         long count = elements.stream()
-                .filter(questInfo -> questInfo.getSortLevel() >= 101)
+                .filter(questInfo -> questInfo.sortLevel() >= 101)
                 .count();
         long completedCount;
 
         if (count > 0) {
             completedCount = elements.stream()
-                    .filter(questInfo ->
-                            questInfo.getStatus() == ActivityStatus.COMPLETED && questInfo.getSortLevel() >= 101)
+                    .filter(questInfo -> questInfo.status() == ActivityStatus.COMPLETED && questInfo.sortLevel() >= 101)
                     .count();
             tooltipLines.add(Component.literal("- Lv. 101+")
                     .append(Component.literal(" [" + completedCount + "/" + count + "]")
@@ -491,7 +490,7 @@ public final class WynntilsQuestBookScreen extends WynntilsListScreen<QuestInfo,
 
         count = elements.size();
         completedCount = elements.stream()
-                .filter(questInfo -> questInfo.getStatus() == ActivityStatus.COMPLETED)
+                .filter(questInfo -> questInfo.status() == ActivityStatus.COMPLETED)
                 .count();
 
         tooltipLines.add(Component.literal(""));

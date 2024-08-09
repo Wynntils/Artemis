@@ -26,6 +26,7 @@ import com.wynntils.core.persisted.upfixers.config.OverlayRestructuringUpfixer;
 import com.wynntils.core.persisted.upfixers.config.QuestBookToContentRenamedConfigsUpfixer;
 import com.wynntils.core.persisted.upfixers.config.TowerAuraVignetteAndOverlayMovedToCommonFeature;
 import com.wynntils.core.persisted.upfixers.config.TowerAuraVignetteNameUpfixer;
+import com.wynntils.core.persisted.upfixers.storage.BankToAccountBankUpfixer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +60,7 @@ public class UpfixerManager extends Manager {
         registerConfigUpfixer(new CombatXpGainToXpGainUpfixer());
 
         // Register storage upfixers here, in order of run priority
+        registerStorageUpfixer(new BankToAccountBankUpfixer());
     }
 
     private void registerConfigUpfixer(Upfixer upfixer) {

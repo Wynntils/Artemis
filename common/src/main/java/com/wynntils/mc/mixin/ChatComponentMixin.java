@@ -20,11 +20,11 @@ public abstract class ChatComponentMixin implements ChatComponentExtension {
     private List<GuiMessage> allMessages;
 
     @Shadow
-    private void refreshTrimmedMessage() {}
+    private void refreshTrimmedMessages() {}
 
     @Override
     public void deleteMessage(Component component) {
         allMessages.removeIf(guiMessage -> guiMessage.content().equals(component));
-        refreshTrimmedMessage();
+        refreshTrimmedMessages();
     }
 }

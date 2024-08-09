@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.ui;
@@ -17,8 +17,8 @@ import com.wynntils.models.worlds.type.WorldState;
 import com.wynntils.screens.characterselector.CharacterSelectorScreen;
 import com.wynntils.utils.mc.McUtils;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.UI)
 public class CustomCharacterSelectionScreenFeature extends Feature {

@@ -15,7 +15,7 @@ import com.wynntils.screens.skillpointloadouts.SkillPointLoadoutsScreen;
 import com.wynntils.utils.mc.McUtils;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.UTILITIES)
 public class SkillPointLoadoutsFeature extends Feature {

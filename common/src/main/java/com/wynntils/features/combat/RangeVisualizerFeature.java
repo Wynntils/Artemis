@@ -1,11 +1,11 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.combat;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.wynntils.core.components.Models;
@@ -34,13 +34,13 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Position;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.joml.Matrix4f;
 
 @ConfigCategory(Category.COMBAT)
 public class RangeVisualizerFeature extends Feature {
     private static final MultiBufferSource.BufferSource BUFFER_SOURCE =
-            MultiBufferSource.immediate(new BufferBuilder(256));
+            MultiBufferSource.immediate(new ByteBufferBuilder(256));
 
     // number of straight lines to draw when rendering circle, higher = smoother but more expensive
     private static final int SEGMENTS = 128;
@@ -173,17 +173,13 @@ public class RangeVisualizerFeature extends Feature {
             }
             float x = (float) (position.x() + Math.sin(angle) * radius);
             float z = (float) (position.z() + Math.cos(angle) * radius);
-            consumer.vertex(matrix4f, x, (float) position.y(), z).color(color).endVertex();
-            consumer.vertex(matrix4f, x, (float) position.y() + HEIGHT, z)
-                    .color(color)
-                    .endVertex();
+            consumer.addVertex(matrix4f, x, (float) position.y(), z).setColor(color);
+            consumer.addVertex(matrix4f, x, (float) position.y() + HEIGHT, z).setColor(color);
             angle += angleStep;
             float x2 = (float) (position.x() + Math.sin(angle) * radius);
             float z2 = (float) (position.z() + Math.cos(angle) * radius);
-            consumer.vertex(matrix4f, x2, (float) position.y() + HEIGHT, z2)
-                    .color(color)
-                    .endVertex();
-            consumer.vertex(matrix4f, x2, (float) position.y(), z2).color(color).endVertex();
+            consumer.addVertex(matrix4f, x2, (float) position.y() + HEIGHT, z2).setColor(color);
+            consumer.addVertex(matrix4f, x2, (float) position.y(), z2).setColor(color);
         }
 
         BUFFER_SOURCE.endBatch();

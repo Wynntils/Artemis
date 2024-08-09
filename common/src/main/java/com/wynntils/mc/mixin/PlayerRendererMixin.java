@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.mixin;
@@ -41,18 +41,19 @@ public abstract class PlayerRendererMixin
 
     @Inject(
             method =
-                    "renderNameTag(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/network/chat/Component;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+                    "renderNameTag(Lnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/network/chat/Component;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IF)V",
             at = @At("HEAD"),
             cancellable = true)
     private void onNameTagRenderPre(
             AbstractClientPlayer entity,
             Component displayName,
-            PoseStack matrixStack,
+            PoseStack poseStack,
             MultiBufferSource buffer,
             int packedLight,
+            float partialTicks,
             CallbackInfo ci) {
         PlayerNametagRenderEvent event = new PlayerNametagRenderEvent(
-                entity, displayName, matrixStack, buffer, packedLight, this.entityRenderDispatcher, this.getFont());
+                entity, displayName, poseStack, buffer, packedLight, this.entityRenderDispatcher, this.getFont());
         MixinHelper.post(event);
         if (event.isCanceled()) {
             ci.cancel();

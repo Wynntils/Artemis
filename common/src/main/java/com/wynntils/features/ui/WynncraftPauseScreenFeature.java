@@ -21,30 +21,38 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.UI)
 public class WynncraftPauseScreenFeature extends Feature {
+    // From PauseScreen
+    private static final String ADVANCEMENTS = "gui.advancements";
+    private static final String STATS = "gui.stats";
+    private static final String SEND_FEEDBACK = "menu.sendFeedback";
+    private static final String REPORT_BUGS = "menu.reportBugs";
+
     @SubscribeEvent
     public void onPauseScreenInitEvent(PauseMenuInitEvent event) {
         PauseScreen pauseScreen = event.getPauseScreen();
         List<Renderable> renderables = new ArrayList<>(pauseScreen.renderables);
 
-        Button territoryMap = replaceButtonFunction(
-                (Button) renderables.get(1),
+        replaceButtonFunction(
+                renderables,
+                ADVANCEMENTS,
                 Component.translatable("feature.wynntils.wynncraftPauseScreen.territoryMap.name")
                         .withStyle(ChatFormatting.DARK_AQUA),
                 (button) -> McUtils.mc().setScreen(GuildMapScreen.create()));
-        renderables.set(1, territoryMap);
 
-        Button wynntilsMenu = replaceButtonFunction(
-                (Button) renderables.get(2),
+        replaceButtonFunction(
+                renderables,
+                STATS,
                 Component.translatable("feature.wynntils.wynncraftPauseScreen.wynntilsMenuButton.name"),
                 (button) -> WynntilsMenuScreenBase.openBook(WynntilsMenuScreen.create()));
-        renderables.set(2, wynntilsMenu);
 
-        Button classSelection = replaceButtonFunction(
-                (Button) renderables.get(3),
+        replaceButtonFunction(
+                renderables,
+                SEND_FEEDBACK,
                 Component.translatable("feature.wynntils.wynncraftPauseScreen.classSelectionButton.name"),
                 (button) -> {
                     McUtils.mc().setScreen(null);
@@ -52,21 +60,15 @@ public class WynncraftPauseScreenFeature extends Feature {
                     Handlers.Command.sendCommandImmediately("class");
                 });
 
-        renderables.set(3, classSelection);
-
-        // If the class is not a button, it is overriden by another mod (ModMenu)
-        if (renderables.get(4).getClass() == Button.class) {
-            Button hub = replaceButtonFunction(
-                    (Button) renderables.get(4),
-                    Component.translatable("feature.wynntils.wynncraftPauseScreen.hubButton.name"),
-                    (button) -> {
-                        McUtils.mc().setScreen(null);
-                        McUtils.mc().mouseHandler.grabMouse();
-                        Handlers.Command.sendCommandImmediately("hub");
-                    });
-
-            renderables.set(4, hub);
-        }
+        replaceButtonFunction(
+                renderables,
+                REPORT_BUGS,
+                Component.translatable("feature.wynntils.wynncraftPauseScreen.hubButton.name"),
+                (button) -> {
+                    McUtils.mc().setScreen(null);
+                    McUtils.mc().mouseHandler.grabMouse();
+                    Handlers.Command.sendCommandImmediately("hub");
+                });
 
         event.getPauseScreen().clearWidgets();
 
@@ -77,10 +79,28 @@ public class WynncraftPauseScreenFeature extends Feature {
         }
     }
 
-    private Button replaceButtonFunction(Button widget, Component component, Button.OnPress onPress) {
-        return new Button.Builder(component, onPress)
-                .pos(widget.getX(), widget.getY())
-                .size(widget.getWidth(), widget.getHeight())
+    private void replaceButtonFunction(
+            List<Renderable> widgets, String translationKey, Component component, Button.OnPress onPress) {
+        Button oldButton = widgets.stream()
+                .filter(Button.class::isInstance)
+                .map(Button.class::cast)
+                .filter(button -> isButton(button, translationKey))
+                .findFirst()
+                .orElse(null);
+
+        if (oldButton == null) return;
+
+        Button newButton = new Button.Builder(component, onPress)
+                .pos(oldButton.getX(), oldButton.getY())
+                .size(oldButton.getWidth(), oldButton.getHeight())
                 .build();
+
+        widgets.set(widgets.indexOf(oldButton), newButton);
+    }
+
+    private boolean isButton(Button button, String translationKey) {
+        return button.visible
+                && button.getMessage().getContents() instanceof TranslatableContents translatableContents
+                && translatableContents.getKey().equals(translationKey);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.hades;
@@ -43,10 +43,12 @@ public class HadesClientHandler implements IHadesClientAdapter {
             hadesConnection.disconnect();
 
             if (Managers.Connection.onServer()) {
-                McUtils.sendErrorToClient("Could not connect to HadesServer because you are not logged in on Athena.");
+                McUtils.sendErrorToClient(
+                        "Could not connect to the remote player server because you are not logged in on Athena.");
             }
 
-            throw new IllegalStateException("Tried to auth to HadesServer without being logged in on Athena.");
+            throw new IllegalStateException(
+                    "Tried to auth to the remote player server without being logged in on Athena.");
         }
 
         hadesConnection.sendPacketAndFlush(new HCPacketAuthenticate(Services.WynntilsAccount.getToken()));
@@ -57,10 +59,10 @@ public class HadesClientHandler implements IHadesClientAdapter {
         WynntilsMod.postEvent(new HadesEvent.Disconnected());
 
         if (Managers.Connection.onServer()) {
-            McUtils.sendErrorToClient("Disconnected from HadesServer");
+            McUtils.sendErrorToClient("Disconnected from the remote player server.");
         }
 
-        WynntilsMod.info("Disconnected from HadesServer.");
+        WynntilsMod.info("Disconnected from the remote player server.");
 
         userRegistry.getHadesUserMap().clear();
     }
@@ -71,20 +73,21 @@ public class HadesClientHandler implements IHadesClientAdapter {
 
         switch (packet.getResponse()) {
             case SUCCESS -> {
-                WynntilsMod.info("Successfully connected to HadesServer: " + packet.getMessage());
-                userComponent = Component.literal("Successfully connected to HadesServer")
+                WynntilsMod.info("Successfully connected to the remote player server: " + packet.getMessage());
+                userComponent = Component.literal("Successfully connected to the remote player server.")
                         .withStyle(ChatFormatting.GREEN);
 
                 WynntilsMod.postEvent(new HadesEvent.Authenticated());
             }
             case INVALID_TOKEN -> {
-                WynntilsMod.error("Got invalid token when trying to connect to HadesServer: " + packet.getMessage());
-                userComponent = Component.literal("Got invalid token when connecting HadesServer")
+                WynntilsMod.error(
+                        "Got invalid token when trying to connect to the remote player server: " + packet.getMessage());
+                userComponent = Component.literal("Got invalid token when connecting the remote player server.")
                         .withStyle(ChatFormatting.RED);
             }
             case ERROR -> {
-                WynntilsMod.error("Got an error trying to connect to HadesServer: " + packet.getMessage());
-                userComponent = Component.literal("Got error when connecting HadesServer")
+                WynntilsMod.error("Got an error trying to connect to the remote player server: " + packet.getMessage());
+                userComponent = Component.literal("Got error when connecting the remote player server.")
                         .withStyle(ChatFormatting.RED);
             }
         }
@@ -128,10 +131,10 @@ public class HadesClientHandler implements IHadesClientAdapter {
 
     @Override
     public void handleDisconnect(HSPacketDisconnect packet) {
-        WynntilsMod.info("Disconnected from HadesServer. Reason: " + packet.getReason());
+        WynntilsMod.info("Disconnected from the remote player server. Reason: " + packet.getReason());
 
         if (Managers.Connection.onServer()) {
-            McUtils.sendMessageToClient(Component.literal("[Wynntils/Artemis] Disconnected from HadesServer.")
+            McUtils.sendMessageToClient(Component.literal("[Wynntils] Disconnected from the remote player server.")
                     .withStyle(ChatFormatting.YELLOW));
         }
 

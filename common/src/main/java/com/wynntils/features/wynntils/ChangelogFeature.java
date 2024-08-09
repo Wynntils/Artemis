@@ -21,8 +21,8 @@ import com.wynntils.models.worlds.event.WorldStateEvent;
 import com.wynntils.screens.changelog.ChangelogScreen;
 import com.wynntils.utils.mc.McUtils;
 import java.util.Map;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.WYNNTILS)
 public class ChangelogFeature extends Feature {

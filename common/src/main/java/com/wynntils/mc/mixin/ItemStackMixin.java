@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.mixin;
@@ -25,21 +25,30 @@ public abstract class ItemStackMixin implements ItemStackExtension {
     @Unique
     private StyledText wynntilsOriginalName;
 
+    // Note: If this mixin method is causing compatibility issues, we have a few options:
+    // 1. Remove the mixin method. It's barely used in Wynntils.
+    // 2. Set the hide additional tooltip flag for the item itself. This is a bit more invasive.
     @ModifyExpressionValue(
             method =
-                    "getTooltipLines(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getHideFlags()I"))
-    private int redirectGetHideFlags(int original) {
+                    "getTooltipLines(Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/world/item/ItemStack;has(Lnet/minecraft/core/component/DataComponentType;)Z",
+                            ordinal = 3))
+    private boolean redirectGetHideFlags(boolean original) {
         ItemStack itemStack = (ItemStack) (Object) this;
-        ItemTooltipFlagsEvent.Mask event = new ItemTooltipFlagsEvent.Mask(itemStack, original);
+        ItemTooltipFlagsEvent.HideAdditionalTooltip event =
+                new ItemTooltipFlagsEvent.HideAdditionalTooltip(itemStack, original);
         MixinHelper.post(event);
 
-        return event.getMask();
+        return event.getHideAdditionalTooltip();
     }
 
     @ModifyVariable(
             method =
-                    "getTooltipLines(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
+                    "getTooltipLines(Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
             at = @At("HEAD"),
             ordinal = 0,
             argsOnly = true)

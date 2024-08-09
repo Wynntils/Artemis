@@ -20,7 +20,7 @@ import com.wynntils.services.hades.HadesUser;
 import com.wynntils.utils.mc.McUtils;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class WarModel extends Model {
     private static final int WAR_RADIUS = 100;

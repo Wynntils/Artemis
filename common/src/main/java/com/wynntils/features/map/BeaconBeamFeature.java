@@ -1,11 +1,11 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.map;
 
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.consumers.features.Feature;
 import com.wynntils.core.persisted.Persisted;
@@ -20,15 +20,17 @@ import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.mc.type.Location;
-import com.wynntils.utils.render.CustomBeaconRenderer;
 import java.util.List;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.core.Position;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.MAP)
 public class BeaconBeamFeature extends Feature {
+    private static final MultiBufferSource.BufferSource BUFFER_SOURCE =
+            MultiBufferSource.immediate(new ByteBufferBuilder(256));
+
     @Persisted
     public final Config<CustomColor> waypointBeamColor = new Config<>(CommonColors.RED);
 
@@ -66,8 +68,6 @@ public class BeaconBeamFeature extends Feature {
         if (markers.isEmpty()) return;
 
         PoseStack poseStack = event.getPoseStack();
-        MultiBufferSource.BufferSource bufferSource =
-                MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
         for (MarkerInfo marker : markers) {
             Position camera = event.getCamera().getPosition();
@@ -99,30 +99,29 @@ public class BeaconBeamFeature extends Feature {
             CustomColor color =
                     marker.beaconColor() == CustomColor.NONE ? waypointBeamColor.get() : marker.beaconColor();
 
-            float[] colorArray;
+            int colorInt;
             if (color == CommonColors.RAINBOW) {
-                colorArray = currentRainbowColor.asFloatArray();
+                colorInt = currentRainbowColor.withAlpha(alpha).asInt();
             } else {
-                colorArray = color.asFloatArray();
+                colorInt = color.withAlpha(alpha).asInt();
             }
 
-            CustomBeaconRenderer.renderBeaconBeam(
+            BeaconRenderer.renderBeaconBeam(
                     poseStack,
-                    bufferSource,
+                    BUFFER_SOURCE,
                     BeaconRenderer.BEAM_LOCATION,
-                    event.getPartialTick(),
+                    event.getDeltaTracker().getGameTimeDeltaPartialTick(false),
                     1f,
                     McUtils.player().level().getGameTime(),
                     0,
-                    1024,
-                    colorArray,
-                    alpha,
+                    BeaconRenderer.MAX_RENDER_Y,
+                    colorInt,
                     0.166f,
                     0.33f);
 
             poseStack.popPose();
         }
 
-        bufferSource.endLastBatch();
+        BUFFER_SOURCE.endLastBatch();
     }
 }

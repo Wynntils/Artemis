@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.inventory;
@@ -19,6 +19,7 @@ import com.wynntils.models.elements.type.Skill;
 import com.wynntils.models.items.WynnItem;
 import com.wynntils.models.items.WynnItemData;
 import com.wynntils.models.items.items.game.AmplifierItem;
+import com.wynntils.models.items.items.game.AspectItem;
 import com.wynntils.models.items.items.game.DungeonKeyItem;
 import com.wynntils.models.items.items.game.EmeraldPouchItem;
 import com.wynntils.models.items.items.game.GatheringToolItem;
@@ -37,7 +38,7 @@ import com.wynntils.utils.render.type.TextShadow;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.INVENTORY)
 public class ItemTextOverlayFeature extends Feature {
@@ -49,6 +50,12 @@ public class ItemTextOverlayFeature extends Feature {
 
     @Persisted
     public final Config<TextShadow> amplifierTierShadow = new Config<>(TextShadow.OUTLINE);
+
+    @Persisted
+    public final Config<Boolean> aspectEnabled = new Config<>(true);
+
+    @Persisted
+    public final Config<TextShadow> aspectShadow = new Config<>(TextShadow.OUTLINE);
 
     @Persisted
     public final Config<Boolean> dungeonKeyEnabled = new Config<>(true);
@@ -154,6 +161,9 @@ public class ItemTextOverlayFeature extends Feature {
         if (wynnItem instanceof AmplifierItem amplifierItem) {
             return new AmplifierOverlay(amplifierItem);
         }
+        if (wynnItem instanceof AspectItem aspectItem) {
+            return new AspectOverlay(aspectItem);
+        }
         if (wynnItem instanceof DungeonKeyItem dungeonKeyItem) {
             return new DungeonKeyOverlay(dungeonKeyItem);
         }
@@ -193,6 +203,42 @@ public class ItemTextOverlayFeature extends Feature {
         TextOverlay getTextOverlay();
 
         boolean isTextOverlayEnabled();
+    }
+
+    private final class AspectOverlay implements TextOverlayInfo {
+        private static final CustomColor TIER_1_HIGHLIGHT_COLOR =
+                CustomColor.fromChatFormatting(ChatFormatting.DARK_GRAY);
+        private static final CustomColor TIER_2_HIGHLIGHT_COLOR = new CustomColor(205, 127, 50);
+        private static final CustomColor TIER_3_HIGHLIGHT_COLOR = new CustomColor(192, 192, 192);
+        private static final CustomColor TIER_4_HIGHLIGHT_COLOR = new CustomColor(255, 215, 0);
+
+        private final AspectItem item;
+
+        private AspectOverlay(AspectItem item) {
+            this.item = item;
+        }
+
+        @Override
+        public TextOverlay getTextOverlay() {
+            CustomColor highlightColor =
+                    switch (item.getAspectTier()) {
+                        case 2 -> TIER_2_HIGHLIGHT_COLOR;
+                        case 3 -> TIER_3_HIGHLIGHT_COLOR;
+                        case 4 -> TIER_4_HIGHLIGHT_COLOR;
+                        default -> TIER_1_HIGHLIGHT_COLOR;
+                    };
+
+            TextRenderSetting style =
+                    TextRenderSetting.DEFAULT.withCustomColor(highlightColor).withTextShadow(aspectShadow.get());
+
+            return new TextOverlay(
+                    new TextRenderTask(item.getClassType().getName().substring(0, 2), style), -1, 1, 0.75f);
+        }
+
+        @Override
+        public boolean isTextOverlayEnabled() {
+            return aspectEnabled.get();
+        }
     }
 
     private final class AmplifierOverlay implements TextOverlayInfo {
@@ -427,6 +473,7 @@ public class ItemTextOverlayFeature extends Feature {
     private final class TeleportScrollOverlay implements TextOverlayInfo {
         private static final CustomColor CITY_COLOR = CustomColor.fromChatFormatting(ChatFormatting.AQUA);
         private static final CustomColor DUNGEON_COLOR = CustomColor.fromChatFormatting(ChatFormatting.GOLD);
+        private static final CustomColor OUT_OF_CHARGES_COLOR = CustomColor.fromChatFormatting(ChatFormatting.RED);
 
         private final TeleportScrollItem item;
 
@@ -441,7 +488,14 @@ public class ItemTextOverlayFeature extends Feature {
 
         @Override
         public TextOverlay getTextOverlay() {
-            CustomColor textColor = item.isDungeon() ? DUNGEON_COLOR : CITY_COLOR;
+            CustomColor textColor;
+            if (item.getRemainingCharges() <= 0) {
+                textColor = OUT_OF_CHARGES_COLOR;
+            } else if (item.isDungeon()) {
+                textColor = DUNGEON_COLOR;
+            } else {
+                textColor = CITY_COLOR;
+            }
 
             String text = item.getDestination();
             TextRenderSetting style =

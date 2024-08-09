@@ -24,7 +24,7 @@ import com.wynntils.utils.render.type.ObjectivesTextures;
 import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.render.type.VerticalAlignment;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.UI)
 public class CraftingProfessionLevelProgressBarFeature extends Feature {

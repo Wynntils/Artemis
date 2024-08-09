@@ -13,7 +13,6 @@ import com.wynntils.models.character.type.ClassType;
 import com.wynntils.models.elements.type.Element;
 import com.wynntils.models.elements.type.Powder;
 import com.wynntils.models.elements.type.Skill;
-import com.wynntils.models.gear.type.ConsumableType;
 import com.wynntils.models.gear.type.GearAttackSpeed;
 import com.wynntils.models.gear.type.GearInfo;
 import com.wynntils.models.gear.type.GearRequirements;
@@ -42,6 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -134,7 +134,7 @@ public final class WynnItemParser {
 
         // Parse lore for identifications, powders and rerolls
         List<Component> lore = ComponentUtils.stripDuplicateBlank(LoreUtils.getTooltipLines(itemStack));
-        lore.remove(0); // remove item name
+        lore.removeFirst(); // remove item name
 
         for (Component loreLine : lore) {
             StyledText coded = StyledText.fromComponent(loreLine);
@@ -445,7 +445,6 @@ public final class WynnItemParser {
         List<Component> lore = ComponentUtils.stripDuplicateBlank(LoreUtils.getTooltipLines(itemStack));
 
         String name = "";
-        ConsumableType consumableType = null;
         int effectStrength = 0;
         GearAttackSpeed attackSpeed = null;
         List<Pair<DamageType, RangedValue>> damages = new ArrayList<>();
@@ -456,10 +455,25 @@ public final class WynnItemParser {
         ClassType classReq = null;
 
         if (!lore.isEmpty()) {
-            Matcher nameMatcher = StyledText.fromComponent(lore.get(0)).getMatcher(CRAFTED_ITEM_NAME_PATTERN);
+            Matcher nameMatcher = StyledText.fromComponent(lore.getFirst()).getMatcher(CRAFTED_ITEM_NAME_PATTERN);
             if (nameMatcher.matches()) {
                 name = nameMatcher.group(1);
                 effectStrength = Integer.parseInt(nameMatcher.group(2));
+            } else {
+                nameMatcher = StyledText.fromComponent(itemStack.getHoverName()).getMatcher(CRAFTED_ITEM_NAME_PATTERN);
+                if (nameMatcher.matches()) {
+                    name = nameMatcher.group(1);
+                    effectStrength = Integer.parseInt(nameMatcher.group(2));
+                } else {
+                    WynntilsMod.warn("Crafted item "
+                            + StyledText.fromComponent(itemStack.getHoverName()).getString()
+                            + " has no name in lore, or as a custom name: "
+                            + lore.stream()
+                                    .map(StyledText::fromComponent)
+                                    .map(StyledText::getString)
+                                    .collect(Collectors.joining("\n")));
+                    return null;
+                }
             }
         }
 

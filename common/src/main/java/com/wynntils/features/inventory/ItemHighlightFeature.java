@@ -27,8 +27,8 @@ import com.wynntils.utils.render.Texture;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.INVENTORY)
 public class ItemHighlightFeature extends Feature {

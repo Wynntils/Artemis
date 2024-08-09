@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.handlers.particle;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.core.Position;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class ParticleHandler extends Handler {
     private final Map<ParticleType, ParticleVerifier> particleVerifiers = new EnumMap<>(ParticleType.class);

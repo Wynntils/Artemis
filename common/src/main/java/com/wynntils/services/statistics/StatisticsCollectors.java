@@ -15,12 +15,12 @@ import com.wynntils.models.raid.event.RaidEndedEvent;
 import com.wynntils.models.spells.event.SpellEvent;
 import com.wynntils.models.war.event.GuildWarEvent;
 import com.wynntils.services.statistics.type.StatisticKind;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class StatisticsCollectors {
     @SubscribeEvent
     public void onDamageDealtEvent(DamageDealtEvent event) {
-        int damageSum = event.getDamages().values().stream().mapToInt(d -> d).sum();
+        long damageSum = event.getDamages().values().stream().mapToLong(d -> d).sum();
         Services.Statistics.addToStatistics(StatisticKind.DAMAGE_DEALT, damageSum);
     }
 
@@ -67,22 +67,22 @@ public final class StatisticsCollectors {
             case NEST_OF_THE_GROOTSLANGS -> {
                 Services.Statistics.increaseStatistics(StatisticKind.NEST_OF_THE_GROOTSLANGS_SUCCEEDED);
                 Services.Statistics.addToStatistics(
-                        StatisticKind.NEST_OF_THE_GROOTSLANGS_TIME_ELAPSED, (int) event.getRaidTime());
+                        StatisticKind.NEST_OF_THE_GROOTSLANGS_TIME_ELAPSED, event.getRaidTime() / 1000);
             }
             case ORPHIONS_NEXUS_OF_LIGHT -> {
                 Services.Statistics.increaseStatistics(StatisticKind.ORPHIONS_NEXUS_OF_LIGHT_SUCCEEDED);
                 Services.Statistics.addToStatistics(
-                        StatisticKind.ORPHIONS_NEXUS_OF_LIGHT_TIME_ELAPSED, (int) event.getRaidTime());
+                        StatisticKind.ORPHIONS_NEXUS_OF_LIGHT_TIME_ELAPSED, event.getRaidTime() / 1000);
             }
             case THE_CANYON_COLOSSUS -> {
                 Services.Statistics.increaseStatistics(StatisticKind.THE_CANYON_COLOSSUS_SUCCEEDED);
                 Services.Statistics.addToStatistics(
-                        StatisticKind.THE_CANYON_COLOSSUS_TIME_ELAPSED, (int) event.getRaidTime());
+                        StatisticKind.THE_CANYON_COLOSSUS_TIME_ELAPSED, event.getRaidTime() / 1000);
             }
             case THE_NAMELESS_ANOMALY -> {
                 Services.Statistics.increaseStatistics(StatisticKind.THE_NAMELESS_ANOMALY_SUCCEEDED);
                 Services.Statistics.addToStatistics(
-                        StatisticKind.THE_NAMELESS_ANOMALY_TIME_ELAPSED, (int) event.getRaidTime());
+                        StatisticKind.THE_NAMELESS_ANOMALY_TIME_ELAPSED, event.getRaidTime() / 1000);
             }
         }
     }
@@ -93,22 +93,22 @@ public final class StatisticsCollectors {
             case NEST_OF_THE_GROOTSLANGS -> {
                 Services.Statistics.increaseStatistics(StatisticKind.NEST_OF_THE_GROOTSLANGS_FAILED);
                 Services.Statistics.addToStatistics(
-                        StatisticKind.NEST_OF_THE_GROOTSLANGS_TIME_ELAPSED, (int) event.getRaidTime());
+                        StatisticKind.NEST_OF_THE_GROOTSLANGS_TIME_ELAPSED, event.getRaidTime() / 1000);
             }
             case ORPHIONS_NEXUS_OF_LIGHT -> {
                 Services.Statistics.increaseStatistics(StatisticKind.ORPHIONS_NEXUS_OF_LIGHT_FAILED);
                 Services.Statistics.addToStatistics(
-                        StatisticKind.ORPHIONS_NEXUS_OF_LIGHT_TIME_ELAPSED, (int) event.getRaidTime());
+                        StatisticKind.ORPHIONS_NEXUS_OF_LIGHT_TIME_ELAPSED, event.getRaidTime() / 1000);
             }
             case THE_CANYON_COLOSSUS -> {
                 Services.Statistics.increaseStatistics(StatisticKind.THE_CANYON_COLOSSUS_FAILED);
                 Services.Statistics.addToStatistics(
-                        StatisticKind.THE_CANYON_COLOSSUS_TIME_ELAPSED, (int) event.getRaidTime());
+                        StatisticKind.THE_CANYON_COLOSSUS_TIME_ELAPSED, event.getRaidTime() / 1000);
             }
             case THE_NAMELESS_ANOMALY -> {
                 Services.Statistics.increaseStatistics(StatisticKind.THE_NAMELESS_ANOMALY_FAILED);
                 Services.Statistics.addToStatistics(
-                        StatisticKind.THE_NAMELESS_ANOMALY_TIME_ELAPSED, (int) event.getRaidTime());
+                        StatisticKind.THE_NAMELESS_ANOMALY_TIME_ELAPSED, event.getRaidTime() / 1000);
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.commands;
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -57,7 +58,7 @@ public class LootrunCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         return base.then(Commands.literal("load")
                         .then(Commands.argument("lootrun", StringArgumentType.string())
                                 .suggests(LOOTRUN_SUGGESTION_PROVIDER)
@@ -69,7 +70,7 @@ public class LootrunCommand extends Command {
                 .then(Commands.literal("note")
                         .then(Commands.literal("add")
                                 .then(Commands.literal("json")
-                                        .then(Commands.argument("text", ComponentArgument.textComponent())
+                                        .then(Commands.argument("text", ComponentArgument.textComponent(context))
                                                 .executes(this::addJsonLootrunNote)))
                                 .then(Commands.literal("text")
                                         .then(Commands.argument("text", StringArgumentType.greedyString())

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.commands;
@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -31,7 +32,7 @@ public class QuestCommand extends Command {
     private static final SuggestionProvider<CommandSourceStack> QUEST_SUGGESTION_PROVIDER =
             (context, builder) -> SharedSuggestionProvider.suggest(
                     Models.Quest.getQuests(ActivitySortOrder.ALPHABETIC).stream()
-                            .map(QuestInfo::getName),
+                            .map(QuestInfo::name),
                     builder);
 
     private static final SuggestionProvider<CommandSourceStack> SORT_SUGGESTION_PROVIDER =
@@ -47,7 +48,7 @@ public class QuestCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         return base.then(Commands.literal("list")
                         .executes((ctxt) -> listQuests(ctxt, "distance"))
                         .then(Commands.argument("sort", StringArgumentType.word())
@@ -86,7 +87,7 @@ public class QuestCommand extends Command {
         }
 
         List<QuestInfo> quests = Models.Quest.getQuests(order).stream()
-                .filter(QuestInfo::isTrackable)
+                .filter(QuestInfo::trackable)
                 .toList();
 
         if (quests.isEmpty()) {
@@ -119,8 +120,8 @@ public class QuestCommand extends Command {
         MutableComponent response;
 
         quests = Models.Quest.getQuestsRaw().stream()
-                .filter(quest -> StringUtils.initialMatch(quest.getName(), searchText)
-                        || StringUtils.initialMatch(quest.getNextTask().getStringWithoutFormatting(), searchText))
+                .filter(quest -> StringUtils.initialMatch(quest.name(), searchText)
+                        || StringUtils.initialMatch(quest.nextTask().getStringWithoutFormatting(), searchText))
                 .toList();
 
         if (quests.isEmpty()) {
@@ -141,14 +142,14 @@ public class QuestCommand extends Command {
         Vec3 playerLocation = McUtils.player().position();
 
         for (QuestInfo quest : quests) {
-            double distance = quest.getNextLocation().isEmpty()
+            double distance = quest.nextLocation().isEmpty()
                     ? 0
-                    : playerLocation.distanceTo(quest.getNextLocation().get().toVec3());
+                    : playerLocation.distanceTo(quest.nextLocation().get().toVec3());
 
             response.append(Component.literal("\n - ").withStyle(ChatFormatting.GRAY))
-                    .append(Component.literal(quest.getName())
+                    .append(Component.literal(quest.name())
                             .withStyle(style -> style.withClickEvent(
-                                    new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/quest info " + quest.getName())))
+                                    new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/quest info " + quest.name())))
                             .withStyle(style -> style.withHoverEvent(
                                     new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click for info"))))
                             .withStyle(ChatFormatting.WHITE));
@@ -174,28 +175,27 @@ public class QuestCommand extends Command {
         if (quest == null) return 0;
 
         MutableComponent response =
-                Component.literal("Info for quest: " + quest.getName()).withStyle(ChatFormatting.AQUA);
+                Component.literal("Info for quest: " + quest.name()).withStyle(ChatFormatting.AQUA);
         response.append(Component.literal("\n - Status: ").withStyle(ChatFormatting.WHITE))
-                .append(quest.getStatus().getQuestStateComponent())
+                .append(quest.status().getQuestStateComponent())
                 .append(Component.literal("\n - Level: ").withStyle(ChatFormatting.WHITE))
-                .append(Component.literal(Integer.toString(quest.getLevel())).withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal(Integer.toString(quest.level())).withStyle(ChatFormatting.YELLOW))
                 .append(Component.literal("\n - Length: ").withStyle(ChatFormatting.WHITE))
-                .append(Component.literal(
-                                StringUtils.capitalized(quest.getLength().toString()))
+                .append(Component.literal(StringUtils.capitalized(quest.length().toString()))
                         .withStyle(ChatFormatting.YELLOW))
                 .append(Component.literal("\n - Next task: ").withStyle(ChatFormatting.WHITE))
-                .append(quest.getNextTask().getComponent().withStyle(ChatFormatting.GRAY))
+                .append(quest.nextTask().getComponent().withStyle(ChatFormatting.GRAY))
                 .append(Component.literal("\n"))
                 .append(Component.literal("[Track quest]")
-                        .withStyle(style -> style.withClickEvent(new ClickEvent(
-                                        ClickEvent.Action.RUN_COMMAND, "/quest track " + quest.getName()))
+                        .withStyle(style -> style.withClickEvent(
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/quest track " + quest.name()))
                                 .withHoverEvent(new HoverEvent(
                                         HoverEvent.Action.SHOW_TEXT, Component.literal("Click to track quest"))))
                         .withStyle(ChatFormatting.DARK_AQUA))
                 .append(Component.literal(" "))
                 .append(Component.literal("[Lookup on wiki]")
                         .withStyle(style -> style.withClickEvent(
-                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/quest wiki " + quest.getName()))
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/quest wiki " + quest.name()))
                                 .withHoverEvent(new HoverEvent(
                                         HoverEvent.Action.SHOW_TEXT,
                                         Component.literal("Click to lookup quest on wiki"))))
@@ -212,7 +212,7 @@ public class QuestCommand extends Command {
 
         Models.Quest.startTracking(quest);
         MutableComponent response =
-                Component.literal("Now tracking quest " + quest.getName()).withStyle(ChatFormatting.AQUA);
+                Component.literal("Now tracking quest " + quest.name()).withStyle(ChatFormatting.AQUA);
         context.getSource().sendSuccess(() -> response, false);
         return 1;
     }
@@ -227,7 +227,7 @@ public class QuestCommand extends Command {
 
         Models.Quest.stopTracking();
 
-        MutableComponent response = Component.literal("Stopped tracking quest " + trackedQuest.getName())
+        MutableComponent response = Component.literal("Stopped tracking quest " + trackedQuest.name())
                 .withStyle(ChatFormatting.AQUA);
         context.getSource().sendSuccess(() -> response, false);
         return 1;
@@ -240,7 +240,7 @@ public class QuestCommand extends Command {
 
         Models.Quest.openQuestOnWiki(quest);
         MutableComponent response =
-                Component.literal("Quest opened on wiki " + quest.getName()).withStyle(ChatFormatting.AQUA);
+                Component.literal("Quest opened on wiki " + quest.name()).withStyle(ChatFormatting.AQUA);
         context.getSource().sendSuccess(() -> response, false);
         return 1;
     }
@@ -253,8 +253,7 @@ public class QuestCommand extends Command {
     private QuestInfo getQuestInfo(CommandContext<CommandSourceStack> context, String questName) {
         String questNameLowerCase = questName.toLowerCase(Locale.ROOT);
         List<QuestInfo> matchingQuests = Models.Quest.getQuestsRaw().stream()
-                .filter(questInfo ->
-                        questInfo.getName().toLowerCase(Locale.ROOT).contains(questNameLowerCase))
+                .filter(questInfo -> questInfo.name().toLowerCase(Locale.ROOT).contains(questNameLowerCase))
                 .toList();
 
         if (matchingQuests.isEmpty()) {
@@ -267,12 +266,12 @@ public class QuestCommand extends Command {
                     .withStyle(ChatFormatting.RED);
             for (QuestInfo quest : matchingQuests) {
                 error.append(Component.literal("\n - ").withStyle(ChatFormatting.GRAY))
-                        .append(Component.literal(quest.getName()).withStyle(ChatFormatting.WHITE));
+                        .append(Component.literal(quest.name()).withStyle(ChatFormatting.WHITE));
             }
             context.getSource().sendFailure(error);
             return null;
         }
 
-        return matchingQuests.get(0);
+        return matchingQuests.getFirst();
     }
 }

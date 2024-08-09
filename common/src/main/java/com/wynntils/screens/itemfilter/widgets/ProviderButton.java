@@ -95,8 +95,6 @@ public class ProviderButton extends WynntilsButton {
                         getX() + 2,
                         getY() + (height / 2f),
                         width - 4,
-                        translationX,
-                        translationY,
                         CommonColors.WHITE,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.MIDDLE,

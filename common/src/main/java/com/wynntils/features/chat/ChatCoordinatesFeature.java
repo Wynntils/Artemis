@@ -20,8 +20,8 @@ import com.wynntils.utils.wynn.LocationUtils;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import net.minecraft.network.chat.Style;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.CHAT)
 public class ChatCoordinatesFeature extends Feature {

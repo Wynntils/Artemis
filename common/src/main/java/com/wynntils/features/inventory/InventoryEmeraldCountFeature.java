@@ -5,6 +5,7 @@
 package com.wynntils.features.inventory;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.wynntils.core.components.Managers;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.consumers.features.Feature;
 import com.wynntils.core.persisted.Persisted;
@@ -14,6 +15,7 @@ import com.wynntils.core.persisted.config.ConfigCategory;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.mc.event.ContainerRenderEvent;
 import com.wynntils.models.containers.containers.CharacterInfoContainer;
+import com.wynntils.models.containers.containers.personal.PersonalStorageContainer;
 import com.wynntils.models.emeralds.type.EmeraldUnits;
 import com.wynntils.screens.gearviewer.GearViewerScreen;
 import com.wynntils.screens.itemsharing.SavedItemsScreen;
@@ -31,7 +33,7 @@ import java.util.Arrays;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 @ConfigCategory(Category.INVENTORY)
@@ -82,6 +84,12 @@ public class InventoryEmeraldCountFeature extends Feature {
         int textX = (textDisplaySide.get() == TextDisplaySide.LEFT)
                 ? containerScreen.leftPos + 2
                 : screen.width - containerScreen.leftPos - 2;
+
+        if (Models.Container.getCurrentContainer() instanceof PersonalStorageContainer
+                && Managers.Feature.getFeatureInstance(PersonalStorageUtilitiesFeature.class)
+                        .isEnabled()) {
+            textureX -= 10 + Texture.BANK_PANEL.width();
+        }
 
         int bottomEmeralds = Models.Emerald.getAmountInInventory();
         boolean displayBottom = !isInventory

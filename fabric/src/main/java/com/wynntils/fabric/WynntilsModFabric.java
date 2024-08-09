@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2021-2023.
+ * Copyright © Wynntils 2021-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.fabric;
@@ -24,6 +24,6 @@ public class WynntilsModFabric implements ClientModInitializer {
                 WynntilsMod.ModLoader.FABRIC,
                 wynntilsMod.get().getMetadata().getVersion().getFriendlyString(),
                 FabricLoader.getInstance().isDevelopmentEnvironment(),
-                new File(wynntilsMod.get().getOrigin().getPaths().get(0).toUri()));
+                new File(wynntilsMod.get().getOrigin().getPaths().getFirst().toUri()));
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.inventory;
@@ -19,7 +19,7 @@ import com.wynntils.models.items.properties.LeveledItemProperty;
 import com.wynntils.models.items.properties.UsesItemProperty;
 import com.wynntils.utils.mc.KeyboardUtils;
 import java.util.Optional;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 @ConfigCategory(Category.INVENTORY)

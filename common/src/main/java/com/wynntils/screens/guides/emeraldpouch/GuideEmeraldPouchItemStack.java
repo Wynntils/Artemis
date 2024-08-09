@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.guides.emeraldpouch;
@@ -12,12 +12,14 @@ import com.wynntils.utils.MathUtils;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.Unbreakable;
 
 public final class GuideEmeraldPouchItemStack extends GuideItemStack {
     private final int tier;
@@ -30,8 +32,7 @@ public final class GuideEmeraldPouchItemStack extends GuideItemStack {
 
         this.tier = tier;
 
-        CompoundTag tag = this.getOrCreateTag();
-        tag.putBoolean("Unbreakable", true);
+        this.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
 
         generatedTooltip = generatePouchLore(tier);
     }
@@ -106,7 +107,7 @@ public final class GuideEmeraldPouchItemStack extends GuideItemStack {
     }
 
     @Override
-    public List<Component> getTooltipLines(Player player, TooltipFlag flag) {
+    public List<Component> getTooltipLines(Item.TooltipContext context, Player player, TooltipFlag flag) {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(getHoverName());
         tooltip.addAll(generatedTooltip);

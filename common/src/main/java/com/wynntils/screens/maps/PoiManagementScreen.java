@@ -989,8 +989,8 @@ public final class PoiManagementScreen extends WynntilsGridLayoutScreen {
         HiddenConfig<List<CustomPoi>> allPois = Managers.Feature.getFeatureInstance(MainMapFeature.class).customPois;
 
         // Potentially a poi that was deleted had been imported so don't want a duplicate
-        if (!allPois.get().contains(deletedPois.get(deletedPois.size() - 1))) {
-            allPois.get().add(deletedIndexes.get(deletedIndexes.size() - 1), deletedPois.get(deletedPois.size() - 1));
+        if (!allPois.get().contains(deletedPois.getLast())) {
+            allPois.get().add(deletedIndexes.getLast(), deletedPois.getLast());
 
             allPois.touched();
             Managers.Feature.getFeatureInstance(MainMapFeature.class).updateWaypoints();
@@ -1003,8 +1003,8 @@ public final class PoiManagementScreen extends WynntilsGridLayoutScreen {
             populatePois();
         }
 
-        deletedIndexes.remove(deletedIndexes.size() - 1);
-        deletedPois.remove(deletedPois.size() - 1);
+        deletedIndexes.removeLast();
+        deletedPois.removeLast();
 
         undoDeleteButton.active = !deletedIndexes.isEmpty();
     }

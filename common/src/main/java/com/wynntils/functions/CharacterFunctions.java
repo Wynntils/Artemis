@@ -28,41 +28,10 @@ public class CharacterFunctions {
         }
     }
 
-    public static class CappedSoulPointsFunction extends Function<CappedValue> {
-        @Override
-        public CappedValue getValue(FunctionArguments arguments) {
-            return Models.CharacterStats.getSoulPoints();
-        }
-    }
-
     public static class SprintFunction extends Function<CappedValue> {
         @Override
         public CappedValue getValue(FunctionArguments arguments) {
             return Models.CharacterStats.getSprint();
-        }
-    }
-
-    public static class SoulpointFunction extends Function<Integer> {
-        @Override
-        public Integer getValue(FunctionArguments arguments) {
-            return Models.CharacterStats.getSoulPoints().current();
-        }
-
-        @Override
-        protected List<String> getAliases() {
-            return List.of("sp");
-        }
-    }
-
-    public static class SoulpointMaxFunction extends Function<Integer> {
-        @Override
-        public Integer getValue(FunctionArguments arguments) {
-            return Models.CharacterStats.getSoulPoints().max();
-        }
-
-        @Override
-        protected List<String> getAliases() {
-            return List.of("sp_max");
         }
     }
 
@@ -116,50 +85,6 @@ public class CharacterFunctions {
         public FunctionArguments.Builder getArgumentsBuilder() {
             return new FunctionArguments.RequiredArgumentBuilder(
                     List.of(new FunctionArguments.Argument<>("query", String.class, null)));
-        }
-    }
-
-    public static class SoulpointTimerFunction extends Function<String> {
-        @Override
-        public String getValue(FunctionArguments arguments) {
-            int totalSeconds = Models.CharacterStats.getTicksToNextSoulPoint() / 20;
-
-            int seconds = totalSeconds % 60;
-            int minutes = totalSeconds / 60;
-            return String.format("%d:%02d", minutes, seconds);
-        }
-
-        @Override
-        protected List<String> getAliases() {
-            return List.of("sp_timer");
-        }
-    }
-
-    public static class SoulpointTimerMFunction extends Function<Integer> {
-        @Override
-        public Integer getValue(FunctionArguments arguments) {
-            int totalSeconds = Models.CharacterStats.getTicksToNextSoulPoint() / 20;
-
-            return totalSeconds / 60;
-        }
-
-        @Override
-        protected List<String> getAliases() {
-            return List.of("sp_timer_m");
-        }
-    }
-
-    public static class SoulpointTimerSFunction extends Function<Integer> {
-        @Override
-        public Integer getValue(FunctionArguments arguments) {
-            int totalSeconds = Models.CharacterStats.getTicksToNextSoulPoint() / 20;
-
-            return totalSeconds % 60;
-        }
-
-        @Override
-        protected List<String> getAliases() {
-            return List.of("sp_timer_s");
         }
     }
 

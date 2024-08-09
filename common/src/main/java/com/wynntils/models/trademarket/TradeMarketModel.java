@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.trademarket;
@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class TradeMarketModel extends Model {
     private static final Pattern[] ITEM_NAME_PATTERNS = {
@@ -87,14 +87,16 @@ public class TradeMarketModel extends Model {
     }
 
     public TradeMarketPriceInfo calculateItemPriceInfo(ItemStack itemStack) {
-        StyledText priceLine = LoreUtils.getLoreLine(itemStack, TRADE_MARKET_PRICE_LINE);
+        List<StyledText> loreLines = LoreUtils.getLore(itemStack);
+
+        StyledText priceLine = loreLines.get(TRADE_MARKET_PRICE_LINE);
 
         if (priceLine == null || !priceLine.matches(PRICE_STR)) {
             WynntilsMod.warn("Trade Market item had an unexpected price line: " + priceLine);
             return TradeMarketPriceInfo.EMPTY;
         }
 
-        StyledText priceValueLine = LoreUtils.getLoreLine(itemStack, TRADE_MARKET_PRICE_LINE + 1);
+        StyledText priceValueLine = loreLines.get(TRADE_MARKET_PRICE_LINE + 1);
 
         Matcher matcher = priceValueLine.getMatcher(PRICE_PATTERN);
         if (!matcher.matches()) {

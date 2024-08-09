@@ -22,8 +22,8 @@ import com.wynntils.utils.mc.McUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @StartDisabled
 @ConfigCategory(Category.UTILITIES)
@@ -63,7 +63,7 @@ public class TranslationFeature extends Feature {
                 .translate(List.of(codedString), languageName.get(), translatedMsgList -> {
                     StyledText messageToSend;
                     if (!translatedMsgList.isEmpty()) {
-                        String result = translatedMsgList.get(0);
+                        String result = translatedMsgList.getFirst();
                         messageToSend = unwrapCoding(result, originalText);
                     } else {
                         if (keepOriginal.get()) return;

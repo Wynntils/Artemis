@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class SetEntityDataEvent extends Event {
     private final int id;

@@ -16,8 +16,8 @@ import com.wynntils.utils.type.CappedValue;
 import com.wynntils.utils.type.TimedSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class CombatXpModel extends Model {
     /* These values are copied from a post by Salted, https://forums.wynncraft.com/threads/2-0-3-hotfix-3.310064/
@@ -65,7 +65,7 @@ public class CombatXpModel extends Model {
         if (!Models.WorldState.onWorld()) return;
 
         // We don't want to track XP before we've even got a packet to set our level
-        if (McUtils.player().experienceLevel == 0) return;
+        if (Models.CharacterStats.getLevel() == 0) return;
 
         // On first world join, we get all our current XP points (the currently gained amount for the next level), but
         // we only care about actual gains
@@ -131,7 +131,7 @@ public class CombatXpModel extends Model {
     }
 
     public CappedValue getCombatLevel() {
-        return new CappedValue(McUtils.player().experienceLevel, MAX_LEVEL);
+        return new CappedValue(Models.CharacterStats.getLevel(), MAX_LEVEL);
     }
 
     public CappedValue getXp() {
@@ -145,7 +145,7 @@ public class CombatXpModel extends Model {
     }
 
     private int getXpPointsNeededToLevelUp() {
-        int levelIndex = McUtils.player().experienceLevel - 1;
+        int levelIndex = Models.CharacterStats.getLevel() - 1;
         if (levelIndex >= LEVEL_UP_XP_REQUIREMENTS.length) {
             return Integer.MAX_VALUE;
         }

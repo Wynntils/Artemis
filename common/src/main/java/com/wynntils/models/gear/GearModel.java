@@ -13,7 +13,6 @@ import com.wynntils.models.gear.type.GearTier;
 import com.wynntils.models.gear.type.GearType;
 import com.wynntils.models.items.items.game.CraftedGearItem;
 import com.wynntils.models.items.items.game.GearBoxItem;
-import com.wynntils.models.items.items.game.GearItem;
 import com.wynntils.models.items.items.game.UnknownGearItem;
 import com.wynntils.models.stats.type.StatPossibleValues;
 import com.wynntils.models.stats.type.StatType;
@@ -26,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.stream.Stream;
 import net.minecraft.world.item.ItemStack;
 
@@ -48,7 +46,6 @@ import net.minecraft.world.item.ItemStack;
 public final class GearModel extends Model {
     private final GearInfoRegistry gearInfoRegistry = new GearInfoRegistry();
 
-    private final GearChatEncoding gearChatEncoding = new GearChatEncoding();
     private final Map<GearBoxItem, List<GearInfo>> possibilitiesCache = new HashMap<>();
 
     public GearModel() {
@@ -176,18 +173,6 @@ public final class GearModel extends Model {
                 result.identifications(),
                 result.powders(),
                 result.rerolls());
-    }
-
-    public GearItem fromEncodedString(String encoded) {
-        return gearChatEncoding.fromEncodedString(encoded);
-    }
-
-    public String toEncodedString(GearItem gearItem) {
-        return gearChatEncoding.toEncodedString(gearItem);
-    }
-
-    public Matcher gearChatEncodingMatcher(String str) {
-        return gearChatEncoding.gearChatEncodingMatcher(str);
     }
 
     public GearInfo getGearInfoFromDisplayName(String gearName) {

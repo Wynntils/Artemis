@@ -49,8 +49,6 @@ public class GuidesButton extends WynntilsButton {
                         this.getX() + 2,
                         this.getY() + 1,
                         this.width - 3,
-                        translationX,
-                        translationY,
                         CommonColors.BLACK,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.TOP,

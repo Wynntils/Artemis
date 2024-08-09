@@ -30,7 +30,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import org.lwjgl.glfw.GLFW;
 
-public class CustomBarSelectionScreen extends WynntilsScreen {
+public final class CustomBarSelectionScreen extends WynntilsScreen {
     // The order of these matters, they must match that in CustomBarsOverlayFeature
     private static final List<Pair<Texture, List<BarTexture>>> availableBars = List.of(
             Pair.of(Texture.UNIVERSAL_BAR, List.of(UniversalTexture.values())),
@@ -226,8 +226,7 @@ public class CustomBarSelectionScreen extends WynntilsScreen {
         previousScreen.populateOverlays();
 
         // Set the new custom bar as selected for easier editing access
-        previousScreen.setSelectedOverlay(
-                barGroup.getOverlays().get(barGroup.getOverlays().size() - 1));
+        previousScreen.setSelectedOverlay(barGroup.getOverlays().getLast());
 
         McUtils.sendMessageToClient(Component.translatable(
                         "screens.wynntils.overlaySelection.createdOverlay",

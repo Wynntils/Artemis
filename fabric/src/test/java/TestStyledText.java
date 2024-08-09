@@ -6,6 +6,7 @@ import com.wynntils.core.text.PartStyle;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.core.text.StyledTextPart;
 import com.wynntils.utils.colors.CustomColor;
+import com.wynntils.utils.type.IterationDecision;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -233,13 +234,13 @@ public class TestStyledText {
                         .withStyle(ChatFormatting.RED)
                         .append(Component.literal("blue")
                                 .withStyle(ChatFormatting.BLUE)
-                                .withStyle(style -> style.withHoverEvent(hoverEvents.get(0))))
+                                .withStyle(style -> style.withHoverEvent(hoverEvents.getFirst())))
                         .append(Component.literal("nonitalic").withStyle(Style.EMPTY.withItalic(false)))
                         .append(Component.literal("inherited")
                                 .append(Component.literal("bold")
                                         .withStyle(ChatFormatting.BOLD)
                                         .withStyle(style -> style.withHoverEvent(hoverEvents.get(1))))))
-                .append(Component.literal("after").withStyle(style -> style.withClickEvent(clickEvents.get(0)))));
+                .append(Component.literal("after").withStyle(style -> style.withClickEvent(clickEvents.getFirst()))));
 
         StyledText styledText = StyledText.fromModifiedString(stringWithEvents, originalText);
 
@@ -357,6 +358,33 @@ public class TestStyledText {
                 expected,
                 styledText.getNormalized().getString(PartStyle.StyleType.NONE),
                 "StyledText.getNormalized().getString() returned an unexpected value.");
+    }
+
+    @Test
+    public void alignedStringStripping_shouldProduceCorrectString() {
+        final String badText =
+                "§c\uDAFF\uDFFC\uDB00\uDC06The war for Detlas Close Suburbs will \uDAFF\uDFFC\uDB00\uDC06start in 30 seconds.";
+        final String expected = "§cThe war for Detlas Close Suburbs will start in 30 seconds.";
+
+        StyledText styledText = StyledText.fromString(badText);
+
+        Assertions.assertEquals(
+                expected,
+                styledText.stripAlignment().getString(PartStyle.StyleType.DEFAULT),
+                "StyledText.stripAlignment().getString() returned an unexpected value.");
+    }
+
+    @Test
+    public void normalStringStripping_shouldHaveNoEffect() {
+        final String badText = "Hello, World!";
+        final String expected = "Hello, World!";
+
+        StyledText styledText = StyledText.fromString(badText);
+
+        Assertions.assertEquals(
+                expected,
+                styledText.stripAlignment().getString(PartStyle.StyleType.DEFAULT),
+                "StyledText.stripAlignment().getString() returned an unexpected value.");
     }
 
     @Test
@@ -530,11 +558,13 @@ public class TestStyledText {
 
         StyledText styledText = StyledText.fromComponent(component);
 
-        // The reconstructed componenet differs in that StyledText always adds components as a sibling to an empty
-        // component
+        // The reconstructed component differs in that StyledText
+        // always adds components as a sibling to an empty component
+        // Note: The comparison is done on the size of the lists, as Style has an equals method that does not
+        //       behave like it's implementation (null != false, when in reality they are equal).
         Assertions.assertEquals(
-                component.toFlatList(),
-                styledText.getComponent().toFlatList(),
+                component.toFlatList().size(),
+                styledText.getComponent().toFlatList().size(),
                 "StyledText.getComponent() returned an unexpected value.");
     }
 
@@ -822,7 +852,7 @@ public class TestStyledText {
 
         StyledText styledText = StyledText.fromComponent(component);
 
-        final String result = "§#240c2atest";
+        final String result = "§#240c2afftest";
         Assertions.assertEquals(
                 result,
                 styledText.getString(PartStyle.StyleType.DEFAULT),
@@ -830,7 +860,25 @@ public class TestStyledText {
     }
 
     @Test
-    public void styledText_inheritesHoverEvents() {
+    public void styledText_fromStringWithNonChatFormattingColors() {
+        final CustomColor color = new CustomColor(36, 12, 42).withAlpha(255);
+        final StyledText styledText = StyledText.fromComponent(Component.literal("test"))
+                .iterate((part, changes) -> {
+                    changes.remove(part);
+                    changes.add(part.withStyle(style -> style.withColor(color)));
+                    return IterationDecision.CONTINUE;
+                });
+
+        StyledTextPart firstPart = styledText.getFirstPart();
+        Assertions.assertNotNull(firstPart, "StyledText.fromString() did not produce a part.");
+
+        CustomColor textColor = firstPart.getPartStyle().getColor();
+
+        Assertions.assertEquals(color, textColor, "StyledText.fromString() returned an unexpected value.");
+    }
+
+    @Test
+    public void styledText_inheritsHoverEvents() {
         final Component component = Component.empty()
                 .withStyle(style ->
                         style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("hover"))))
@@ -840,7 +888,7 @@ public class TestStyledText {
 
         Assertions.assertEquals(
                 component.getStyle().getHoverEvent(),
-                styledText.getComponent().toFlatList().get(0).getStyle().getHoverEvent(),
+                styledText.getComponent().toFlatList().getFirst().getStyle().getHoverEvent(),
                 "StyledText.fromComponent() did not inherit the correct hover event.");
     }
 }

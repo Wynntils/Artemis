@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.profession.type;
@@ -86,7 +86,7 @@ public final class MaterialProfile {
                 .flatMap(Collection::stream)
                 .filter(material -> material.name().equals(sourceMaterialName))
                 .findFirst()
-                .orElseGet(null);
+                .orElse(null);
         if (sourceMaterial == null) return null;
 
         ResourceType resourceType = ResourceType.fromString(resourceTypeName);

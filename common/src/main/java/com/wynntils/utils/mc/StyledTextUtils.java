@@ -82,4 +82,11 @@ public final class StyledTextUtils {
 
         return newLines;
     }
+
+    /**
+     * Removes all newlines from the given styled text.
+     */
+    public static StyledText joinAllLines(StyledText styledText) {
+        return styledText.replaceAll("\n", "");
+    }
 }

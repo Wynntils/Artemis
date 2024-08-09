@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.partymanagement.widgets;
@@ -50,7 +50,7 @@ public class SuggestionPlayerWidget extends AbstractWidget {
         PlayerInfo playerInfo =
                 McUtils.mc().getConnection().getPlayerInfo(playerName); // Disconnected players will just be steves
         ResourceLocation skin = (playerInfo == null)
-                ? new ResourceLocation("textures/entity/steve.png")
+                ? ResourceLocation.withDefaultNamespace("textures/entity/steve.png")
                 : playerInfo.getSkin().texture();
         // head rendering
         RenderUtils.drawTexturedRect(

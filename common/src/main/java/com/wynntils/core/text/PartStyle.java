@@ -14,6 +14,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
 
 public final class PartStyle {
     private static final String STYLE_PREFIX = "§";
@@ -22,7 +23,7 @@ public final class PartStyle {
             .filter(ChatFormatting::isColor)
             .collect(
                     () -> new Int2ObjectOpenHashMap<>(ChatFormatting.values().length),
-                    (map, cf) -> map.put(cf.getColor(), cf),
+                    (map, cf) -> map.put(cf.getColor() | 0xFF000000, cf),
                     Int2ObjectMap::putAll);
 
     private final StyledTextPart owner;
@@ -35,6 +36,7 @@ public final class PartStyle {
     private final boolean italic;
     private final ClickEvent clickEvent;
     private final HoverEvent hoverEvent;
+    private final ResourceLocation font;
 
     private PartStyle(
             StyledTextPart owner,
@@ -45,7 +47,8 @@ public final class PartStyle {
             boolean underlined,
             boolean italic,
             ClickEvent clickEvent,
-            HoverEvent hoverEvent) {
+            HoverEvent hoverEvent,
+            ResourceLocation font) {
         this.owner = owner;
         this.color = color;
         this.obfuscated = obfuscated;
@@ -55,6 +58,7 @@ public final class PartStyle {
         this.italic = italic;
         this.clickEvent = clickEvent;
         this.hoverEvent = hoverEvent;
+        this.font = font;
     }
 
     PartStyle(PartStyle partStyle, StyledTextPart owner) {
@@ -67,6 +71,7 @@ public final class PartStyle {
         this.italic = partStyle.italic;
         this.clickEvent = partStyle.clickEvent;
         this.hoverEvent = partStyle.hoverEvent;
+        this.font = partStyle.font;
     }
 
     static PartStyle fromStyle(Style style, StyledTextPart owner, Style parentStyle) {
@@ -75,7 +80,7 @@ public final class PartStyle {
         if (parentStyle == null) {
             inheritedStyle = style;
         } else {
-            // This changes properties that are null, as-in, inherting from the previous style.
+            // This changes properties that are null, as-in, inheriting from the previous style.
             inheritedStyle = style.applyTo(parentStyle);
         }
 
@@ -83,14 +88,15 @@ public final class PartStyle {
                 owner,
                 inheritedStyle.getColor() == null
                         ? CustomColor.NONE
-                        : CustomColor.fromInt(inheritedStyle.getColor().getValue()),
+                        : CustomColor.fromInt(inheritedStyle.getColor().getValue() | 0xFF000000),
                 inheritedStyle.isObfuscated(),
                 inheritedStyle.isBold(),
                 inheritedStyle.isStrikethrough(),
                 inheritedStyle.isUnderlined(),
                 inheritedStyle.isItalic(),
                 inheritedStyle.getClickEvent(),
-                inheritedStyle.getHoverEvent());
+                inheritedStyle.getHoverEvent(),
+                inheritedStyle.getFont());
     }
 
     public String asString(PartStyle previousStyle, StyleType type) {
@@ -186,10 +192,8 @@ public final class PartStyle {
     public Style getStyle() {
         // Optimization: Use raw Style constructor, instead of the builder.
         TextColor textColor = color == CustomColor.NONE ? null : TextColor.fromRgb(color.asInt());
-        Style reconstructedStyle = new Style(
-                textColor, bold, italic, underlined, strikethrough, obfuscated, clickEvent, hoverEvent, null, null);
-
-        return reconstructedStyle;
+        return new Style(
+                textColor, bold, italic, underlined, strikethrough, obfuscated, clickEvent, hoverEvent, null, font);
     }
 
     public PartStyle withColor(ChatFormatting color) {
@@ -197,10 +201,15 @@ public final class PartStyle {
             throw new IllegalArgumentException("ChatFormatting " + color + " is not a color!");
         }
 
-        CustomColor newColor = CustomColor.fromInt(color.getColor());
+        CustomColor newColor = CustomColor.fromInt(color.getColor() | 0xFF000000);
 
         return new PartStyle(
-                owner, newColor, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent);
+                owner, newColor, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
+    }
+
+    public PartStyle withColor(CustomColor color) {
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     public boolean isBold() {
@@ -231,32 +240,52 @@ public final class PartStyle {
         return hoverEvent;
     }
 
+    public CustomColor getColor() {
+        return color;
+    }
+
+    public ResourceLocation getFont() {
+        return font;
+    }
+
     public PartStyle withBold(boolean bold) {
-        return new PartStyle(owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent);
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     public PartStyle withObfuscated(boolean obfuscated) {
-        return new PartStyle(owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent);
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     public PartStyle withStrikethrough(boolean strikethrough) {
-        return new PartStyle(owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent);
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     public PartStyle withUnderlined(boolean underlined) {
-        return new PartStyle(owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent);
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     public PartStyle withItalic(boolean italic) {
-        return new PartStyle(owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent);
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     public PartStyle withClickEvent(ClickEvent clickEvent) {
-        return new PartStyle(owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent);
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     public PartStyle withHoverEvent(HoverEvent hoverEvent) {
-        return new PartStyle(owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent);
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
+    }
+
+    public PartStyle withFont(ResourceLocation font) {
+        return new PartStyle(
+                owner, color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     private String tryConstructDifference(PartStyle oldStyle, boolean includeEvents) {
@@ -268,7 +297,7 @@ public final class PartStyle {
         if (oldColorInt == -1) {
             if (newColorInt != -1) {
                 Arrays.stream(ChatFormatting.values())
-                        .filter(c -> c.isColor() && newColorInt == c.getColor())
+                        .filter(c -> c.isColor() && newColorInt == (c.getColor() | 0xFF000000))
                         .findFirst()
                         .ifPresent(add::append);
             }
@@ -321,14 +350,15 @@ public final class PartStyle {
     @Override
     public String toString() {
         return "PartStyle{" + "color="
-                + color + ", bold="
-                + bold + ", italic="
-                + italic + ", underlined="
-                + underlined + ", strikethrough="
-                + strikethrough + ", obfuscated="
-                + obfuscated + ", clickEvent="
+                + color + ", obfuscated="
+                + obfuscated + ", bold="
+                + bold + ", strikethrough="
+                + strikethrough + ", underlined="
+                + underlined + ", italic="
+                + italic + ", clickEvent="
                 + clickEvent + ", hoverEvent="
-                + hoverEvent + '}';
+                + hoverEvent + ", font="
+                + font + '}';
     }
 
     @Override
@@ -336,19 +366,20 @@ public final class PartStyle {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PartStyle partStyle = (PartStyle) o;
-        return bold == partStyle.bold
-                && italic == partStyle.italic
-                && underlined == partStyle.underlined
+        return obfuscated == partStyle.obfuscated
+                && bold == partStyle.bold
                 && strikethrough == partStyle.strikethrough
-                && obfuscated == partStyle.obfuscated
+                && underlined == partStyle.underlined
+                && italic == partStyle.italic
                 && Objects.equals(color, partStyle.color)
                 && Objects.equals(clickEvent, partStyle.clickEvent)
-                && Objects.equals(hoverEvent, partStyle.hoverEvent);
+                && Objects.equals(hoverEvent, partStyle.hoverEvent)
+                && Objects.equals(font, partStyle.font);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(color, bold, italic, underlined, strikethrough, obfuscated, clickEvent, hoverEvent);
+        return Objects.hash(color, obfuscated, bold, strikethrough, underlined, italic, clickEvent, hoverEvent, font);
     }
 
     public enum StyleType {

@@ -7,7 +7,7 @@ package com.wynntils.features.inventory;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.consumers.features.Feature;
@@ -46,8 +46,8 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 
@@ -120,7 +120,9 @@ public class ItemScreenshotFeature extends Feature {
         // draw tooltip to framebuffer, create image
         McUtils.mc().getMainRenderTarget().unbindWrite();
 
-        GuiGraphics guiGraphics = new GuiGraphics(McUtils.mc(), MultiBufferSource.immediate(new BufferBuilder(256)));
+        ByteBufferBuilder byteBuffer = new ByteBufferBuilder(256);
+        MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(byteBuffer);
+        GuiGraphics guiGraphics = new GuiGraphics(McUtils.mc(), bufferSource);
         RenderTarget fb = new MainTarget(width * 2, height * 2);
         fb.setClearColor(1f, 1f, 1f, 0f);
         fb.createBuffers(width * 2, height * 2, false);
@@ -139,6 +141,10 @@ public class ItemScreenshotFeature extends Feature {
         McUtils.mc().getMainRenderTarget().bindWrite(true);
 
         BufferedImage bi = SystemUtils.createScreenshot(fb);
+
+        // Free the buffer source to prevent memory leaks
+        byteBuffer.close();
+        bufferSource = null;
 
         if (saveToDisk.get()) {
             // First try to save it to disk

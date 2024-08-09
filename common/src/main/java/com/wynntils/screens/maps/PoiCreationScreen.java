@@ -12,7 +12,6 @@ import com.wynntils.core.components.Services;
 import com.wynntils.core.persisted.config.HiddenConfig;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.features.map.MainMapFeature;
-import com.wynntils.screens.base.TextboxScreen;
 import com.wynntils.screens.base.widgets.TextInputBoxWidget;
 import com.wynntils.services.map.pois.CustomPoi;
 import com.wynntils.services.map.pois.Poi;
@@ -38,7 +37,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
-public final class PoiCreationScreen extends AbstractMapScreen implements TextboxScreen {
+public final class PoiCreationScreen extends AbstractMapScreen {
     private static final Pattern COORDINATE_PATTERN = Pattern.compile("[-+]?\\d{1,8}");
 
     private static final float GRID_DIVISIONS = 64.0f;

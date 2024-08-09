@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.lootrun.scoreboard;
@@ -30,8 +30,9 @@ public class LootrunScoreboardPart extends ScoreboardPart {
     private static final Pattern DEFEND_PATTERN = Pattern.compile("^Defend for (\\d+)s!$");
 
     private static final Pattern TIMER_PATTERN =
-            Pattern.compile("^[-—] Time Left: (\\d+):(\\d+)(?: \\[\\+\\d+[msMS]\\])?$");
-    private static final Pattern CHALLENGES_PATTERN = Pattern.compile("^[-—] Challenges: (\\d+)/(\\d+)$");
+            Pattern.compile("^[-—] Time Left: (\\d+):(\\d+)(?: \\[[+-]\\d+[msMS]\\])?$");
+    private static final Pattern CHALLENGES_PATTERN =
+            Pattern.compile("^[-—] Challenges: (\\d+)/(\\d+)(?: \\[[+-]\\d+\\])$");
 
     @Override
     public SegmentMatcher getSegmentMatcher() {
@@ -47,7 +48,7 @@ public class LootrunScoreboardPart extends ScoreboardPart {
             return;
         }
 
-        StyledText currentStateLine = content.get(0);
+        StyledText currentStateLine = content.getFirst();
 
         if (currentStateLine.matches(CHOOSE_BEACON_PATTERN, PartStyle.StyleType.NONE)) {
             Models.Lootrun.setState(LootrunningState.CHOOSING_BEACON, null);

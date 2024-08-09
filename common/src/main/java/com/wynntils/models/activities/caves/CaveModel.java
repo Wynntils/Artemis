@@ -54,9 +54,7 @@ public class CaveModel extends Model {
     }
 
     public Optional<CaveInfo> getCaveInfoFromName(String name) {
-        return getCavesRaw().stream()
-                .filter(cave -> cave.getName().equals(name))
-                .findFirst();
+        return getCavesRaw().stream().filter(cave -> cave.name().equals(name)).findFirst();
     }
 
     public List<CaveInfo> getSortedCaves(ActivitySortOrder sortOrder) {
@@ -68,27 +66,27 @@ public class CaveModel extends Model {
         // the given sort order, and finally a third way if the given sort order is equal.
 
         CaveInfo trackedCaveInfo = Models.Activity.getTrackedCaveInfo();
-        String trackedCaveName = trackedCaveInfo != null ? trackedCaveInfo.getName() : "";
+        String trackedCaveName = trackedCaveInfo != null ? trackedCaveInfo.name() : "";
         Comparator<CaveInfo> baseComparator =
-                Comparator.comparing(caveInfo -> !caveInfo.getName().equals(trackedCaveName));
+                Comparator.comparing(caveInfo -> !caveInfo.name().equals(trackedCaveName));
         return switch (sortOrder) {
             case LEVEL -> caveList.stream()
                     .sorted(baseComparator
-                            .thenComparing(CaveInfo::getStatus)
-                            .thenComparing(CaveInfo::getRecommendedLevel)
-                            .thenComparing(CaveInfo::getName))
+                            .thenComparing(CaveInfo::status)
+                            .thenComparing(CaveInfo::recommendedLevel)
+                            .thenComparing(CaveInfo::name))
                     .toList();
             case DISTANCE -> caveList.stream()
                     .sorted(baseComparator
-                            .thenComparing(CaveInfo::getStatus)
-                            .thenComparing(CaveInfo::getDistance)
-                            .thenComparing(CaveInfo::getName))
+                            .thenComparing(CaveInfo::status)
+                            .thenComparing(CaveInfo::distance)
+                            .thenComparing(CaveInfo::name))
                     .toList();
             case ALPHABETIC -> caveList.stream()
                     .sorted(baseComparator
-                            .thenComparing(CaveInfo::getStatus)
-                            .thenComparing(CaveInfo::getName)
-                            .thenComparing(CaveInfo::getRecommendedLevel))
+                            .thenComparing(CaveInfo::status)
+                            .thenComparing(CaveInfo::name)
+                            .thenComparing(CaveInfo::recommendedLevel))
                     .toList();
         };
     }

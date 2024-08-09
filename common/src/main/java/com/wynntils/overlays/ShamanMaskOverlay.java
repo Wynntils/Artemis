@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.overlays;
@@ -16,8 +16,9 @@ import com.wynntils.models.abilities.event.ShamanMaskTitlePacketEvent;
 import com.wynntils.models.abilities.type.ShamanMaskType;
 import com.wynntils.utils.render.type.HorizontalAlignment;
 import com.wynntils.utils.render.type.VerticalAlignment;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class ShamanMaskOverlay extends TextOverlay {
     private static final String TEMPLATE = "{shaman_mask} mask";
@@ -49,12 +50,12 @@ public class ShamanMaskOverlay extends TextOverlay {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         ShamanMaskType currentMaskType = Models.ShamanMask.getCurrentMaskType();
 
         if (currentMaskType == ShamanMaskType.NONE && !displayNone.get()) return;
 
-        super.render(poseStack, bufferSource, partialTicks, window);
+        super.render(poseStack, bufferSource, deltaTracker, window);
     }
 
     @Override

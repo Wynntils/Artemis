@@ -5,7 +5,7 @@
 package com.wynntils.models.containers.event;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class MythicFoundEvent extends Event {
     private final ItemStack mythicBoxItem;

@@ -1,31 +1,6 @@
-buildscript {
-    repositories {
-        maven {
-            url "https://jitpack.io/"
-        }
-    }
-
-    /*
-     This implements transformers to apply net.minecraftforge.eventbus.EventSubclassTransformer
-     through the 2 following ways
-     Architectury fabric transformer
-     - Transforms relevant classes in dev environment at runtime
-     - class EventBusTransform in com.github.wynntils:EventBusTransformer dependency
-     GradleTask applyEventBus
-     - Transforms relevant classes after shadowing jar for use in final jar
-     - class Main in com.github.wynntils:EventBusTransformer dependency
-     */
-
-    dependencies {
-        classpath "com.github.wynntils:EventBusTransformer:${event_bus_transformer_version}"
-    }
-}
-
 plugins {
     id "com.github.johnrengelman.shadow" version "${shadow_version}"
 }
-
-import com.wynntils.eventbustransformer.EventBusTransform
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
@@ -33,7 +8,7 @@ loom {
 
 architectury {
     platformSetupLoomIde()
-    fabric() { it.add(EventBusTransform.class) }
+    fabric()
 }
 
 configurations {
@@ -50,16 +25,21 @@ repositories {
     maven {
         url "https://jitpack.io"
     }
+    maven {
+        url "https://maven.terraformersmc.com/"
+    }
 }
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     include(modImplementation(fabricApi.module("fabric-resource-loader-v0", fabric_version)))
 
+    modCompileOnly("com.terraformersmc:modmenu:${modmenu_version}")
+
     testImplementation(common(project(path: ":common", configuration: "namedElements"))) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
-    shadowImplementation("net.minecraftforge:eventbus:${forge_eventbus_version}") {
+    shadowImplementation("net.neoforged:bus:${neoforge_eventbus_version}") {
         exclude group: "org.ow2.asm"
         exclude group: "org.apache.logging.log4j"
         exclude group: "cpw.mods", module: "modlauncher"
@@ -71,9 +51,6 @@ dependencies {
 
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixinextras_version}")))
 
-    // EventBusTransform needs to only be available for the dev env at runtime and
-    // does not need to be shadowed
-    runtimeOnly "com.github.wynntils:EventBusTransformer:${event_bus_transformer_version}"
     modRuntimeOnly "me.djtheredstoner:DevAuth-fabric:${devauth_version}"
 
     testImplementation("net.fabricmc:fabric-loader-junit:${fabric_loader_version}")
@@ -85,10 +62,16 @@ test {
 }
 
 processResources {
-    inputs.property "version", project.version
+    var replaceProperties = [
+        mod_version                : rootProject.version,
+        minecraft_version          : minecraft_version,
+        fabric_loader_version      : fabric_loader_version,
+        mod_id                     : mod_id
+    ]
+    inputs.properties replaceProperties
 
     filesMatching("fabric.mod.json") {
-        expand("version": project.version)
+        expand replaceProperties
     }
 }
 
@@ -111,24 +94,9 @@ shadowJar {
     archiveClassifier = "dev-shadow"
 }
 
-tasks.register("applyEventBus", Jar) {
-    inputs.file shadowJar.archiveFile
-    archiveClassifier = "transformed-eventbus"
-    dependsOn shadowJar
-    doLast {
-        javaexec {
-            classpath = sourceSets.main.runtimeClasspath
-            mainClass = "com.wynntils.eventbustransformer.Main"
-            args(shadowJar.archiveFile.get(), archiveFile.get())
-            workingDir = "${buildDir}"
-        }
-    }
-}
-
 remapJar {
     injectAccessWidener = true
-    input.set applyEventBus.archiveFile
-    dependsOn applyEventBus
+    inputFile.set shadowJar.archiveFile
     archiveClassifier = "fabric+MC-${minecraft_version}"
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.damage;
@@ -8,30 +8,28 @@ import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Handlers;
 import com.wynntils.core.components.Model;
 import com.wynntils.handlers.bossbar.TrackedBar;
-import com.wynntils.handlers.labels.event.EntityLabelChangedEvent;
+import com.wynntils.handlers.labels.event.LabelIdentifiedEvent;
+import com.wynntils.models.damage.label.DamageLabelInfo;
+import com.wynntils.models.damage.label.DamageLabelParser;
 import com.wynntils.models.damage.type.DamageDealtEvent;
 import com.wynntils.models.damage.type.FocusedDamageEvent;
 import com.wynntils.models.stats.type.DamageType;
 import com.wynntils.utils.type.TimedSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class DamageModel extends Model {
-    // Test in DamageModel_DAMAGE_LABEL_PATTERN
-    private static final Pattern DAMAGE_LABEL_PATTERN = Pattern.compile("(?:§[245bcef](?:§l)?-(\\d+) ([❤✦✤❉❋✹☠]) )");
-
     // Test in DamageModel_DAMAGE_BAR_PATTERN
-    private static final Pattern DAMAGE_BAR_PATTERN = Pattern.compile("^§[ac](.*) - §c(\\d+)§4❤(?: - §7(.*)§7)?$");
+    private static final Pattern DAMAGE_BAR_PATTERN =
+            Pattern.compile("^§[ac](.*) - §c(\\d+)§4❤(?:§r -( (§.(.+))(Dam|Weak|Def))+)?$");
 
     private final DamageBar damageBar = new DamageBar();
 
-    private final TimedSet<Integer> areaDamageSet = new TimedSet<>(60, TimeUnit.SECONDS, true);
+    private final TimedSet<Long> areaDamageSet = new TimedSet<>(60, TimeUnit.SECONDS, true);
 
     private String focusedMobName;
     private String focusedMobElementals;
@@ -42,6 +40,7 @@ public final class DamageModel extends Model {
         super(List.of());
 
         Handlers.BossBar.registerBar(damageBar);
+        Handlers.Label.registerParser(new DamageLabelParser());
     }
 
     public long getLastDamageDealtTimestamp() {
@@ -49,34 +48,22 @@ public final class DamageModel extends Model {
     }
 
     @SubscribeEvent
-    public void onLabelChange(EntityLabelChangedEvent event) {
-        if (!(event.getEntity() instanceof ArmorStand)) return;
+    public void onLabelIdentified(LabelIdentifiedEvent event) {
+        if (!(event.getLabelInfo() instanceof DamageLabelInfo damageLabelInfo)) return;
 
-        Matcher matcher = event.getName().getMatcher(DAMAGE_LABEL_PATTERN);
-        if (!matcher.find()) return;
-
-        Map<DamageType, Integer> damages = new HashMap<>();
-        // Restart finding from the beginning
-        matcher.reset();
-        while (matcher.find()) {
-            int damage = Integer.parseInt(matcher.group(1));
-            DamageType damageType = DamageType.fromSymbol(matcher.group(2));
-
-            damages.put(damageType, damage);
-        }
-
+        Map<DamageType, Long> damages = damageLabelInfo.getDamages();
         WynntilsMod.postEvent(new DamageDealtEvent(damages));
 
-        int damageSum = damages.values().stream().mapToInt(Integer::intValue).sum();
+        long damageSum = damages.values().stream().mapToLong(d -> d).sum();
         areaDamageSet.put(damageSum);
 
         lastDamageDealtTimestamp = System.currentTimeMillis();
     }
 
-    public int getAreaDamagePerSecond() {
+    public long getAreaDamagePerSecond() {
         return areaDamageSet.getEntries().stream()
                 .filter(timedEntry -> (System.currentTimeMillis() - timedEntry.getCreation()) <= 1000L)
-                .mapToInt(TimedSet.TimedEntry::getEntry)
+                .mapToLong(TimedSet.TimedEntry::getEntry)
                 .sum();
     }
 
@@ -84,7 +71,7 @@ public final class DamageModel extends Model {
         return areaDamageSet.getEntries().stream()
                         .filter(timedEntry ->
                                 (System.currentTimeMillis() - timedEntry.getCreation()) <= seconds * 1000L)
-                        .mapToInt(TimedSet.TimedEntry::getEntry)
+                        .mapToLong(TimedSet.TimedEntry::getEntry)
                         .sum()
                 / (double) seconds;
     }

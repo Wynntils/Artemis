@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.stats.builders;
@@ -34,8 +34,7 @@ public enum MiscStatKind {
     SLOW_ENEMY("Slow Enemy", StatUnit.PERCENT, "slowEnemy"),
     WEAKEN_ENEMY("Weaken Enemy", StatUnit.PERCENT, "weakenEnemy"),
 
-    // Bonuses for soul points, emeralds, XP, loot and gathering
-    SOUL_POINT_REGEN("Soul Point Regen", StatUnit.PERCENT, "soulPointRegen", "SOULPOINTS"),
+    // Bonuses for emeralds, XP, loot and gathering
     STEALING("Stealing", StatUnit.PERCENT, "stealing", "EMERALDSTEALING"),
     XP_BONUS("XP Bonus", StatUnit.PERCENT, "xpBonus"),
     LOOT_BONUS("Loot Bonus", StatUnit.PERCENT, "lootBonus"),

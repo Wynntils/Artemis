@@ -10,7 +10,6 @@ import com.wynntils.core.components.Model;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.handlers.chat.event.ChatMessageReceivedEvent;
-import com.wynntils.handlers.chat.type.RecipientType;
 import com.wynntils.handlers.scoreboard.ScoreboardPart;
 import com.wynntils.handlers.scoreboard.ScoreboardSegment;
 import com.wynntils.mc.event.TickEvent;
@@ -20,6 +19,7 @@ import com.wynntils.models.territories.markers.GuildAttackMarkerProvider;
 import com.wynntils.models.territories.profile.TerritoryProfile;
 import com.wynntils.models.territories.type.GuildResourceValues;
 import com.wynntils.utils.mc.McUtils;
+import com.wynntils.utils.mc.StyledTextUtils;
 import com.wynntils.utils.type.TimedSet;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 /**
  * A note about territory attack timers:
@@ -50,8 +50,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public final class GuildAttackTimerModel extends Model {
     private static final Pattern GUILD_ATTACK_PATTERN = Pattern.compile("§b- (.+):(.+) §3(.+)");
     private static final Pattern GUILD_DEFENSE_CHAT_PATTERN = Pattern.compile("§3.+§b (.+) defense is (.+)");
+    // Test in GuildAttackTimerModel_WAR_MESSAGE_PATTERN
     private static final Pattern WAR_MESSAGE_PATTERN = Pattern.compile(
-            "§3\\[WAR\\]§c The war for (?<territory>.+) will start in (?<remaining>.+) (?<type>minutes|seconds)\\.");
+            "§c\uE006\uE002 The war for (?<territory>.+) will start in ((?<minutes>\\d+) minute(?:s)?)?(?: and )?((?<seconds>\\d+) second(?:s)?)?\\.");
     private static final Pattern CAPTURED_PATTERN =
             Pattern.compile("§3\\[WAR\\]§c \\[(?<guild>.+)\\] (?:has )?captured the territory (?<territory>.+)\\.");
     private static final ScoreboardPart GUILD_ATTACK_SCOREBOARD_PART = new GuildAttackScoreboardPart();
@@ -72,13 +73,21 @@ public final class GuildAttackTimerModel extends Model {
 
     @SubscribeEvent
     public void onMessage(ChatMessageReceivedEvent event) {
-        if (event.getRecipientType() != RecipientType.GUILD) return;
+        // TODO: Once RecipientType supports Wynncraft 2.1 messages, we can check for RecipientType.GUILD
 
-        Matcher matcher = event.getOriginalStyledText().getMatcher(WAR_MESSAGE_PATTERN);
+        String cleanMessage = StyledTextUtils.joinAllLines(event.getStyledText().stripAlignment())
+                .getString()
+                .replaceAll("\uE001 ", "");
+        Matcher matcher = WAR_MESSAGE_PATTERN.matcher(cleanMessage);
         if (matcher.matches()) {
-            long remaining = Long.parseLong(matcher.group("remaining"));
-            long timerEnd = (matcher.group("type").equals("minutes") ? remaining * 60 : remaining) * 1000
-                    + System.currentTimeMillis();
+            long timerEnd = System.currentTimeMillis();
+
+            if (matcher.group("minutes") != null) {
+                timerEnd += Long.parseLong(matcher.group("minutes")) * 60 * 1000;
+            }
+            if (matcher.group("seconds") != null) {
+                timerEnd += Long.parseLong(matcher.group("seconds")) * 1000;
+            }
 
             String territory = matcher.group("territory");
             TerritoryAttackTimer scoreboardTimer = scoreboardAttackTimers.remove(territory);
@@ -90,6 +99,7 @@ public final class GuildAttackTimerModel extends Model {
             if (oldTimer == null && scoreboardTimer == null) {
                 WynntilsMod.postEvent(new GuildWarQueuedEvent(attackTimer));
             }
+
             return;
         }
 

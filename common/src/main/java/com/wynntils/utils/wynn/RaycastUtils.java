@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.utils.wynn;
@@ -31,6 +31,6 @@ public final class RaycastUtils {
 
         if (hitResult == null) return Optional.empty();
 
-        return Optional.ofNullable((Player) hitResult.getEntity());
+        return Optional.of((Player) hitResult.getEntity());
     }
 }

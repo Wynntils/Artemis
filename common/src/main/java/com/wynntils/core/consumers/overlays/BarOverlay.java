@@ -20,6 +20,7 @@ import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.type.CappedValue;
 import com.wynntils.utils.type.ErrorOr;
 import com.wynntils.utils.type.Pair;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public abstract class BarOverlay extends DynamicOverlay {
@@ -50,7 +51,7 @@ public abstract class BarOverlay extends DynamicOverlay {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         if (!isRendered()) return;
 
         BarOverlayTemplatePair template = getTemplate();
@@ -69,7 +70,8 @@ public abstract class BarOverlay extends DynamicOverlay {
     }
 
     @Override
-    public void renderPreview(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void renderPreview(
+            PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         BarOverlayTemplatePair previewTemplate = getPreviewTemplate();
         Pair<StyledText, ErrorOr<CappedValue>> calculatedTemplate = calculateTemplate(previewTemplate);
 

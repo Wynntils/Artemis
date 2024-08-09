@@ -24,8 +24,8 @@ import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.render.RenderUtils;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.OVERLAYS)
 public class TowerEffectOverlayFeature extends Feature {

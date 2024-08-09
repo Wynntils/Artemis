@@ -23,7 +23,7 @@ import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.type.CappedValue;
 import java.util.Locale;
 import net.minecraft.core.Position;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class DiscordRichPresenceFeature extends Feature {
     @Persisted

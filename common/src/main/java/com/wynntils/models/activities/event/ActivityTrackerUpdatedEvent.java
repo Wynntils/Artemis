@@ -1,12 +1,12 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.activities.event;
 
 import com.wynntils.core.text.StyledText;
 import com.wynntils.models.activities.type.ActivityType;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class ActivityTrackerUpdatedEvent extends Event {
     private final ActivityType type;

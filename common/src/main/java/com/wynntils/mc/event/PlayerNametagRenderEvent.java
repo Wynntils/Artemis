@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
@@ -11,10 +11,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public class PlayerNametagRenderEvent extends EntityNameTagRenderEvent {
+public class PlayerNametagRenderEvent extends EntityNameTagRenderEvent implements ICancellableEvent {
     public PlayerNametagRenderEvent(
             AbstractClientPlayer entity,
             Component displayName,

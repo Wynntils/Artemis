@@ -5,7 +5,7 @@
 package com.wynntils.models.war.event;
 
 import com.wynntils.models.war.type.WarBattleInfo;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class GuildWarEvent extends Event {
     protected final WarBattleInfo warBattleInfo;

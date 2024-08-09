@@ -101,8 +101,6 @@ public class ConfigTile extends WynntilsButton {
                         getRenderX(),
                         this.getY() + 3,
                         this.width - 3,
-                        translationX,
-                        translationY,
                         CommonColors.BLACK,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.TOP,

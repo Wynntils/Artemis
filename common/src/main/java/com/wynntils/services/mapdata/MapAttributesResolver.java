@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  * attribute first to the category hierarchy for the given feature, and
  * finally by going to the default value for each attribute.
  */
-public class MapAttributesResolver {
+public final class MapAttributesResolver {
     private final MapFeature feature;
 
     private MapAttributesResolver(MapFeature feature) {

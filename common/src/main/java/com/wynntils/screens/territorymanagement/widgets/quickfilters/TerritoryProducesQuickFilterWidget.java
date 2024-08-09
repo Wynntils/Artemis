@@ -31,7 +31,7 @@ public class TerritoryProducesQuickFilterWidget extends TerritoryQuickFilterWidg
     protected void forwardClick() {
         // Cycle between null and the guild resource
         if (resource == null) {
-            resource = POSSIBLE_RESOURCES.get(0);
+            resource = POSSIBLE_RESOURCES.getFirst();
         } else {
             int index = POSSIBLE_RESOURCES.indexOf(resource) + 1;
             if (index >= POSSIBLE_RESOURCES.size()) {
@@ -46,7 +46,7 @@ public class TerritoryProducesQuickFilterWidget extends TerritoryQuickFilterWidg
     protected void backwardClick() {
         // Cycle between null and the guild resource
         if (resource == null) {
-            resource = POSSIBLE_RESOURCES.get(POSSIBLE_RESOURCES.size() - 1);
+            resource = POSSIBLE_RESOURCES.getLast();
         } else {
             int index = POSSIBLE_RESOURCES.indexOf(resource) - 1;
             if (index < 0) {

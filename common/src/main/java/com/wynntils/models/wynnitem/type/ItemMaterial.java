@@ -1,24 +1,26 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.wynnitem.type;
 
-import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Models;
 import com.wynntils.models.gear.type.GearType;
 import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.SkinUtils;
 import java.util.Locale;
 import java.util.Optional;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.fixes.ItemIdFix;
 import net.minecraft.util.datafix.fixes.ItemStackTheFlatteningFix;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.Unbreakable;
 
 public record ItemMaterial(ItemStack itemStack) {
     public static ItemMaterial getDefaultTomeItemMaterial() {
@@ -39,11 +41,7 @@ public record ItemMaterial(ItemStack itemStack) {
         ItemStack itemStack = createItemStack(getItem("minecraft:" + itemId), 0);
         if (color != null) {
             // color is only set in case of leather
-            CompoundTag tag = itemStack.getOrCreateTag();
-            CompoundTag displayTag = new CompoundTag();
-            tag.put("display", displayTag);
-            displayTag.putInt("color", color.asInt());
-            itemStack.setTag(tag);
+            itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(color.asInt(), false));
         }
 
         return new ItemMaterial(itemStack);
@@ -58,7 +56,7 @@ public record ItemMaterial(ItemStack itemStack) {
 
     public static ItemMaterial fromGearType(GearType gearType) {
         // Material is missing, so just give generic icon for this type of gear (weapon or accessory)
-        ItemStack itemStack = createItemStack(gearType.getDefaultItem(), gearType.getDefaultDamage());
+        ItemStack itemStack = createItemStack(gearType.getDefaultItem(), gearType.getDefaultModel());
 
         return new ItemMaterial(itemStack);
     }
@@ -86,21 +84,15 @@ public record ItemMaterial(ItemStack itemStack) {
         return fromItemId(itemId, damageCode);
     }
 
-    private static ItemStack createItemStack(Item item, int damageValue) {
+    private static ItemStack createItemStack(Item item, int modelValue) {
         ItemStack itemStack = new ItemStack(item);
 
-        itemStack.setDamageValue(damageValue);
-        CompoundTag tag = itemStack.getOrCreateTag();
-        tag.putBoolean("Unbreakable", true);
+        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(modelValue));
+        itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
         return itemStack;
     }
 
     private static Item getItem(String itemId) {
-        Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(itemId));
-        if (item == null) {
-            WynntilsMod.error("Cannot create item for " + itemId);
-            throw new RuntimeException();
-        }
-        return item;
+        return BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemId));
     }
 }

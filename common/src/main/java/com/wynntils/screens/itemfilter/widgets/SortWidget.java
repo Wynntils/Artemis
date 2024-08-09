@@ -93,8 +93,6 @@ public class SortWidget extends AbstractWidget {
                         getX() + 2,
                         getY() + (height / 2f),
                         width - 54,
-                        translationX,
-                        translationY,
                         CommonColors.WHITE,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.MIDDLE,

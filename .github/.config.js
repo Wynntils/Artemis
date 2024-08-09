@@ -12,7 +12,7 @@ function whatBump(commits) {
         if (commit == null || !commit.header) continue;
 
         // We want to select the highest release type
-        if (commit.header.startsWith("chore(bump-mc)") || commit.header.startsWith("chore!")) {
+        if (commit.header.startsWith("chore(bump-mc)") || commit.header.startsWith("chore!") || commit.header.startsWith("feat(major)")) {
             releaseType = 0;
             break;
         }
@@ -26,9 +26,9 @@ function whatBump(commits) {
 
     let reason = "No special commits found. Defaulting to a patch.";
 
-    switch (releaseType) {
+    switch (releaseTypes[releaseType]) {
         case "major":
-            reason = "Found a commit with a chore(bump-mc) header..";
+            reason = "Found a commit with a chore(bump-mc) or feat(major) header.";
             break;
         case "minor":
             reason = "Found a commit with a feat! or fix! header.";

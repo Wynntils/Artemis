@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
@@ -14,10 +14,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
-public class PlayerInteractEvent extends PlayerEvent {
+public abstract class PlayerInteractEvent extends PlayerEvent {
     private final InteractionHand hand;
     private InteractionResult cancellationResult = InteractionResult.PASS;
 
@@ -46,11 +45,8 @@ public class PlayerInteractEvent extends PlayerEvent {
         this.cancellationResult = result;
     }
 
-    @Cancelable
-    public static class RightClickBlock extends PlayerInteractEvent {
+    public static class RightClickBlock extends PlayerInteractEvent implements ICancellableEvent {
         private final BlockPos pos;
-        private Event.Result useBlock = Event.Result.DEFAULT;
-        private Event.Result useItem = Event.Result.DEFAULT;
         private final BlockHitResult hitVec;
 
         public RightClickBlock(Player player, InteractionHand hand, BlockPos pos, BlockHitResult hitVec) {
@@ -59,42 +55,16 @@ public class PlayerInteractEvent extends PlayerEvent {
             this.hitVec = hitVec;
         }
 
-        public Event.Result getUseBlock() {
-            return this.useBlock;
-        }
-
-        public Event.Result getUseItem() {
-            return this.useItem;
-        }
-
-        public BlockHitResult getHitVec() {
-            return this.hitVec;
-        }
-
-        public void setUseBlock(Event.Result triggerBlock) {
-            this.useBlock = triggerBlock;
-        }
-
-        public void setUseItem(Event.Result triggerItem) {
-            this.useItem = triggerItem;
-        }
-
         public BlockPos getPos() {
             return this.pos;
         }
 
-        @Override
-        public void setCanceled(boolean canceled) {
-            super.setCanceled(canceled);
-            if (canceled) {
-                this.useBlock = Event.Result.DENY;
-                this.useItem = Event.Result.DENY;
-            }
+        public BlockHitResult getHitVec() {
+            return hitVec;
         }
     }
 
-    @Cancelable
-    public static class Interact extends PlayerInteractEvent {
+    public static class Interact extends PlayerInteractEvent implements ICancellableEvent {
         private final Entity target;
 
         public Interact(Player player, InteractionHand hand, Entity target) {
@@ -107,8 +77,7 @@ public class PlayerInteractEvent extends PlayerEvent {
         }
     }
 
-    @Cancelable
-    public static class InteractAt extends Interact {
+    public static class InteractAt extends Interact implements ICancellableEvent {
         private final EntityHitResult entityHitResult;
 
         public InteractAt(Player player, InteractionHand hand, Entity target, EntityHitResult entityHitResult) {

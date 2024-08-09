@@ -18,7 +18,7 @@ import com.wynntils.models.war.type.WarTowerState;
 import com.wynntils.models.worlds.event.WorldStateEvent;
 import java.util.List;
 import java.util.Optional;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class GuildWarTowerModel extends Model {
     private static final int EFFECT_PROC_MS = 3200;

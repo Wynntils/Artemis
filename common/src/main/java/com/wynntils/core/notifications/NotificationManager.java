@@ -18,7 +18,7 @@ import com.wynntils.utils.type.TimedSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class NotificationManager extends Manager {
     private static final TimedSet<MessageContainer> cachedMessageSet = new TimedSet<>(10, TimeUnit.SECONDS, true);

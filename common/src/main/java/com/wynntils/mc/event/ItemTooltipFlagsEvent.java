@@ -1,12 +1,12 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class ItemTooltipFlagsEvent extends Event {
     private final ItemStack itemStack;
@@ -36,20 +36,20 @@ public abstract class ItemTooltipFlagsEvent extends Event {
         }
     }
 
-    public static final class Mask extends ItemTooltipFlagsEvent {
-        private int mask;
+    public static final class HideAdditionalTooltip extends ItemTooltipFlagsEvent {
+        private boolean hideTooltip;
 
-        public Mask(ItemStack itemStack, int mask) {
+        public HideAdditionalTooltip(ItemStack itemStack, boolean hideTooltip) {
             super(itemStack);
-            this.mask = mask;
+            this.hideTooltip = hideTooltip;
         }
 
-        public int getMask() {
-            return mask;
+        public boolean getHideAdditionalTooltip() {
+            return hideTooltip;
         }
 
-        public void setMask(int mask) {
-            this.mask = mask;
+        public void setHideAdditionalTooltip(boolean hideTooltip) {
+            this.hideTooltip = hideTooltip;
         }
     }
 }

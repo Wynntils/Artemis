@@ -43,7 +43,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class LootrunPathsService extends Service {
     public static final File LOOTRUNS = WynntilsMod.getModStorageDir("lootruns");
@@ -265,7 +265,7 @@ public final class LootrunPathsService extends Service {
 
         if (activeLootrun.path() == null || activeLootrun.path().points().isEmpty()) return null;
 
-        return activeLootrun.path().points().get(0);
+        return activeLootrun.path().points().getFirst();
     }
 
     public LootrunSaveResult saveCurrentLootrun(String name) {
@@ -281,7 +281,7 @@ public final class LootrunPathsService extends Service {
 
     @SubscribeEvent
     public void onRenderLastLevel(RenderLevelEvent.Post event) {
-        PoseStack poseStack = event.getPoseStack();
+        PoseStack poseStack = new PoseStack();
 
         LootrunRenderer.renderLootrun(
                 poseStack,

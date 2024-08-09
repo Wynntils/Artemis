@@ -1,15 +1,14 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.handlers.bossbar.event;
 
 import com.wynntils.handlers.bossbar.TrackedBar;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public class BossBarAddedEvent extends Event {
+public class BossBarAddedEvent extends Event implements ICancellableEvent {
     private final TrackedBar trackedBar;
 
     public BossBarAddedEvent(TrackedBar trackedBar) {

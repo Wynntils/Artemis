@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.redirects;
@@ -13,7 +13,7 @@ import com.wynntils.handlers.chat.event.ChatMessageReceivedEvent;
 import com.wynntils.mc.event.SubtitleSetTextEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
 
 @ConfigCategory(Category.REDIRECTS)

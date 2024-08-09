@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.overlays;
@@ -32,6 +32,9 @@ public class ShamanTotemTimerOverlay extends TextOverlay {
 
     @Persisted
     public final Config<ColorChatFormatting> thirdTotemTextColor = new Config<>(ColorChatFormatting.RED);
+
+    @Persisted
+    public final Config<ColorChatFormatting> fourthTotemTextColor = new Config<>(ColorChatFormatting.GREEN);
 
     public ShamanTotemTimerOverlay() {
         super(
@@ -81,7 +84,8 @@ public class ShamanTotemTimerOverlay extends TextOverlay {
     private final ChatFormatting[] totemColorsArray = {
         firstTotemTextColor.get().getChatFormatting(),
         secondTotemTextColor.get().getChatFormatting(),
-        thirdTotemTextColor.get().getChatFormatting()
+        thirdTotemTextColor.get().getChatFormatting(),
+        fourthTotemTextColor.get().getChatFormatting()
     };
 
     private enum TotemTrackingDetail {

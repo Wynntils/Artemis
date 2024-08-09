@@ -11,8 +11,8 @@ import com.wynntils.core.persisted.config.ConfigCategory;
 import com.wynntils.core.text.PartStyle;
 import com.wynntils.handlers.chat.event.ChatMessageReceivedEvent;
 import java.util.regex.Pattern;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.REDIRECTS)
 public class AbilityRefreshRedirectFeature extends Feature {

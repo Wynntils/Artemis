@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.chat;
@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 @ConfigCategory(Category.CHAT)
@@ -49,6 +49,9 @@ public class ChatTabsFeature extends Feature {
             new ChatTab("Party", false, "/p  ", Sets.newHashSet(RecipientType.PARTY), null),
             new ChatTab("Private", false, "/r  ", Sets.newHashSet(RecipientType.PRIVATE), null),
             new ChatTab("Shout", false, null, Sets.newHashSet(RecipientType.SHOUT), null))));
+
+    @Persisted
+    public final Config<Boolean> oldTabHotkey = new Config<>(false);
 
     // We do this here, and not in Services.ChatTab to not introduce a feature-model dependency.
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -125,13 +128,38 @@ public class ChatTabsFeature extends Feature {
 
     @SubscribeEvent
     public void onChatScreenKeyTyped(ChatScreenKeyTypedEvent event) {
-        // We can't use keybinds here to not conflict with TAB key's other behaviours.
-        if (event.getKeyCode() != GLFW.GLFW_KEY_TAB) return;
         if (!(McUtils.mc().screen instanceof ChatScreen)) return;
-        if (!KeyboardUtils.isShiftDown()) return;
 
-        event.setCanceled(true);
-        Services.ChatTab.setFocusedTab(Services.ChatTab.getNextFocusedTab());
+        int keyCode = event.getKeyCode();
+        if (keyCode == GLFW.GLFW_KEY_TAB) {
+            int newTab = -1;
+            if (oldTabHotkey.get()) {
+                if (KeyboardUtils.isShiftDown()) {
+                    newTab = Services.ChatTab.getNextFocusedTab();
+                }
+            } else {
+                if (KeyboardUtils.isControlDown()) {
+                    newTab = KeyboardUtils.isShiftDown()
+                            ? Services.ChatTab.getPreviousFocusedTab()
+                            : Services.ChatTab.getNextFocusedTab();
+                }
+            }
+
+            if (newTab == -1) return;
+
+            Services.ChatTab.setFocusedTab(newTab);
+            event.setCanceled(true);
+            return;
+        }
+
+        if (KeyboardUtils.isControlDown() && keyCode >= GLFW.GLFW_KEY_1 && keyCode <= GLFW.GLFW_KEY_9) {
+            ChatTab newTab = Services.ChatTab.getTab(keyCode - GLFW.GLFW_KEY_1);
+            if (newTab != null) {
+                Services.ChatTab.setFocusedTab(newTab);
+            }
+            event.setCanceled(true);
+            return;
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

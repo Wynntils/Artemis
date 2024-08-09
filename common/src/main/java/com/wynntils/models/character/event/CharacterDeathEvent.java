@@ -5,11 +5,10 @@
 package com.wynntils.models.character.event;
 
 import com.wynntils.utils.mc.type.Location;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public class CharacterDeathEvent extends Event {
+public class CharacterDeathEvent extends Event implements ICancellableEvent {
     private final Location location;
 
     public CharacterDeathEvent(Location location) {

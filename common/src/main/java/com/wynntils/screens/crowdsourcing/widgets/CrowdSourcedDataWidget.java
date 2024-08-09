@@ -67,8 +67,6 @@ public class CrowdSourcedDataWidget extends WynntilsButton implements TooltipPro
                         this.getX() + 14,
                         this.getY() + 1,
                         this.width - 15,
-                        crowdSourcingSettingsScreen.getTranslationX(),
-                        crowdSourcingSettingsScreen.getTranslationY(),
                         CommonColors.BLACK,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.TOP,

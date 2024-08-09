@@ -1,31 +1,24 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.spells.event;
 
-import com.wynntils.models.spells.type.PartialSpellSource;
 import com.wynntils.models.spells.type.SpellDirection;
 import com.wynntils.models.spells.type.SpellFailureReason;
 import com.wynntils.models.spells.type.SpellType;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class SpellEvent extends Event {
     public abstract static class Casting extends SpellEvent {
         private final SpellDirection[] spellDirectionArray;
-        private final PartialSpellSource partialSpellSource;
 
-        protected Casting(SpellDirection[] spellDirectionArray, PartialSpellSource partialSpellSource) {
+        protected Casting(SpellDirection[] spellDirectionArray) {
             this.spellDirectionArray = spellDirectionArray;
-            this.partialSpellSource = partialSpellSource;
         }
 
         public SpellDirection[] getSpellDirectionArray() {
             return spellDirectionArray.clone();
-        }
-
-        public PartialSpellSource getSource() {
-            return partialSpellSource;
         }
     }
 
@@ -33,8 +26,8 @@ public abstract class SpellEvent extends Event {
      * Fired upon user inputting the next click in a sequence to cast a spell.
      */
     public static final class Partial extends Casting {
-        public Partial(SpellDirection[] spellDirectionArray, PartialSpellSource partialSpellSource) {
-            super(spellDirectionArray, partialSpellSource);
+        public Partial(SpellDirection[] spellDirectionArray) {
+            super(spellDirectionArray);
         }
     }
 
@@ -45,8 +38,8 @@ public abstract class SpellEvent extends Event {
     public static final class Completed extends Casting {
         private final SpellType spell;
 
-        public Completed(SpellDirection[] spellDirectionArray, PartialSpellSource partialSpellSource, SpellType spell) {
-            super(spellDirectionArray, partialSpellSource);
+        public Completed(SpellDirection[] spellDirectionArray, SpellType spell) {
+            super(spellDirectionArray);
             this.spell = spell;
         }
 

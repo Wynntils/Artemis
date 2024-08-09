@@ -11,7 +11,7 @@ import com.wynntils.mc.event.TickEvent;
 import com.wynntils.utils.mc.McUtils;
 import java.util.LinkedList;
 import java.util.Queue;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class CommandHandler extends Handler {
     private static final int TICKS_PER_EXECUTE = 7;

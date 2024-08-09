@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.objectives;
@@ -81,7 +81,8 @@ public abstract class AbstractObjectivesScoreboardPart extends ScoreboardPart {
     }
 
     protected static boolean isSegmentAllDone(ScoreboardSegment segment) {
-        return segment.getContent().size() == 1 && segment.getContent().get(0).equals(ALL_DONE);
+        return segment.getContent().size() == 1
+                && segment.getContent().getFirst().equals(ALL_DONE);
     }
 
     @Override

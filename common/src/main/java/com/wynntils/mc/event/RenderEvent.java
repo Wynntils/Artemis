@@ -1,24 +1,25 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
 public abstract class RenderEvent extends Event {
     private final GuiGraphics guiGraphics;
-    private final float partialTicks;
+    private final DeltaTracker deltaTracker;
     private final Window window;
     private final ElementType type;
 
-    protected RenderEvent(GuiGraphics guiGraphics, float partialTicks, Window window, ElementType type) {
+    protected RenderEvent(GuiGraphics guiGraphics, DeltaTracker deltaTracker, Window window, ElementType type) {
         this.guiGraphics = guiGraphics;
-        this.partialTicks = partialTicks;
+        this.deltaTracker = deltaTracker;
         this.window = window;
         this.type = type;
     }
@@ -35,8 +36,8 @@ public abstract class RenderEvent extends Event {
         return guiGraphics.pose();
     }
 
-    public float getPartialTicks() {
-        return partialTicks;
+    public DeltaTracker getDeltaTracker() {
+        return deltaTracker;
     }
 
     public Window getWindow() {
@@ -51,16 +52,15 @@ public abstract class RenderEvent extends Event {
         PLAYER_TAB_LIST
     }
 
-    @Cancelable
-    public static class Pre extends RenderEvent {
-        public Pre(GuiGraphics guiGraphics, float partialTicks, Window window, ElementType type) {
-            super(guiGraphics, partialTicks, window, type);
+    public static class Pre extends RenderEvent implements ICancellableEvent {
+        public Pre(GuiGraphics guiGraphics, DeltaTracker deltaTracker, Window window, ElementType type) {
+            super(guiGraphics, deltaTracker, window, type);
         }
     }
 
     public static class Post extends RenderEvent {
-        public Post(GuiGraphics guiGraphics, float partialTicks, Window window, ElementType type) {
-            super(guiGraphics, partialTicks, window, type);
+        public Post(GuiGraphics guiGraphics, DeltaTracker deltaTracker, Window window, ElementType type) {
+            super(guiGraphics, deltaTracker, window, type);
         }
     }
 }

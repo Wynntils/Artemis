@@ -5,7 +5,7 @@
 package com.wynntils.models.npcdialogue.event;
 
 import com.wynntils.models.npcdialogue.type.NpcDialogue;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 /**
  * Note that currently this event is only fired for non-confirmationless dialogues.

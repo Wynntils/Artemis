@@ -7,7 +7,7 @@ package com.wynntils.services.mapdata.attributes;
 import com.wynntils.services.mapdata.attributes.type.MapVisibility;
 import java.util.Optional;
 
-public class FixedMapVisibility implements MapVisibility {
+public final class FixedMapVisibility implements MapVisibility {
     public static final MapVisibility ICON_ALWAYS = new FixedMapVisibility(0f, 100f, 6f);
     public static final MapVisibility ICON_NEVER = new FixedMapVisibility(100f, 0f, 6f);
 

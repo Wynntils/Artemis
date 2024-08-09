@@ -1,0 +1,85 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "${shadow_version}"
+}
+
+repositories {
+    maven { url 'https://maven.neoforged.net/releases'}
+}
+
+loom {
+    accessWidenerPath = project(":common").loom.accessWidenerPath
+}
+
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+configurations {
+    common
+    // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+}
+
+dependencies {
+    neoForge "net.neoforged:neoforge:${neoforge_version}"
+    modRuntimeOnly "me.djtheredstoner:DevAuth-neoforge:${devauth_version}"
+
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
+
+    // Hades Protocol
+    include(forgeRuntimeLibrary("com.github.wynntils:hades:v${hades_version}"))
+    include(forgeRuntimeLibrary("com.github.wynntils:antiope:v${antiope_version}"))
+
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixinextras_version}"))
+    implementation(include("io.github.llamalad7:mixinextras-neoforge:${mixinextras_version}"))
+}
+
+processResources {
+    var replaceProperties = [
+        mod_version                : rootProject.version,
+        minecraft_version          : minecraft_version,
+        neoforge_version_range     : neoforge_version_range,
+        loader_version_range       : neoforge_loader_version_range,
+        mod_id                     : mod_id
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching([
+        'META-INF/neoforge.mods.toml',
+        'pack.mcmeta'
+    ]) {
+        expand replaceProperties
+    }
+}
+
+shadowJar {
+    exclude "fabric.mod.json"
+
+    configurations = [
+        project.configurations.shadowCommon
+    ]
+
+    archiveClassifier = "dev-shadow"
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
+    archiveClassifier = "neoforge+MC-${minecraft_version}"
+    atAccessWideners.add loom.accessWidenerPath.get().asFile.name
+}
+
+jar {
+    archiveClassifier = "dev"
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}

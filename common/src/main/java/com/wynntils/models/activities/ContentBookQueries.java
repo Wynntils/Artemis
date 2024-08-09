@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.activities;
@@ -43,11 +43,11 @@ public class ContentBookQueries {
     private static final int PROGRESS_SLOT = 68;
     private static final int NEXT_PAGE_SLOT = 69;
 
-    private static final StyledText SCROLL_DOWN_TEXT = StyledText.fromString("§7Scroll Down");
-    private static final String FILTER_ITEM_TITLE = "§eFilter";
+    private static final StyledText SCROLL_DOWN_TEXT = StyledText.fromString("Scroll Down");
+    private static final String FILTER_ITEM_TITLE = "Filter";
     private static final Pattern ACTIVE_FILTER = Pattern.compile("^§f- §7(.*)$");
     private static final Pattern INACTIVE_FILTER = Pattern.compile("^§7- §8(.*)$");
-    private static final int MAX_FILTERS = 11;
+    private static final int MAX_FILTERS = 12;
 
     private String selectedFilter;
     private String activeFilter;
@@ -139,7 +139,7 @@ public class ContentBookQueries {
                                 return false;
                             }
                             return ScriptedContainerQuery.containerHasSlot(
-                                    c, NEXT_PAGE_SLOT, Items.GOLDEN_SHOVEL, SCROLL_DOWN_TEXT);
+                                    c, NEXT_PAGE_SLOT, Items.POTION, SCROLL_DOWN_TEXT);
                         },
                         QueryStep.clickOnSlot(NEXT_PAGE_SLOT)
                                 .processIncomingContainer(c -> processContentBookPage(c, newActivity)))

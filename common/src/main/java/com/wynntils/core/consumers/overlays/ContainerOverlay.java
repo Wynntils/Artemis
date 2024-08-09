@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.core.consumers.overlays;
@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public abstract class ContainerOverlay<T extends Overlay> extends Overlay {
     private static final int DEFAULT_SPACING = 3;
@@ -45,6 +45,7 @@ public abstract class ContainerOverlay<T extends Overlay> extends Overlay {
         this.spacing.store(spacing);
         this.horizontalAlignmentOverride.store(horizontalAlignment);
         this.verticalAlignmentOverride.store(verticalAlignment);
+        WynntilsMod.registerListener(this::onResizeEvent);
     }
 
     protected ContainerOverlay(
@@ -77,18 +78,19 @@ public abstract class ContainerOverlay<T extends Overlay> extends Overlay {
     protected abstract List<T> getPreviewChildren();
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
-        children.forEach(o -> o.render(poseStack, bufferSource, partialTicks, window));
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
+        children.forEach(o -> o.render(poseStack, bufferSource, deltaTracker, window));
     }
 
     @Override
-    public void renderPreview(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void renderPreview(
+            PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         List<T> previewChildren = getPreviewChildren();
         Map<T, OverlaySize> previewSize =
                 previewChildren.stream().collect(Collectors.toMap(Function.identity(), Overlay::getSize));
 
         updateLayout(previewChildren, previewSize);
-        previewChildren.forEach(o -> o.renderPreview(poseStack, bufferSource, partialTicks, window));
+        previewChildren.forEach(o -> o.renderPreview(poseStack, bufferSource, deltaTracker, window));
     }
 
     @Override
@@ -117,7 +119,7 @@ public abstract class ContainerOverlay<T extends Overlay> extends Overlay {
         updateAllChildren();
     }
 
-    @SubscribeEvent
+    // As this is an abstract class, this event was subscribed to manually in ctor
     public void onResizeEvent(DisplayResizeEvent event) {
         updateAllChildren();
     }

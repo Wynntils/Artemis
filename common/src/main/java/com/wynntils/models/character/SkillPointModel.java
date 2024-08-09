@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.lwjgl.glfw.GLFW;
@@ -46,9 +45,9 @@ public class SkillPointModel extends Model {
 
     private static final int TOME_SLOT = 8;
     private static final int[] SKILL_POINT_TOTAL_SLOTS = {11, 12, 13, 14, 15};
-    private static final int[] SKILL_POINT_TOME_SLOTS = {4, 11, 19};
-    private static final int CHARACTER_INFO_SOUL_POINT_SLOT = 62;
-    private static final int TOME_MENU_SOUL_POINT_SLOT = 89;
+    private static final int SKILL_POINT_TOME_SLOT = 4;
+    private static final int CONTENT_BOOK_SLOT = 62;
+    private static final int TOME_MENU_CONTENT_BOOK_SLOT = 89;
 
     private Map<Skill, Integer> totalSkillPoints = new EnumMap<>(Skill.class);
     private Map<Skill, Integer> gearSkillPoints = new EnumMap<>(Skill.class);
@@ -139,7 +138,7 @@ public class SkillPointModel extends Model {
                 .then(QueryStep.useItemInHotbar(InventoryUtils.COMPASS_SLOT_NUM)
                         .expectContainerTitle(ContainerModel.CHARACTER_INFO_NAME)
                         .verifyContentChange((container, changes, changeType) ->
-                                verifyChange(container, changes, changeType, CHARACTER_INFO_SOUL_POINT_SLOT))
+                                verifyChange(container, changes, changeType, CONTENT_BOOK_SLOT))
                         .processIncomingContainer((container) -> loadSkillPointsOnServer(container, name)))
                 .build();
         query.executeQuery();
@@ -353,17 +352,17 @@ public class SkillPointModel extends Model {
 
         ScriptedContainerQuery query = ScriptedContainerQuery.builder("Total and Tome Skill Point Query")
                 .onError(msg -> WynntilsMod.warn("Failed to query skill points: " + msg))
-                .then(QueryStep.useItemInHotbar(CharacterModel.CHARACTER_INFO_SLOT - 1)
+                .then(QueryStep.useItemInHotbar(CharacterModel.CHARACTER_INFO_SLOT)
                         .expectContainerTitle(ContainerModel.CHARACTER_INFO_NAME)
                         .verifyContentChange((container, changes, changeType) ->
-                                verifyChange(container, changes, changeType, CHARACTER_INFO_SOUL_POINT_SLOT))
+                                verifyChange(container, changes, changeType, CONTENT_BOOK_SLOT))
                         .processIncomingContainer(this::processTotalSkillPoints))
                 .conditionalThen(
                         this::checkTomesUnlocked,
                         QueryStep.clickOnSlot(TOME_SLOT)
                                 .expectContainerTitle(ContainerModel.MASTERY_TOMES_NAME)
                                 .verifyContentChange((container, changes, changeType) ->
-                                        verifyChange(container, changes, changeType, TOME_MENU_SOUL_POINT_SLOT))
+                                        verifyChange(container, changes, changeType, TOME_MENU_CONTENT_BOOK_SLOT))
                                 .processIncomingContainer(this::processTomeSkillPoints))
                 .execute(this::calculateAssignedSkillPoints)
                 .build();
@@ -379,12 +378,11 @@ public class SkillPointModel extends Model {
             ContainerContent content,
             Int2ObjectFunction<ItemStack> changes,
             ContainerContentChangeType changeType,
-            int soulPointItemSlot) {
+            int contentBookSlot) {
         // soul points resent last for both containers
-        Item soulPointItem = Models.Character.isHuntedMode() ? Items.DIAMOND_AXE : Items.NETHER_STAR;
-        return changeType == ContainerContentChangeType.SET_SLOT
-                && changes.containsKey(soulPointItemSlot)
-                && (content.items().get(soulPointItemSlot).getItem() == soulPointItem);
+        return changeType == ContainerContentChangeType.SET_CONTENT
+                && changes.containsKey(contentBookSlot)
+                && (content.items().get(contentBookSlot).getItem() == Items.PAPER);
     }
 
     private void processTotalSkillPoints(ContainerContent content) {
@@ -401,21 +399,19 @@ public class SkillPointModel extends Model {
     }
 
     private void processTomeSkillPoints(ContainerContent content) {
-        for (Integer slot : SKILL_POINT_TOME_SLOTS) {
-            ItemStack itemStack = content.items().get(slot);
-            Optional<WynnItem> wynnItemOptional = Models.Item.getWynnItem(itemStack);
-            if (wynnItemOptional.isPresent() && wynnItemOptional.get() instanceof TomeItem tome) {
-                tome.getIdentifications().forEach(x -> {
-                    if (x.statType() instanceof SkillStatType skillStat) {
-                        tomeSkillPoints.merge(skillStat.getSkill(), x.value(), Integer::sum);
-                    }
-                });
-            } else if (LoreUtils.getStringLore(itemStack).contains("§6Requirements:")) {
-                // no-op, this is a tome that has not been unlocked or is not used by the player
-            } else {
-                WynntilsMod.warn("Skill Point Model failed to parse tome: "
-                        + LoreUtils.getStringLore(content.items().get(slot)));
-            }
+        ItemStack itemStack = content.items().get(SKILL_POINT_TOME_SLOT);
+        Optional<WynnItem> wynnItemOptional = Models.Item.getWynnItem(itemStack);
+        if (wynnItemOptional.isPresent() && wynnItemOptional.get() instanceof TomeItem tome) {
+            tome.getIdentifications().forEach(x -> {
+                if (x.statType() instanceof SkillStatType skillStat) {
+                    tomeSkillPoints.merge(skillStat.getSkill(), x.value(), Integer::sum);
+                }
+            });
+        } else if (LoreUtils.getStringLore(itemStack).contains("§6Requirements:")) {
+            // no-op, this is a tome that has not been unlocked or is not used by the player
+        } else {
+            WynntilsMod.warn("Skill Point Model failed to parse tome: "
+                    + LoreUtils.getStringLore(content.items().get(SKILL_POINT_TOME_SLOT)));
         }
     }
 

@@ -8,7 +8,7 @@ import com.wynntils.models.containers.Container;
 import java.util.regex.Pattern;
 
 public class CharacterInfoContainer extends Container {
-    private static final Pattern TITLE_PATTERN = Pattern.compile("Character Info");
+    private static final Pattern TITLE_PATTERN = Pattern.compile("\uDAFF\uDFDC\uE003");
 
     public CharacterInfoContainer() {
         super(TITLE_PATTERN);

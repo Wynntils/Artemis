@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
@@ -11,16 +11,16 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
 /**
  * This event is fired when an item tooltip is rendered.
- *
+ * <p>
  * However, starting Minecraft 1.20, there is no longer a concrete way of rendering item tooltips.
  * We still have {@link GuiGraphics#renderTooltip(Font, ItemStack, int, int)}, but some screens tend to convert an item into tooltip themselves.
  * This leads to us having to call this event from 3 locations, which the secondary location being {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen#renderTooltip(GuiGraphics, int, int)}.`
- * The third location is patched in by Forge, handled in {@link ForgeGuiMixin}.
+ * The third location is patched in by Forge, handled in {@link ForgeGuiGraphicsMixin}.
  */
 public abstract class ItemTooltipRenderEvent extends Event {
     private final GuiGraphics guiGraphics;
@@ -55,8 +55,7 @@ public abstract class ItemTooltipRenderEvent extends Event {
         return mouseY;
     }
 
-    @Cancelable
-    public static class Pre extends ItemTooltipRenderEvent {
+    public static class Pre extends ItemTooltipRenderEvent implements ICancellableEvent {
         private List<Component> tooltips;
 
         public Pre(GuiGraphics guiGraphics, ItemStack itemStack, List<Component> tooltips, int mouseX, int mouseY) {

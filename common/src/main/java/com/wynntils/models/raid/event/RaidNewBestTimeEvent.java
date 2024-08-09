@@ -5,7 +5,7 @@
 package com.wynntils.models.raid.event;
 
 import com.wynntils.models.raid.type.RaidKind;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class RaidNewBestTimeEvent extends Event {
     private final RaidKind raidKind;

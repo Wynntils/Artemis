@@ -1,15 +1,14 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import net.minecraft.world.inventory.Slot;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public class InventoryMouseClickedEvent extends Event {
+public class InventoryMouseClickedEvent extends Event implements ICancellableEvent {
     private final double mouseX;
     private final double mouseY;
     private final int button;

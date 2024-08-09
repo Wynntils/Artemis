@@ -47,7 +47,7 @@ public final class FunctionArguments {
             }
 
             boolean hasListArgument = arguments.stream().anyMatch(argument -> argument instanceof ListArgument<?>);
-            if (hasListArgument && !(arguments.get(arguments.size() - 1) instanceof ListArgument<?>)) {
+            if (hasListArgument && !(arguments.getLast() instanceof ListArgument<?>)) {
                 throw new IllegalArgumentException("List argument needs to be the last argument.");
             }
 

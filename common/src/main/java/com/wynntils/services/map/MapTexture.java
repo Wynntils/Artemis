@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.map;
@@ -33,7 +33,7 @@ public class MapTexture {
         this.textureWidth = texture.getWidth();
         this.textureHeight = texture.getHeight();
 
-        this.mapResource = new ResourceLocation("wynntils", "/maps/" + name);
+        this.mapResource = ResourceLocation.fromNamespaceAndPath("wynntils", "/maps/" + name);
 
         assert (x2 - x1 + 1 == textureWidth);
         assert (z2 - z1 + 1 == textureHeight);

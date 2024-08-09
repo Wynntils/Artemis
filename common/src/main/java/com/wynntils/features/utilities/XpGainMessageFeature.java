@@ -19,7 +19,7 @@ import com.wynntils.models.profession.type.ProfessionType;
 import com.wynntils.models.worlds.event.WorldStateEvent;
 import java.util.EnumMap;
 import java.util.Map;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.UTILITIES)
 public class XpGainMessageFeature extends Feature {

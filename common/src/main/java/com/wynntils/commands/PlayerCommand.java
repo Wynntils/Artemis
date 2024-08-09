@@ -17,6 +17,7 @@ import com.wynntils.utils.mc.McUtils;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -40,7 +41,7 @@ public class PlayerCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         return base.then(Commands.literal("guild")
                         .then(Commands.argument("username", StringArgumentType.word())
                                 .suggests(PLAYER_NAME_SUGGESTION_PROVIDER)

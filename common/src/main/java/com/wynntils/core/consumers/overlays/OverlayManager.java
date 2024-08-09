@@ -5,7 +5,7 @@
 package com.wynntils.core.consumers.overlays;
 
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Manager;
 import com.wynntils.core.components.Managers;
@@ -36,11 +36,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 public final class OverlayManager extends Manager {
-    private final MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(new BufferBuilder(256));
+    private static final MultiBufferSource.BufferSource BUFFER_SOURCE =
+            MultiBufferSource.immediate(new ByteBufferBuilder(256));
 
     private final Map<Feature, List<Overlay>> overlayParentMap = new HashMap<>();
     private final Map<Overlay, OverlayInfoContainer> overlayInfoMap = new HashMap<>();
@@ -254,7 +256,9 @@ public final class OverlayManager extends Manager {
                 if (renderState != RenderState.PRE) {
                     continue;
                 }
-                event.setCanceled(true);
+                if (event instanceof ICancellableEvent cancellableEvent) {
+                    cancellableEvent.setCanceled(true);
+                }
             } else {
                 if (renderInfo.renderState() != renderState) {
                     continue;
@@ -266,10 +270,10 @@ public final class OverlayManager extends Manager {
                     if (selectedOverlay != null && overlay != selectedOverlay && !renderNonSelected) continue;
 
                     overlay.renderPreview(
-                            event.getPoseStack(), bufferSource, event.getPartialTicks(), event.getWindow());
+                            event.getPoseStack(), BUFFER_SOURCE, event.getDeltaTracker(), event.getWindow());
                 } else if (shouldRender) {
                     long startTime = System.currentTimeMillis();
-                    overlay.render(event.getPoseStack(), bufferSource, event.getPartialTicks(), event.getWindow());
+                    overlay.render(event.getPoseStack(), BUFFER_SOURCE, event.getDeltaTracker(), event.getWindow());
                     logProfilingData(startTime, overlay);
                 }
             } catch (Throwable t) {
@@ -288,7 +292,7 @@ public final class OverlayManager extends Manager {
             }
         }
 
-        bufferSource.endBatch();
+        BUFFER_SOURCE.endBatch();
 
         // Hopefully we have none :)
         for (Overlay overlay : crashedOverlays) {

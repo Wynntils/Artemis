@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -224,7 +225,9 @@ public final class OverlaySelectionScreen extends WynntilsScreen {
 
             // Revert the posestack translation and render the preview with an outline
             poseStack.popPose();
-            selectedOverlay.renderPreview(poseStack, guiGraphics.bufferSource(), partialTick, McUtils.window());
+
+            // We don't have a delta tracker here, so we'll just use a zero delta tracker
+            selectedOverlay.renderPreview(poseStack, guiGraphics.bufferSource(), DeltaTracker.ZERO, McUtils.window());
 
             RenderUtils.drawRectBorders(
                     poseStack,
@@ -682,7 +685,7 @@ public final class OverlaySelectionScreen extends WynntilsScreen {
                 populateOverlays();
 
                 // Set the new info box as the selected overlay
-                setSelectedOverlay(group.getOverlays().get(group.getOverlays().size() - 1));
+                setSelectedOverlay(group.getOverlays().getLast());
 
                 McUtils.sendMessageToClient(Component.translatable(
                                 "screens.wynntils.overlaySelection.createdOverlay",

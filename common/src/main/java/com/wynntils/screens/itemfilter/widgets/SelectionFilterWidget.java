@@ -65,8 +65,6 @@ public final class SelectionFilterWidget extends GeneralFilterWidget {
                         getX() + 2,
                         getY() + (height / 2f),
                         width - 4,
-                        parent.getTranslationX(),
-                        parent.getTranslationY(),
                         CommonColors.WHITE,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.MIDDLE,

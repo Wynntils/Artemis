@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.spells.type;
@@ -11,7 +11,11 @@ import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.world.InteractionHand;
 
 public enum SpellDirection {
-    RIGHT(() -> McUtils.sendSequencedPacket(id -> new ServerboundUseItemPacket(InteractionHand.MAIN_HAND, id))),
+    RIGHT(() -> McUtils.sendSequencedPacket(id -> new ServerboundUseItemPacket(
+            InteractionHand.MAIN_HAND,
+            id,
+            McUtils.player().getXRot(),
+            McUtils.player().getYRot()))),
     LEFT(() -> McUtils.sendPacket(new ServerboundSwingPacket(InteractionHand.MAIN_HAND)));
 
     private final Runnable sendPacketRunnable;

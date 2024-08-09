@@ -270,10 +270,8 @@ public final class SavedItemsScreen extends WynntilsContainerScreen<SavedItemsMe
                         (int) (categoryRenderX + 97),
                         (int) categoryRenderY,
                         (int) (categoryRenderY + 8))) {
-            if (!editingCategory) {
-                editingCategory = true;
-                addCategoryInput();
-            }
+            editingCategory = true;
+            addCategoryInput();
 
             return true;
         }
@@ -370,9 +368,9 @@ public final class SavedItemsScreen extends WynntilsContainerScreen<SavedItemsMe
 
         // If scrolling past one end of the set, go to the other end
         if (newIndex >= categories.size()) {
-            currentCategory = categories.get(0);
+            currentCategory = categories.getFirst();
         } else if (newIndex < 0) {
-            currentCategory = categories.get(categories.size() - 1);
+            currentCategory = categories.getLast();
         } else {
             currentCategory = categories.get(newIndex);
         }

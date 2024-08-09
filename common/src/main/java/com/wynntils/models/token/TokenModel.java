@@ -8,8 +8,7 @@ import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Model;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.text.StyledText;
-import com.wynntils.handlers.labels.event.EntityLabelChangedEvent;
-import com.wynntils.handlers.labels.event.EntityLabelVisibilityEvent;
+import com.wynntils.handlers.labels.event.EntityLabelEvent;
 import com.wynntils.mc.event.RemoveEntitiesEvent;
 import com.wynntils.models.inventory.InventoryWatcher;
 import com.wynntils.models.items.items.game.MiscItem;
@@ -34,7 +33,7 @@ import java.util.regex.Pattern;
 import net.minecraft.core.Position;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class TokenModel extends Model {
     private static final Pattern TOA_GATEKEEPER_NAME_PATTERN =
@@ -76,7 +75,7 @@ public class TokenModel extends Model {
     }
 
     @SubscribeEvent
-    public void onLabelChange(EntityLabelChangedEvent event) {
+    public void onLabelChange(EntityLabelEvent.Changed event) {
         if (!(event.getEntity() instanceof ArmorStand)) return;
 
         StyledText name = event.getName();
@@ -167,7 +166,7 @@ public class TokenModel extends Model {
     }
 
     @SubscribeEvent
-    public void onLabelVisibility(EntityLabelVisibilityEvent event) {
+    public void onLabelVisibility(EntityLabelEvent.Visibility event) {
         if (!event.getVisibility()) {
             // This is the normal way in which gatekeepers are "removed" when done
             int id = event.getEntity().getId();

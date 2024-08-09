@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Optional;
 
 public final class StatCalculator {
+    // This constant is used to verify the calculated internal rolls
+    // Enable this in development environments to check if the calculated internal rolls are correct
+    private static final boolean VERIFY_CALCULATED_ROLLS = false;
+
     public static RangedValue calculatePossibleValuesRange(int baseValue, boolean preIdentified, StatType statType) {
         if (preIdentified) {
             // This is actually a single, fixed value
@@ -67,7 +71,7 @@ public final class StatCalculator {
 
         // If the stat is calculated as inverted,
         // invert the base value and the actual value
-        // (this weird edge case was relevaled by Wynn's star calculations)
+        // (this weird edge case was revealed by Wynn's star calculations)
         if (possibleValues.statType().calculateAsInverted()) {
             baseValue = -baseValue;
             value = -value;
@@ -105,8 +109,9 @@ public final class StatCalculator {
         int lowerRollBound = (int) Math.max(Math.ceil(lowerRawRollBound), starMin);
         int higherRollBound = (int) Math.max(lowerRollBound, Math.min(Math.floor(higherRawRollBound), starMax));
 
-        // This is a costly check, so we only do it in development environments
-        if (WynntilsMod.isDevelopmentEnvironment()) {
+        // This is a costly check and can fail sporadically if the API is not up-to-date,
+        // so we only do it if the developer enables it
+        if (VERIFY_CALCULATED_ROLLS) {
             verifyCalculatedInternalRoll(
                     baseValue, statCalculationInfo, lowerRollBound, higherRollBound, starMin, starMax);
         }

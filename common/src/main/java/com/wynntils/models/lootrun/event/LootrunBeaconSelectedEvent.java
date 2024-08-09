@@ -1,12 +1,12 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.lootrun.event;
 
 import com.wynntils.models.beacons.type.Beacon;
 import com.wynntils.models.lootrun.type.TaskLocation;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class LootrunBeaconSelectedEvent extends Event {
     private final Beacon beacon;

@@ -4,7 +4,7 @@
  */
 package com.wynntils.models.worlds.event;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class StreamModeEvent extends Event {
     private final boolean enabled;

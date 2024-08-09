@@ -30,7 +30,7 @@ jobs:
           title: "chore: [auto-generated] Update urls.json [ci skip]"
           body: |
             The URL list on [Static-Storage](https://github.com/Wynntils/Static-Storage/main/Data-Storage/urls.json) has changed.
-            This should be incorporated into the next release of Artemis.
+            This should be incorporated into the next release of Wynntils.
             
             This PR has been automatically generated.
           branch: auto-update-urls

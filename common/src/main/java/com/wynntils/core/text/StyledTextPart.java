@@ -4,6 +4,7 @@
  */
 package com.wynntils.core.text;
 
+import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.wynn.WynnUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,7 @@ public final class StyledTextPart {
         StringBuilder currentString = new StringBuilder();
 
         boolean nextIsFormatting = false;
+        StringBuilder hexColorFormatting = new StringBuilder();
 
         // []
         boolean clickEventPrefix = false;
@@ -76,6 +78,12 @@ public final class StyledTextPart {
                         hoverEventPrefix = true;
                         continue;
                     }
+                }
+
+                // It looks like we have a hex color code
+                if (current == '#') {
+                    hexColorFormatting.append(current);
+                    continue;
                 }
 
                 ChatFormatting formatting = ChatFormatting.getByCode(current);
@@ -155,7 +163,7 @@ public final class StyledTextPart {
                     if (!currentString.isEmpty()) {
                         if (style != Style.EMPTY) {
                             // We might have lost an event, so we need to add it back
-                            // (theoritically this case can't happen at this location)
+                            // (theoretically this case can't happen at this location)
                             currentStyle = currentStyle
                                     .withClickEvent(style.getClickEvent())
                                     .withHoverEvent(style.getHoverEvent());
@@ -182,6 +190,42 @@ public final class StyledTextPart {
                 clickEventPrefix = false;
                 hoverEventPrefix = false;
                 eventIndexString = "";
+                continue;
+            }
+
+            if (!hexColorFormatting.isEmpty()) {
+                hexColorFormatting.append(current);
+
+                // StyledText#getString() always uses full hex representation,
+                // if the color is not a ChatFormatting color (#rrggbbaa)
+                if (hexColorFormatting.length() == 9) {
+                    CustomColor customColor = CustomColor.fromHexString(hexColorFormatting.toString());
+
+                    // If the color is invalid, we just append the hex formatting as text
+                    if (customColor == CustomColor.NONE) {
+                        currentString.append(hexColorFormatting);
+                    } else if (!currentString.isEmpty()) {
+                        // If we already had some text with the current style
+                        // Append it before modifying the style
+                        if (style != Style.EMPTY) {
+                            // We might have lost an event, so we need to add it back
+                            currentStyle = currentStyle
+                                    .withClickEvent(style.getClickEvent())
+                                    .withHoverEvent(style.getHoverEvent());
+                        }
+                        // But if the style is empty, we might have parsed events from the string itself
+
+                        parts.add(new StyledTextPart(currentString.toString(), currentStyle, null, parentStyle));
+
+                        // reset string
+                        // style is not reset, because we want to keep the formatting
+                        currentString = new StringBuilder();
+                    }
+
+                    currentStyle = currentStyle.withColor(customColor.asInt());
+                    hexColorFormatting = new StringBuilder();
+                }
+
                 continue;
             }
 

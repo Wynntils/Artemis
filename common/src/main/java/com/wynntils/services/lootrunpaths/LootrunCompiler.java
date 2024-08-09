@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.lootrunpaths;
@@ -66,11 +66,7 @@ public final class LootrunCompiler {
         positions.add(currentPositions);
         for (Vec3 element : raw.points()) {
             if (!currentPositions.points().isEmpty()
-                    && currentPositions
-                                    .points()
-                                    .get(currentPositions.points().size() - 1)
-                                    .distanceTo(element)
-                            >= 32) {
+                    && currentPositions.points().getLast().distanceTo(element) >= 32) {
                 currentPositions = new LootrunPath(new ArrayList<>());
                 positions.add(currentPositions);
             }
@@ -232,7 +228,7 @@ public final class LootrunCompiler {
 
         // find the farthest point for splitting
         for (int i = 1; i < end; i++) {
-            double d = pointLineDistance(points.get(i), points.get(0), points.get(end));
+            double d = pointLineDistance(points.get(i), points.getFirst(), points.get(end));
             if (d > dist) {
                 dist = d;
                 index = i;
@@ -249,7 +245,7 @@ public final class LootrunCompiler {
             simplified.addAll(right);
         } else {
             // return both end of the simplified line otherwise
-            simplified.add(points.get(0));
+            simplified.add(points.getFirst());
             simplified.add(points.get(end));
         }
 

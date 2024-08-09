@@ -29,8 +29,8 @@ import com.wynntils.utils.mc.McUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 @ConfigCategory(Category.UI)
@@ -152,14 +152,13 @@ public class WynntilsContentBookFeature extends Feature {
         tryCancelQuestBookOpen(event);
     }
 
-    private void tryCancelQuestBookOpen(Event event) {
+    private void tryCancelQuestBookOpen(ICancellableEvent event) {
         // Tutorial safeguard, don't replace the content book if the player hasn't completed the tutorial
         if (McUtils.inventory().getItem(TUTORIAL_HIGHLIGHT_SLOT).getItem() == Items.GOLDEN_AXE) return;
 
         ItemStack itemInHand = McUtils.player().getItemInHand(InteractionHand.MAIN_HAND);
 
-        if (itemInHand != null
-                && StyledText.fromComponent(itemInHand.getHoverName()).equals(CONTENT_BOOK_NAME)) {
+        if (StyledText.fromComponent(itemInHand.getHoverName()).equals(CONTENT_BOOK_NAME)) {
             event.setCanceled(true);
             WynntilsMenuScreenBase.openBook(
                     switch (initialPage.get()) {

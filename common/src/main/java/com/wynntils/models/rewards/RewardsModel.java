@@ -24,7 +24,7 @@ import com.wynntils.models.wynnitem.parsing.WynnItemParser;
 import java.util.List;
 import java.util.stream.Stream;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class RewardsModel extends Model {
     private final TomeInfoRegistry tomeInfoRegistry = new TomeInfoRegistry();

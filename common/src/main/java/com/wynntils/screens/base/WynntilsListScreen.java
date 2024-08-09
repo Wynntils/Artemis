@@ -26,7 +26,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class WynntilsListScreen<E, B extends WynntilsButton> extends WynntilsMenuScreenBase
-        implements WynntilsPagedScreen, TextboxScreen {
+        implements WynntilsPagedScreen {
     private double currentScroll = 0;
 
     protected int currentPage = 0;

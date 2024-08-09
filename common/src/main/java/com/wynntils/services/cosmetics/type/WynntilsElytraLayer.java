@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.cosmetics.type;
@@ -54,9 +54,8 @@ public final class WynntilsElytraLayer extends WynntilsLayer {
         this.getParentModel().copyPropertiesTo(this.elytraModel);
         this.elytraModel.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         VertexConsumer vertexConsumer =
-                ItemRenderer.getArmorFoilBuffer(buffer, RenderType.armorCutoutNoCull(texture), false, false);
-        this.elytraModel.renderToBuffer(
-                poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                ItemRenderer.getArmorFoilBuffer(buffer, RenderType.armorCutoutNoCull(texture), false);
+        this.elytraModel.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 }

@@ -304,7 +304,7 @@ public final class UrlManager extends Manager {
         GET,
         POST;
 
-        protected static Method from(String str) {
+        private static Method from(String str) {
             if (str == null || str.isEmpty()) return GET; // GET is default if unspecified
             return Method.valueOf(str.toUpperCase(Locale.ROOT));
         }
@@ -321,7 +321,7 @@ public final class UrlManager extends Manager {
             this.encoder = encoder;
         }
 
-        protected static Encoding from(String str) {
+        private static Encoding from(String str) {
             if (str == null || str.isEmpty()) return NONE; // NONE is default if unspecified
             return Encoding.valueOf(str.toUpperCase(Locale.ROOT));
         }

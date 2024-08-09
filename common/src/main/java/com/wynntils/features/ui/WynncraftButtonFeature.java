@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2021-2023.
+ * Copyright © Wynntils 2021-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.ui;
@@ -31,7 +31,7 @@ import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.apache.commons.lang3.Validate;
 
 @ConfigCategory(Category.UI)
@@ -90,7 +90,7 @@ public class WynncraftButtonFeature extends Feature {
 
     private static void connectToServer(ServerData serverData) {
         ConnectScreen.startConnecting(
-                McUtils.mc().screen, McUtils.mc(), ServerAddress.parseString(serverData.ip), serverData, false);
+                McUtils.mc().screen, McUtils.mc(), ServerAddress.parseString(serverData.ip), serverData, false, null);
     }
 
     private static class WynncraftButton extends Button {
@@ -160,8 +160,8 @@ public class WynncraftButtonFeature extends Feature {
         @SuppressWarnings("deprecation")
         private void loadResource(boolean allowStale) {
             // Try default
-            ResourceLocation destination =
-                    new ResourceLocation("servers/" + Hashing.sha1().hashUnencodedChars(server.ip) + "/icon");
+            ResourceLocation destination = ResourceLocation.withDefaultNamespace(
+                    "servers/" + Hashing.sha1().hashUnencodedChars(server.ip) + "/icon");
 
             // If someone converts this to get the actual ServerData used by the gui, check
             // ServerData#pinged here and
@@ -176,7 +176,7 @@ public class WynncraftButtonFeature extends Feature {
                 ServerStatusPinger pinger = new ServerStatusPinger();
                 // FIXME: DynamicTexture issues in loadServerIcon
                 //        loadServerIcon(destination);
-                pinger.pingServer(server, this::onDone);
+                pinger.pingServer(server, () -> {}, this::onDone);
             } catch (Exception e) {
                 WynntilsMod.warn("Failed to ping server", e);
                 onDone();

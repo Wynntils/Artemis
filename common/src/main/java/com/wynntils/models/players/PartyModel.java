@@ -31,13 +31,18 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 /**
  * This model handles the player's party relations.
  */
 public final class PartyModel extends Model {
+    // 󏿼󏿿󏿾 is for the first line
+    // 󏿼󐀆  is for the other lines
+    private static final String PARTY_PREFIX_REGEX =
+            "(?:(?:§e)?(?:\uDAFF\uDFFC\uE005\uDAFF\uDFFF\uE002\uDAFF\uDFFE|\uDAFF\uDFFC\uE001\uDB00\uDC06)\\s)?";
+
     // region Party Regexes
     /*
     Regexes should be named with this format:
@@ -52,35 +57,45 @@ public final class PartyModel extends Model {
     - OTHER should be used if the action affects another player(s), but not ALL players
     DETAIL (optional) should be a descriptor if necessary
     */
-    private static final Pattern PARTY_LIST_ALL = Pattern.compile("§eParty members: (.*)");
+    private static final Pattern PARTY_LIST_ALL = Pattern.compile(PARTY_PREFIX_REGEX + "Party members: (.*)");
     private static final Pattern PARTY_LIST_LEADER = Pattern.compile("§b(\\w{1,16})");
-    private static final Pattern PARTY_LIST_SELF_FAILED = Pattern.compile("§eYou must be in a party to list\\.");
+    private static final Pattern PARTY_LIST_SELF_FAILED =
+            Pattern.compile(PARTY_PREFIX_REGEX + "You must be in a party to use this\\.");
 
-    private static final Pattern PARTY_LEAVE_OTHER = Pattern.compile("§e(\\w{1,16}) has left the party\\.");
-    private static final Pattern PARTY_LEAVE_SELF_ALREADYLEFT = Pattern.compile("§eYou must be in a party to leave\\.");
+    private static final Pattern PARTY_LEAVE_OTHER =
+            Pattern.compile(PARTY_PREFIX_REGEX + "(\\w{1,16}) has left the party\\.");
+    private static final Pattern PARTY_LEAVE_SELF_ALREADYLEFT =
+            Pattern.compile(PARTY_PREFIX_REGEX + "You must be in a party to leave\\.");
 
     // This is a special case; Wynn sends the same message for when we leave a party or get kicked from a party
-    private static final Pattern PARTY_LEAVE_SELF_KICK = Pattern.compile("§eYou have been removed from the party\\.");
+    private static final Pattern PARTY_LEAVE_SELF_KICK =
+            Pattern.compile(PARTY_PREFIX_REGEX + "You have been removed from the party\\.");
 
-    private static final Pattern PARTY_JOIN_OTHER = Pattern.compile("§e(\\w{1,16}) has joined your party, say hello!");
+    private static final Pattern PARTY_JOIN_OTHER =
+            Pattern.compile(PARTY_PREFIX_REGEX + "(\\w{1,16}) has joined your party, say hello!");
     private static final Pattern PARTY_JOIN_OTHER_SWITCH =
-            Pattern.compile("§eSay hello to (\\w{1,16}) which just joined your party!");
-    private static final Pattern PARTY_JOIN_SELF = Pattern.compile("§eYou have successfully joined the party\\.");
+            Pattern.compile(PARTY_PREFIX_REGEX + "Say hello to (\\w{1,16}) which just joined your party!");
+    private static final Pattern PARTY_JOIN_SELF =
+            Pattern.compile(PARTY_PREFIX_REGEX + "You have successfully joined the party\\.");
 
-    private static final Pattern PARTY_PROMOTE_OTHER = Pattern.compile("§eSuccessfully promoted (.+) to party leader!");
-    private static final Pattern PARTY_PROMOTE_SELF =
-            Pattern.compile("§eYou are now the leader of this party! Type /party for a list of commands\\.");
+    private static final Pattern PARTY_PROMOTE_OTHER =
+            Pattern.compile(PARTY_PREFIX_REGEX + "Successfully promoted (.+) to party leader!");
+    private static final Pattern PARTY_PROMOTE_SELF = Pattern.compile(
+            PARTY_PREFIX_REGEX + "You are now the leader of this party! Type /party for a list of commands\\.");
 
-    private static final Pattern PARTY_DISBAND_ALL = Pattern.compile("§eYour party has been disbanded\\.");
-    private static final Pattern PARTY_DISBAND_SELF =
-            Pattern.compile("§eYour party has been disbanded since you were the only member remaining\\.");
+    private static final Pattern PARTY_DISBAND_ALL =
+            Pattern.compile(PARTY_PREFIX_REGEX + "Your party has been disbanded\\.");
+    private static final Pattern PARTY_DISBAND_SELF = Pattern.compile(
+            PARTY_PREFIX_REGEX + "Your party has been disbanded since you were the only member remaining\\.");
 
-    private static final Pattern PARTY_CREATE_SELF = Pattern.compile("§eYou have successfully created a party\\.");
+    private static final Pattern PARTY_CREATE_SELF =
+            Pattern.compile(PARTY_PREFIX_REGEX + "You have successfully created a party\\.");
 
     private static final Pattern PARTY_INVITED =
-            Pattern.compile("\\s+§eYou have been invited to join (\\w{1,16})'s? party!");
+            Pattern.compile(PARTY_PREFIX_REGEX + "\\s+You have been invited to join (\\w{1,16})'s? party!");
 
-    private static final Pattern PARTY_KICK_OTHER = Pattern.compile("§eYou have kicked the player from the party\\.");
+    private static final Pattern PARTY_KICK_OTHER =
+            Pattern.compile(PARTY_PREFIX_REGEX + "You have kicked the player from the party\\.");
     // endregion
 
     private static final ScoreboardPart PARTY_SCOREBOARD_PART = new PartyScoreboardPart();

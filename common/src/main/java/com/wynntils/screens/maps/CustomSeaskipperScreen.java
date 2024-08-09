@@ -481,7 +481,7 @@ public final class CustomSeaskipperScreen extends AbstractMapScreen {
 
         if (hoveredPoi != null) {
             filteredPois.remove(hoveredPoi);
-            filteredPois.add(0, hoveredPoi);
+            filteredPois.addFirst(hoveredPoi);
         }
 
         return filteredPois;

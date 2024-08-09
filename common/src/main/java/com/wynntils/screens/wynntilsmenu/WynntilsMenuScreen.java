@@ -37,6 +37,8 @@ import com.wynntils.utils.render.Texture;
 import com.wynntils.utils.render.type.HorizontalAlignment;
 import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.type.CappedValue;
+import com.wynntils.utils.wynn.ContainerUtils;
+import com.wynntils.utils.wynn.InventoryUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +62,7 @@ public final class WynntilsMenuScreen extends WynntilsMenuScreenBase {
 
     // This makes sure we "save" our status on the settings & overlay screen, and we reopen it in the same state
     private static final Screen overlayScreenInstance = OverlaySelectionScreen.create();
-    private static final Screen settingsScreenInstance = WynntilsBookSettingsScreen.create();
+    private static final Screen settingsScreenInstance = WynntilsBookSettingsScreen.create(null);
 
     private WynntilsMenuScreen() {
         super(Component.translatable("screens.wynntils.wynntilsMenu.name"));
@@ -91,7 +93,7 @@ public final class WynntilsMenuScreen extends WynntilsMenuScreenBase {
         }
 
         // region Row 1: Content / Activities
-        buttons.get(0)
+        buttons.getFirst()
                 .add(new WynntilsMenuButton(
                         Texture.QUEST_BOOK_ICON,
                         true,
@@ -107,7 +109,7 @@ public final class WynntilsMenuScreen extends WynntilsMenuScreenBase {
                                 Component.literal(""),
                                 Component.translatable("screens.wynntils.wynntilsMenu.leftClickToSelect")
                                         .withStyle(ChatFormatting.GREEN))));
-        buttons.get(0)
+        buttons.getFirst()
                 .add(new WynntilsMenuButton(
                         Texture.DISCOVERIES_ICON,
                         true,
@@ -135,6 +137,22 @@ public final class WynntilsMenuScreen extends WynntilsMenuScreenBase {
                                                 .withStyle(ChatFormatting.BOLD)
                                                 .withStyle(ChatFormatting.GOLD)),
                                 Component.translatable("screens.wynntils.wynntilsCaves.description")
+                                        .withStyle(ChatFormatting.GRAY),
+                                Component.literal(""),
+                                Component.translatable("screens.wynntils.wynntilsMenu.leftClickToSelect")
+                                        .withStyle(ChatFormatting.GREEN))));
+        buttons.get(0)
+                .add(new WynntilsMenuButton(
+                        Texture.ADD_ICON,
+                        false,
+                        () -> ContainerUtils.openInventory(InventoryUtils.CONTENT_BOOK_SLOT_NUM),
+                        List.of(
+                                Component.literal("[>] ")
+                                        .withStyle(ChatFormatting.GOLD)
+                                        .append(Component.translatable("screens.wynntils.additionalContent.name")
+                                                .withStyle(ChatFormatting.BOLD)
+                                                .withStyle(ChatFormatting.GOLD)),
+                                Component.translatable("screens.wynntils.additionalContent.description")
                                         .withStyle(ChatFormatting.GRAY),
                                 Component.literal(""),
                                 Component.translatable("screens.wynntils.wynntilsMenu.leftClickToSelect")
@@ -481,7 +499,7 @@ public final class WynntilsMenuScreen extends WynntilsMenuScreenBase {
         if (this.hovered == null) return false;
 
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            McUtils.mc().setScreen(this.hovered.openedScreen());
+            this.hovered.clickAction().run();
         }
 
         return true;

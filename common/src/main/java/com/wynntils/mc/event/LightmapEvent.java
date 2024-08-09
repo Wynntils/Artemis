@@ -4,7 +4,7 @@
  */
 package com.wynntils.mc.event;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class LightmapEvent extends Event {
     private int rgb;

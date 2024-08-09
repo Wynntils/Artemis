@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class IngredientModel extends Model {
     private static final Map<ChatFormatting, Integer> TIER_COLOR_CODES = Map.of(

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.players;
@@ -15,7 +15,7 @@ import com.wynntils.models.players.event.FriendsEvent;
 import com.wynntils.models.players.event.PartyEvent;
 import com.wynntils.screens.partymanagement.PartyManagementScreen;
 import com.wynntils.utils.mc.McUtils;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 @ConfigCategory(Category.PLAYERS)

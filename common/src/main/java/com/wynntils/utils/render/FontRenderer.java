@@ -4,8 +4,8 @@
  */
 package com.wynntils.utils.render;
 
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.mc.mixin.accessors.MinecraftAccessor;
 import com.wynntils.utils.colors.CustomColor;
@@ -25,6 +25,8 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 
 public final class FontRenderer {
+    private static final MultiBufferSource.BufferSource BUFFER_SOURCE =
+            MultiBufferSource.immediate(new ByteBufferBuilder(256));
     private static final FontRenderer INSTANCE = new FontRenderer();
     private final Font font;
 
@@ -54,13 +56,10 @@ public final class FontRenderer {
             VerticalAlignment verticalAlignment,
             TextShadow shadow,
             float textScale) {
-        MultiBufferSource.BufferSource bufferSource =
-                MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-
         BufferedFontRenderer.getInstance()
                 .renderText(
                         poseStack,
-                        bufferSource,
+                        BUFFER_SOURCE,
                         text,
                         x,
                         y,
@@ -70,7 +69,7 @@ public final class FontRenderer {
                         shadow,
                         textScale);
 
-        bufferSource.endBatch();
+        BUFFER_SOURCE.endBatch();
     }
 
     public void renderText(
@@ -321,8 +320,6 @@ public final class FontRenderer {
             float x,
             float y,
             float renderWidth,
-            float translationX,
-            float translationY,
             CustomColor customColor,
             HorizontalAlignment horizontalAlignment,
             VerticalAlignment verticalAlignment,
@@ -366,10 +363,7 @@ public final class FontRenderer {
                         case BOTTOM -> y - font.lineHeight - 1;
                     };
 
-            scissorX += translationX;
-            scissorY += translationY;
-
-            RenderUtils.enableScissor((int) scissorX, (int) scissorY, (int) renderWidth, (int)
+            RenderUtils.createRectMask(poseStack, (int) scissorX, (int) scissorY, (int) renderWidth, (int)
                     ((font.lineHeight + 1) * textScale)); // + 1 to account for letters that sit lower, eg y
             renderText(
                     poseStack,
@@ -381,7 +375,7 @@ public final class FontRenderer {
                     verticalAlignment,
                     shadow,
                     textScale);
-            RenderUtils.disableScissor();
+            RenderUtils.clearMask();
         } else {
             renderText(
                     poseStack,
@@ -402,8 +396,6 @@ public final class FontRenderer {
             float x,
             float y,
             float renderWidth,
-            float translationX,
-            float translationY,
             CustomColor customColor,
             HorizontalAlignment horizontalAlignment,
             VerticalAlignment verticalAlignment,
@@ -414,39 +406,11 @@ public final class FontRenderer {
                 x,
                 y,
                 renderWidth,
-                translationX,
-                translationY,
                 customColor,
                 horizontalAlignment,
                 verticalAlignment,
                 shadow,
                 1);
-    }
-
-    public void renderScrollingText(
-            PoseStack poseStack,
-            StyledText styledText,
-            float x,
-            float y,
-            float renderWidth,
-            CustomColor customColor,
-            HorizontalAlignment horizontalAlignment,
-            VerticalAlignment verticalAlignment,
-            TextShadow shadow,
-            float textScale) {
-        renderScrollingText(
-                poseStack,
-                styledText,
-                x,
-                y,
-                renderWidth,
-                0,
-                0,
-                customColor,
-                horizontalAlignment,
-                verticalAlignment,
-                shadow,
-                textScale);
     }
 
     public void renderScrollingAlignedTextInBox(
@@ -483,8 +447,6 @@ public final class FontRenderer {
                 renderX,
                 renderY,
                 renderWidth,
-                translationX,
-                translationY,
                 customColor,
                 horizontalAlignment,
                 verticalAlignment,

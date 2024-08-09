@@ -113,8 +113,6 @@ public class OverlayButton extends WynntilsButton {
                         getX() + 2,
                         getY() + (height / 2f),
                         width - 4,
-                        selectionScreen.getTranslationX(),
-                        selectionScreen.getTranslationY(),
                         CommonColors.WHITE,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.MIDDLE,

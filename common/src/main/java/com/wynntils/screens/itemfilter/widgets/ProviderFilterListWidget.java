@@ -75,7 +75,7 @@ public class ProviderFilterListWidget extends AbstractWidget {
                                 if (widgets.isEmpty()) {
                                     renderY = getY() + 2;
                                 } else {
-                                    renderY = widgets.get(widgets.size() - 1).getY() + 24;
+                                    renderY = widgets.getLast().getY() + 24;
                                 }
 
                                 widgets.add(
@@ -104,7 +104,7 @@ public class ProviderFilterListWidget extends AbstractWidget {
                                 if (widgets.isEmpty()) {
                                     renderY = getY() + 2;
                                 } else {
-                                    renderY = widgets.get(widgets.size() - 1).getY() + 24;
+                                    renderY = widgets.getLast().getY() + 24;
                                 }
 
                                 GeneralFilterWidget filterWidget = getNumericFilterWidget(renderY);
@@ -286,7 +286,7 @@ public class ProviderFilterListWidget extends AbstractWidget {
             if (filterPairs.isEmpty()) {
                 widgets.add(new BooleanFilterWidget(null, this));
             } else {
-                widgets.add(new BooleanFilterWidget(filterPairs.get(0), this));
+                widgets.add(new BooleanFilterWidget(filterPairs.getFirst(), this));
             }
 
             return;
@@ -427,9 +427,9 @@ public class ProviderFilterListWidget extends AbstractWidget {
         List<NumericType> types = new ArrayList<>(List.of(NumericType.values()));
 
         if (types.indexOf(numericChoice) + direction < 0) {
-            numericChoice = types.get(types.size() - 1);
+            numericChoice = types.getLast();
         } else if (types.indexOf(numericChoice) + direction == types.size()) {
-            numericChoice = types.get(0);
+            numericChoice = types.getFirst();
         } else {
             numericChoice = types.get(types.indexOf(numericChoice) + direction);
         }

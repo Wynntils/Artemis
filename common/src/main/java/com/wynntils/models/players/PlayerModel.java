@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class PlayerModel extends Model {
     private static final Gson PLAYER_GSON = new GsonBuilder()

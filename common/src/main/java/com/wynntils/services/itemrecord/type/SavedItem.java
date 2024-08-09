@@ -18,8 +18,14 @@ import com.wynntils.utils.EncodedByteBuffer;
 import com.wynntils.utils.type.ErrorOr;
 import java.lang.reflect.Type;
 import java.util.Set;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.Unbreakable;
 
 public record SavedItem(String base64, Set<String> categories, ItemStack itemStack) implements Comparable<SavedItem> {
     // This is the encoding settings used to encode the item when it was saved
@@ -76,12 +82,23 @@ public record SavedItem(String base64, Set<String> categories, ItemStack itemSta
 
             // Create itemStack from itemStackInfo
             ItemStack itemStack = new ItemStack(Item.byId(itemStackInfo.itemId), 1);
-            itemStack.getOrCreateTag().putInt("Damage", itemStackInfo.damage);
-            itemStack.getOrCreateTag().putInt("HideFlags", itemStackInfo.hideFlags);
-            itemStack.getOrCreateTag().putBoolean("Unbreakable", itemStackInfo.unbreakable);
+            DataComponentMap.Builder componentsBuilder = DataComponentMap.builder()
+                    .set(DataComponents.DAMAGE, itemStackInfo.damage)
+                    .set(DataComponents.UNBREAKABLE, new Unbreakable(false))
+                    .set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE);
+
             if (itemStackInfo.color != -1) {
-                itemStack.getOrCreateTag().getCompound("display").putInt("color", itemStackInfo.color);
+                componentsBuilder.set(DataComponents.DYED_COLOR, new DyedItemColor(itemStackInfo.color, false));
             }
+
+            itemStack.applyComponents(componentsBuilder.build());
+
+            // Also hide the attribute modifiers tooltip
+            itemStack.set(
+                    DataComponents.ATTRIBUTE_MODIFIERS,
+                    itemStack
+                            .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY)
+                            .withTooltip(false));
 
             return new SavedItem(base64, categories, itemStack);
         }
@@ -98,17 +115,19 @@ public record SavedItem(String base64, Set<String> categories, ItemStack itemSta
 
             ItemStack itemStack = src.itemStack();
 
-            // Leather armor can be dyed, we need to store the color
-            int color = itemStack.getTag().getCompound("display").contains("color")
-                    ? itemStack.getTag().getCompound("display").getInt("color")
-                    : -1;
+            DataComponentMap components = itemStack.getComponents();
 
-            ItemStackInfo itemStackInfo = new ItemStackInfo(
-                    Item.getId(itemStack.getItem()),
-                    itemStack.getTag().getInt("Damage"),
-                    itemStack.getTag().getInt("HideFlags"),
-                    itemStack.getTag().getBoolean("Unbreakable"),
-                    color);
+            // Leather armor can be dyed, we need to store the color
+            int color = components
+                    .getOrDefault(DataComponents.DYED_COLOR, new DyedItemColor(-1, false))
+                    .rgb();
+
+            int damage = components.getOrDefault(DataComponents.DAMAGE, 0);
+            boolean unbreakable = components.has(DataComponents.UNBREAKABLE);
+
+            // Note: HideFlags is kept as a boolean for compatibility with the old system
+            ItemStackInfo itemStackInfo =
+                    new ItemStackInfo(Item.getId(itemStack.getItem()), damage, unbreakable, color);
 
             // Add itemStackInfo to jsonObject
             jsonObject.add("itemStackInfo", context.serialize(itemStackInfo));
@@ -117,5 +136,5 @@ public record SavedItem(String base64, Set<String> categories, ItemStack itemSta
         }
     }
 
-    private record ItemStackInfo(int itemId, int damage, int hideFlags, boolean unbreakable, int color) {}
+    private record ItemStackInfo(int itemId, int damage, boolean unbreakable, int color) {}
 }

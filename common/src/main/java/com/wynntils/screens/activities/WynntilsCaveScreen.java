@@ -1,10 +1,10 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.activities;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Handlers;
@@ -47,11 +47,14 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class WynntilsCaveScreen extends WynntilsListScreen<CaveInfo, CaveButton>
         implements SortableActivityScreen {
+    private static final MultiBufferSource.BufferSource BUFFER_SOURCE =
+            MultiBufferSource.immediate(new ByteBufferBuilder(256));
+
     private ActivitySortOrder activitySortOrder = ActivitySortOrder.LEVEL;
     private CaveInfo trackingRequested = null;
 
@@ -228,8 +231,6 @@ public final class WynntilsCaveScreen extends WynntilsListScreen<CaveInfo, CaveB
 
         List<MapTexture> maps = Services.Map.getMapsForBoundingBox(textureBoundingBox);
 
-        MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(new BufferBuilder(256));
-
         for (MapTexture map : maps) {
             float textureX = map.getTextureXPosition(mapCenterX);
             float textureZ = map.getTextureZPosition(mapCenterZ);
@@ -237,7 +238,7 @@ public final class WynntilsCaveScreen extends WynntilsListScreen<CaveInfo, CaveB
             MapRenderer.renderMapQuad(
                     map,
                     poseStack,
-                    bufferSource,
+                    BUFFER_SOURCE,
                     centerX,
                     centerZ,
                     textureX,
@@ -247,7 +248,7 @@ public final class WynntilsCaveScreen extends WynntilsListScreen<CaveInfo, CaveB
                     1f / currentZoom);
         }
 
-        bufferSource.endBatch();
+        BUFFER_SOURCE.endBatch();
 
         RenderUtils.disableScissor();
     }
@@ -267,7 +268,7 @@ public final class WynntilsCaveScreen extends WynntilsListScreen<CaveInfo, CaveB
     @Override
     protected void reloadElementsList(String searchTerm) {
         elements.addAll(Models.Cave.getSortedCaves(activitySortOrder).stream()
-                .filter(info -> StringUtils.partialMatch(info.getName(), searchTerm))
+                .filter(info -> StringUtils.partialMatch(info.name(), searchTerm))
                 .toList());
     }
 

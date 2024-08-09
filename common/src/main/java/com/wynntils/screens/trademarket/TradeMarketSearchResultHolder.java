@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.trademarket;
@@ -25,11 +25,10 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 public class TradeMarketSearchResultHolder extends WrappedScreenHolder<TradeMarketSearchResultScreen> {
@@ -444,7 +443,7 @@ public class TradeMarketSearchResultHolder extends WrappedScreenHolder<TradeMark
     }
 
     private boolean isEmptyItem(ItemStack itemStack) {
-        ListTag loreTag = LoreUtils.getLoreTag(itemStack);
+        List<StyledText> loreTag = LoreUtils.getLore(itemStack);
         return itemStack.getItem() == Items.SNOW && (loreTag == null || loreTag.isEmpty());
     }
 

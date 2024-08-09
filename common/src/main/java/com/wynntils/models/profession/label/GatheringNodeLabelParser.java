@@ -16,12 +16,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.entity.Entity;
 
 public class GatheringNodeLabelParser implements LabelParser<ProfessionGatheringNodeLabelInfo> {
-    // Note: At the moment, only Dernic appends to the end of the label, but not consistently..
-    private static final Pattern GATHERING_NODE_LABEL = Pattern.compile("^§(.)(.+?)(:?\\s(Fish|Seed|Ore|Wood))?$");
+    // Note: At the moment, only "Dernic" tier does not have the types consistently as a suffix
+    private static final Pattern GATHERING_NODE_LABEL = Pattern.compile("^§(.)(.+?)(:?\\s(Fish|Seed|Ore|Wood))?\n$");
 
     @Override
     public ProfessionGatheringNodeLabelInfo getInfo(StyledText label, Location location, Entity entity) {
-        Matcher matcher = label.getMatcher(GATHERING_NODE_LABEL);
+        if (label.isEmpty()) return null;
+
+        Matcher matcher = StyledText.fromPart(label.getFirstPart()).getMatcher(GATHERING_NODE_LABEL);
         if (matcher.matches()) {
             Optional<Pair<MaterialProfile.MaterialType, MaterialProfile.SourceMaterial>> materialLookup =
                     MaterialProfile.findByMaterialName(

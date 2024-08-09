@@ -7,6 +7,7 @@ package com.wynntils.mc.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.tree.RootCommandNode;
 import com.wynntils.core.events.MixinHelper;
 import com.wynntils.core.text.StyledText;
@@ -14,6 +15,7 @@ import com.wynntils.mc.event.AddEntityEvent;
 import com.wynntils.mc.event.AdvancementUpdateEvent;
 import com.wynntils.mc.event.ChatPacketReceivedEvent;
 import com.wynntils.mc.event.ChatSentEvent;
+import com.wynntils.mc.event.ChunkReceivedEvent;
 import com.wynntils.mc.event.CommandSentEvent;
 import com.wynntils.mc.event.CommandsAddedEvent;
 import com.wynntils.mc.event.ContainerSetContentEvent;
@@ -26,9 +28,9 @@ import com.wynntils.mc.event.PlayerInfoEvent;
 import com.wynntils.mc.event.PlayerInfoFooterChangedEvent;
 import com.wynntils.mc.event.PlayerTeleportEvent;
 import com.wynntils.mc.event.RemoveEntitiesEvent;
+import com.wynntils.mc.event.ScoreboardEvent;
 import com.wynntils.mc.event.ScoreboardSetDisplayObjectiveEvent;
 import com.wynntils.mc.event.ScoreboardSetObjectiveEvent;
-import com.wynntils.mc.event.ScoreboardSetScoreEvent;
 import com.wynntils.mc.event.SetEntityDataEvent;
 import com.wynntils.mc.event.SetEntityPassengersEvent;
 import com.wynntils.mc.event.SetPlayerTeamEvent;
@@ -47,18 +49,18 @@ import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.Connection;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MessageSignatureCache;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
 import net.minecraft.network.protocol.game.ClientboundContainerClosePacket;
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerChatPacket;
@@ -67,6 +69,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket;
+import net.minecraft.network.protocol.game.ClientboundResetScorePacket;
 import net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
@@ -85,7 +88,9 @@ import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -104,7 +109,11 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private RegistryAccess.Frozen registryAccess;
 
     @Shadow
-    private MessageSignatureCache messageSignatureCache;
+    @Final
+    private FeatureFlagSet enabledFeatures;
+
+    @Shadow
+    protected abstract ParseResults<SharedSuggestionProvider> parseCommand(String command);
 
     protected ClientPacketListenerMixin(
             Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
@@ -153,7 +162,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         // We need to read the root from the CommandDispatcher, not the packet,
         // due to interop with other mods
         RootCommandNode<SharedSuggestionProvider> root = this.commands.getRoot();
-        CommandsAddedEvent event = new CommandsAddedEvent(root);
+        CommandsAddedEvent event =
+                new CommandsAddedEvent(root, CommandBuildContext.simple(this.registryAccess, this.enabledFeatures));
         MixinHelper.post(event);
 
         if (event.getRoot() != root) {
@@ -204,7 +214,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private void handleTabListCustomisationPost(ClientboundTabListPacket packet, CallbackInfo ci) {
         if (!isRenderThread()) return;
 
-        MixinHelper.post(new PlayerInfoFooterChangedEvent(StyledText.fromComponent(packet.getFooter())));
+        MixinHelper.post(new PlayerInfoFooterChangedEvent(StyledText.fromComponent(packet.footer())));
     }
 
     @Inject(
@@ -224,7 +234,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private void handleOpenScreenPre(ClientboundOpenScreenPacket packet, CallbackInfo ci) {
         if (!isRenderThread()) return;
 
-        MenuEvent.MenuOpenedEvent event =
+        MenuEvent.MenuOpenedEvent.Pre event =
                 new MenuEvent.MenuOpenedEvent.Pre(packet.getType(), packet.getTitle(), packet.getContainerId());
         MixinHelper.post(event);
         if (event.isCanceled()) {
@@ -265,7 +275,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private void handleContainerContentPre(ClientboundContainerSetContentPacket packet, CallbackInfo ci) {
         if (!isRenderThread()) return;
 
-        ContainerSetContentEvent event = new ContainerSetContentEvent.Pre(
+        ContainerSetContentEvent.Pre event = new ContainerSetContentEvent.Pre(
                 packet.getItems(), packet.getCarriedItem(), packet.getContainerId(), packet.getStateId());
         MixinHelper.post(event);
         if (event.isCanceled()) {
@@ -379,7 +389,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             // Signal loading complete to the loading screen,
             // or else we are stuck in an "infinite" loading state
             if (McUtils.mc().screen instanceof ReceivingLevelScreen receivingLevelScreen) {
-                receivingLevelScreen.loadingPacketsReceived();
+                receivingLevelScreen.onClose();
             }
         }
     }
@@ -391,7 +401,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private void setTitleTextPre(ClientboundSetTitleTextPacket packet, CallbackInfo ci) {
         if (!isRenderThread()) return;
 
-        TitleSetTextEvent event = new TitleSetTextEvent(packet.getText());
+        TitleSetTextEvent event = new TitleSetTextEvent(packet.text());
         MixinHelper.post(event);
         if (event.isCanceled()) {
             ci.cancel();
@@ -405,7 +415,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private void setSubtitleTextPre(ClientboundSetSubtitleTextPacket packet, CallbackInfo ci) {
         if (!isRenderThread()) return;
 
-        SubtitleSetTextEvent event = new SubtitleSetTextEvent(packet.getText());
+        SubtitleSetTextEvent event = new SubtitleSetTextEvent(packet.text());
         MixinHelper.post(event);
         if (event.isCanceled()) {
             ci.cancel();
@@ -437,13 +447,9 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         }
 
         if (event.isMessageChanged()) {
-            // We know this is present because of the injection point
-            ChatType.Bound bound =
-                    packet.chatType().resolve(this.registryAccess).get();
-
-            this.minecraft.getChatListener().handlePlayerChatMessage(playerChatMessage, playerInfo.getProfile(), bound);
-            this.messageSignatureCache.push(playerChatMessage);
-
+            this.minecraft
+                    .getChatListener()
+                    .handlePlayerChatMessage(playerChatMessage, playerInfo.getProfile(), packet.chatType());
             ci.cancel();
         }
     }
@@ -492,11 +498,19 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private void handleSetScore(ClientboundSetScorePacket packet, CallbackInfo ci) {
         if (!isRenderThread()) return;
 
-        ScoreboardSetScoreEvent event = new ScoreboardSetScoreEvent(
-                StyledText.fromString(packet.getOwner()),
-                packet.getObjectiveName(),
-                packet.getScore(),
-                packet.getMethod());
+        ScoreboardEvent event =
+                new ScoreboardEvent.Set(StyledText.fromString(packet.owner()), packet.objectiveName(), packet.score());
+        MixinHelper.post(event);
+    }
+
+    @Inject(
+            method = "handleResetScore(Lnet/minecraft/network/protocol/game/ClientboundResetScorePacket;)V",
+            at = @At("RETURN"))
+    private void handleResetScore(ClientboundResetScorePacket packet, CallbackInfo ci) {
+        if (!isRenderThread()) return;
+
+        ScoreboardEvent event =
+                new ScoreboardEvent.Reset(StyledText.fromString(packet.owner()), packet.objectiveName());
         MixinHelper.post(event);
     }
 
@@ -536,7 +550,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         MixinHelper.post(new MobEffectEvent.Update(
                 McUtils.mc().level.getEntity(packet.getEntityId()),
-                packet.getEffect(),
+                packet.getEffect().value(),
                 packet.getEffectAmplifier(),
                 packet.getEffectDurationTicks()));
     }
@@ -547,7 +561,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private void handleRemoveMobEffectPost(ClientboundRemoveMobEffectPacket packet, CallbackInfo ci) {
         if (!isRenderThread()) return;
 
-        MixinHelper.post(new MobEffectEvent.Remove(packet.getEntity(McUtils.mc().level), packet.getEffect()));
+        MixinHelper.post(new MobEffectEvent.Remove(
+                packet.getEntity(McUtils.mc().level), packet.effect().value()));
     }
 
     @Inject(
@@ -630,5 +645,16 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         if (!isRenderThread()) return;
 
         MixinHelper.post(new ParticleAddedEvent(packet));
+    }
+
+    @Inject(
+            method =
+                    "handleLevelChunkWithLight(Lnet/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket;)V",
+            at = @At("RETURN"))
+    private void handleLevelChunkWithLight(ClientboundLevelChunkWithLightPacket packet, CallbackInfo ci) {
+        if (!isRenderThread()) return;
+
+        MixinHelper.post(
+                new ChunkReceivedEvent(packet.getX(), packet.getZ(), packet.getChunkData(), packet.getLightData()));
     }
 }

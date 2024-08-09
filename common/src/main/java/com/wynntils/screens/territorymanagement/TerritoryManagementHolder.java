@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 public class TerritoryManagementHolder extends WrappedScreenHolder<TerritoryManagementScreen> {

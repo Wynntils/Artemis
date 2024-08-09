@@ -13,6 +13,7 @@ import com.wynntils.models.activities.ActivityModel;
 import com.wynntils.models.activities.caves.CaveModel;
 import com.wynntils.models.activities.discoveries.DiscoveryModel;
 import com.wynntils.models.activities.quests.QuestModel;
+import com.wynntils.models.activities.worldevents.WorldEventModel;
 import com.wynntils.models.beacons.BeaconModel;
 import com.wynntils.models.character.CharacterModel;
 import com.wynntils.models.character.CharacterSelectionModel;
@@ -86,6 +87,7 @@ public final class Models {
     public static final GuildModel Guild = new GuildModel();
     public static final GuildWarTowerModel GuildWarTower = new GuildWarTowerModel();
     public static final HorseModel Horse = new HorseModel();
+    public static final InventoryModel Inventory = new InventoryModel();
     public static final ItemEncodingModel ItemEncoding = new ItemEncodingModel();
     public static final ItemModel Item = new ItemModel();
     public static final LootChestModel LootChest = new LootChestModel();
@@ -95,7 +97,6 @@ public final class Models {
     public static final NpcModel Npc = new NpcModel();
     public static final ObjectivesModel Objectives = new ObjectivesModel();
     public static final PartyModel Party = new PartyModel();
-    public static final InventoryModel Inventory = new InventoryModel();
     public static final PlayerModel Player = new PlayerModel();
     public static final ProfessionModel Profession = new ProfessionModel();
     public static final QuestModel Quest = new QuestModel();
@@ -114,6 +115,7 @@ public final class Models {
     public static final TokenModel Token = new TokenModel();
     public static final TradeMarketModel TradeMarket = new TradeMarketModel();
     public static final WarModel War = new WarModel();
+    public static final WorldEventModel WorldEvent = new WorldEventModel();
     public static final WorldStateModel WorldState = new WorldStateModel();
     public static final WynnAlphabetModel WynnAlphabet = new WynnAlphabetModel();
     public static final WynnItemModel WynnItem = new WynnItemModel();

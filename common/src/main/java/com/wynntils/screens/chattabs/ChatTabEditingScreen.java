@@ -348,15 +348,15 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
             }
         }
 
-        boolean mouseClicked = super.doMouseClicked(mouseX, mouseY, button);
-        updateSaveButtonActive();
-
         if (saveButton.isMouseOver(mouseX, mouseY)) {
             return saveButton.mouseClicked(mouseX, mouseY, button);
         }
         if (saveAndCloseButton.isMouseOver(mouseX, mouseY)) {
             return saveAndCloseButton.mouseClicked(mouseX, mouseY, button);
         }
+
+        boolean mouseClicked = super.doMouseClicked(mouseX, mouseY, button);
+        updateSaveButtonActive();
 
         return mouseClicked;
     }

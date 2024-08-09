@@ -145,7 +145,7 @@ public class TerritoryPoi implements Poi {
                             actualRenderZ,
                             actualRenderZ + renderHeight,
                             0,
-                            colors.get(0),
+                            colors.getFirst(),
                             HorizontalAlignment.CENTER,
                             VerticalAlignment.MIDDLE,
                             TextShadow.OUTLINE);

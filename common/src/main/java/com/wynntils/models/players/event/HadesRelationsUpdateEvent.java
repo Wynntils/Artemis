@@ -1,12 +1,12 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.players.event;
 
 import com.wynntils.hades.protocol.enums.PacketAction;
 import java.util.Set;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class HadesRelationsUpdateEvent extends Event {
     private final Set<String> changedPlayers;

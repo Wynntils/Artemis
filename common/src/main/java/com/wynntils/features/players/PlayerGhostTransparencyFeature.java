@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.players;
@@ -13,7 +13,7 @@ import com.wynntils.core.persisted.config.ConfigCategory;
 import com.wynntils.mc.event.LivingEntityRenderTranslucentCheckEvent;
 import com.wynntils.mc.event.PlayerRenderLayerEvent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.PLAYERS)
 public class PlayerGhostTransparencyFeature extends Feature {

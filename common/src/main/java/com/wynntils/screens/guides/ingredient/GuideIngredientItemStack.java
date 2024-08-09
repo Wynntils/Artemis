@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.guides.ingredient;
@@ -25,6 +25,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 
 public final class GuideIngredientItemStack extends GuideItemStack {
@@ -39,7 +40,7 @@ public final class GuideIngredientItemStack extends GuideItemStack {
     }
 
     @Override
-    public List<Component> getTooltipLines(Player player, TooltipFlag isAdvanced) {
+    public List<Component> getTooltipLines(Item.TooltipContext context, Player player, TooltipFlag isAdvanced) {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(getHoverName());
 

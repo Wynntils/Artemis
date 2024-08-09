@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.lootrunpaths;
@@ -32,7 +32,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class WynntilsLootrunPathsScreen extends WynntilsListScreen<LootrunPathInstance, LootrunPathButton> {
     private WynntilsLootrunPathsScreen() {
@@ -206,7 +206,7 @@ public final class WynntilsLootrunPathsScreen extends WynntilsListScreen<Lootrun
                             VerticalAlignment.TOP,
                             TextShadow.NONE);
 
-            Position start = currentLootrun.path().points().get(0);
+            Position start = currentLootrun.path().points().getFirst();
             FontRenderer.getInstance()
                     .renderText(
                             poseStack,
@@ -219,10 +219,7 @@ public final class WynntilsLootrunPathsScreen extends WynntilsListScreen<Lootrun
                             VerticalAlignment.TOP,
                             TextShadow.NONE);
 
-            Position end = currentLootrun
-                    .path()
-                    .points()
-                    .get(currentLootrun.path().points().size() - 1);
+            Position end = currentLootrun.path().points().getLast();
             FontRenderer.getInstance()
                     .renderText(
                             poseStack,

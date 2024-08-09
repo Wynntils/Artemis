@@ -23,6 +23,7 @@ import com.wynntils.services.mapdata.providers.json.JsonProvider;
 import com.wynntils.services.mapdata.type.MapCategory;
 import com.wynntils.services.mapdata.type.MapFeature;
 import java.io.File;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class MapDataService extends Service {
     private static final String NAMELESS_CATEGORY = "Category '%s'";
 
     // Used for referencing the map data service before it is fully initialized in Services
-    private final LinkedList<String> providerOrder = new LinkedList<>();
+    private final Deque<String> providerOrder = new LinkedList<>();
     private final Map<String, MapDataProvider> allProviders = new HashMap<>();
     private final Map<MapFeature, ResolvedMapAttributes> resolvedAttributesCache = new HashMap<>();
     private final Map<String, Optional<MapIcon>> iconCache = new HashMap<>();

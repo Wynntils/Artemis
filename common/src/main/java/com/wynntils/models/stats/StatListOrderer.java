@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.stats;
@@ -137,7 +137,6 @@ public final class StatListOrderer {
             MiscStatKind.ATTACK_SPEED,
             MiscStatKind.POISON,
             MiscStatKind.HEALTH,
-            MiscStatKind.SOUL_POINT_REGEN,
             MiscStatKind.STEALING,
             MiscStatKind.HEALTH_REGEN_RAW,
             MiscStatKind.HEALING_EFFICIENCY,

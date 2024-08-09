@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class GearInfoRegistry {
     private List<GearInfo> gearInfoRegistry = List.of();

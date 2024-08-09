@@ -12,19 +12,21 @@ import com.wynntils.core.persisted.storage.Storage;
 import com.wynntils.mc.event.ConnectionEvent;
 import com.wynntils.mc.event.ServerResourcePackEvent;
 import com.wynntils.utils.mc.McUtils;
+import com.wynntils.utils.type.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class ResourcePackService extends Service {
     private static final String PRELOADED_PACK_PREFIX = "wynntils_preloaded/";
 
     @Persisted
-    private final Storage<String> requestedPreloadHash = new Storage<>("");
+    private final Storage<Pair<UUID, String>> resourcePackIdHash = new Storage<>(Pair.of(null, ""));
 
     private boolean serverHasResourcePack = false;
 
@@ -32,8 +34,8 @@ public final class ResourcePackService extends Service {
         super(List.of());
     }
 
-    public void setRequestedPreloadHash(String hash) {
-        requestedPreloadHash.store(hash);
+    public void setRequestedPreloadHash(UUID id, String hash) {
+        resourcePackIdHash.store(Pair.of(id, hash));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -199,11 +201,13 @@ public final class ResourcePackService extends Service {
     }
 
     private boolean isResourcePackInfoMissing() {
-        String resourceInfo = requestedPreloadHash.get();
-        return resourceInfo == null || resourceInfo.isEmpty();
+        Pair<UUID, String> resourceInfo = resourcePackIdHash.get();
+        return resourceInfo.key() == null
+                || resourceInfo.value() == null
+                || resourceInfo.value().isEmpty();
     }
 
     private String getExpectedPackId() {
-        return PRELOADED_PACK_PREFIX + requestedPreloadHash.get();
+        return PRELOADED_PACK_PREFIX + resourcePackIdHash.get().value();
     }
 }

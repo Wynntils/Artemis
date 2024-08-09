@@ -1,11 +1,11 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.token.event;
 
 import com.wynntils.models.token.type.TokenGatekeeper;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public abstract class TokenGatekeeperEvent extends Event {
     private final TokenGatekeeper gatekeeper;

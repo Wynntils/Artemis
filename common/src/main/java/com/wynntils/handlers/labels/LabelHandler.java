@@ -7,10 +7,10 @@ package com.wynntils.handlers.labels;
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Handler;
 import com.wynntils.core.text.StyledText;
-import com.wynntils.handlers.labels.event.EntityLabelChangedEvent;
-import com.wynntils.handlers.labels.event.EntityLabelVisibilityEvent;
+import com.wynntils.handlers.labels.event.EntityLabelEvent;
 import com.wynntils.handlers.labels.event.LabelIdentifiedEvent;
 import com.wynntils.handlers.labels.event.LabelsRemovedEvent;
+import com.wynntils.handlers.labels.event.TextDisplayChangedEvent;
 import com.wynntils.handlers.labels.type.LabelInfo;
 import com.wynntils.handlers.labels.type.LabelParser;
 import com.wynntils.mc.event.RemoveEntitiesEvent;
@@ -26,9 +26,10 @@ import java.util.Optional;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class LabelHandler extends Handler {
     private final List<LabelParser> parsers = new ArrayList<>();
@@ -37,19 +38,67 @@ public class LabelHandler extends Handler {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onEntitySetData(SetEntityDataEvent event) {
+        // Handle the events regarding the Wynncraft 2.1 TextDisplays
+        handleTextDisplayEvents(event);
+
+        // Handle the events regarding the entity labels, which are old (usually armor stands)
+        handleEntityLabelEvents(event);
+    }
+
+    private void handleTextDisplayEvents(SetEntityDataEvent event) {
+        Entity entity = McUtils.mc().level.getEntity(event.getId());
+        if (!(entity instanceof Display.TextDisplay textDisplay)) return;
+
+        for (SynchedEntityData.DataValue<?> packedItem : event.getPackedItems()) {
+            if (packedItem.id() == Display.TextDisplay.DATA_TEXT_ID.id()) {
+                Component oldComponent = textDisplay.getText();
+                Component newComponent = (Component) packedItem.value();
+
+                StyledText oldText = StyledText.fromComponent(oldComponent);
+                StyledText newText = StyledText.fromComponent(newComponent);
+
+                // Sometimes there is no actual change; ignore it then
+                if (oldText.equals(newText)) continue;
+
+                LabelInfo labelInfo = tryIdentifyLabel(newText, entity);
+                if (labelInfo != null) {
+                    liveLabels.put(entity.getId(), labelInfo);
+                }
+
+                TextDisplayChangedEvent.Text textChangedEvent =
+                        new TextDisplayChangedEvent.Text(textDisplay, labelInfo, newText);
+                WynntilsMod.postEvent(textChangedEvent);
+
+                // If the event was cancelled, remove the name change data
+                if (textChangedEvent.isCanceled()) {
+                    event.removePackedItem(packedItem);
+                    continue;
+                }
+
+                // If the event changed the name, update the data
+                if (!textChangedEvent.getText().equals(newText)) {
+                    SynchedEntityData.DataValue<Component> newTextData = new SynchedEntityData.DataValue<>(
+                            Display.TextDisplay.DATA_TEXT_ID.id(),
+                            (EntityDataSerializer<Component>) packedItem.serializer(),
+                            textChangedEvent.getText().getComponent());
+                    event.removePackedItem(packedItem);
+                    event.addPackedItem(newTextData);
+                }
+            }
+        }
+    }
+
+    private void handleEntityLabelEvents(SetEntityDataEvent event) {
         Entity entity = McUtils.mc().level.getEntity(event.getId());
         if (entity == null) return;
 
-        SynchedEntityData.DataValue<?> oldNameData = null;
-        SynchedEntityData.DataValue<Optional<Component>> newCustomNameData = null;
-
         for (SynchedEntityData.DataValue<?> packedItem : event.getPackedItems()) {
-            if (packedItem.id() == Entity.DATA_CUSTOM_NAME_VISIBLE.getId()) {
-                WynntilsMod.postEvent(new EntityLabelVisibilityEvent(entity, (Boolean) packedItem.value()));
+            if (packedItem.id() == Entity.DATA_CUSTOM_NAME_VISIBLE.id()) {
+                WynntilsMod.postEvent(new EntityLabelEvent.Visibility(entity, (Boolean) packedItem.value()));
                 continue;
             }
 
-            if (packedItem.id() == Entity.DATA_CUSTOM_NAME.getId()) {
+            if (packedItem.id() == Entity.DATA_CUSTOM_NAME.id()) {
                 Optional<Component> value = (Optional<Component>) packedItem.value();
                 if (value.isEmpty()) continue;
 
@@ -61,40 +110,9 @@ public class LabelHandler extends Handler {
                 // Sometimes there is no actual change; ignore it then
                 if (newName.equals(oldName)) continue;
 
-                LabelInfo labelInfo = tryIdentifyLabel(newName, entity);
-                if (labelInfo != null) {
-                    liveLabels.put(entity.getId(), labelInfo);
-                }
-
-                EntityLabelChangedEvent labelChangedEvent =
-                        new EntityLabelChangedEvent(entity, newName, oldName, labelInfo);
+                EntityLabelEvent.Changed labelChangedEvent = new EntityLabelEvent.Changed(entity, newName);
                 WynntilsMod.postEvent(labelChangedEvent);
-
-                // If the event was cancelled, remove the name change data
-                if (labelChangedEvent.isCanceled()) {
-                    oldNameData = packedItem;
-                    continue;
-                }
-
-                // If the event changed the name, update the data
-                if (!labelChangedEvent.getName().equals(newName)) {
-                    oldNameData = packedItem;
-                    newCustomNameData = new SynchedEntityData.DataValue<>(
-                            Entity.DATA_CUSTOM_NAME.getId(),
-                            (EntityDataSerializer<Optional<Component>>) packedItem.serializer(),
-                            Optional.of(labelChangedEvent.getName().getComponent()));
-                }
             }
-        }
-
-        // If the name was removed, remove the old data
-        if (oldNameData != null) {
-            event.removePackedItem(oldNameData);
-        }
-
-        // If the name was changed, add the new data
-        if (newCustomNameData != null) {
-            event.addPackedItem(newCustomNameData);
         }
     }
 

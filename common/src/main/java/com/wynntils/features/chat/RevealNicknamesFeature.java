@@ -22,14 +22,15 @@ import java.util.regex.Pattern;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @StartDisabled
 @ConfigCategory(Category.CHAT)
 public class RevealNicknamesFeature extends Feature {
+    // Note: Post Wynncraft 2.1, the hover text is inconsistent, sometimes "'s" is white, sometimes it's gray
     private static final Pattern NICKNAME_PATTERN =
-            Pattern.compile("§f(?<nick>.+)§7's real username is §f(?<username>.+)");
+            Pattern.compile("§f(?<nick>.+?)(§7)?'s(§7)? real username is §f(?<username>.+)");
     private static final String NICKNAME_HOVER_TEXT = "§f%s§7's nickname is §f%s";
 
     @Persisted

@@ -7,33 +7,43 @@ package com.wynntils.models.gear.type;
 import com.wynntils.models.character.type.ClassType;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.IntStream;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomModelData;
 
 public enum GearType {
-    SPEAR(ClassType.WARRIOR, Items.IRON_SHOVEL, 0, 0),
-    WAND(ClassType.MAGE, Items.STICK, 0, List.of(Items.WOODEN_SHOVEL), 1),
-    DAGGER(ClassType.ASSASSIN, Items.SHEARS, 0, 2),
-    BOW(ClassType.ARCHER, Items.BOW, 0, 3),
-    RELIK(ClassType.SHAMAN, Items.STONE_SHOVEL, 7, 4),
+    SPEAR(ClassType.WARRIOR, Items.IRON_HORSE_ARMOR, 437, 497, 0),
+    WAND(ClassType.MAGE, Items.IRON_HORSE_ARMOR, 308, 372, 1),
+    DAGGER(ClassType.ASSASSIN, Items.IRON_HORSE_ARMOR, 244, 307, 2),
+    BOW(ClassType.ARCHER, Items.IRON_HORSE_ARMOR, 182, 243, 3),
+    RELIK(ClassType.SHAMAN, Items.IRON_HORSE_ARMOR, 373, 436, 4),
     // This is a fallback for signed, crafted gear with a skin
-    WEAPON(null, Items.DIAMOND_SHOVEL, 0, 12),
-    // FIXME: We need a complete mapping of damage values for ring, bracelet and necklace to be able
-    // to get rid of this (needed for crafted and unknown gear)
-    ACCESSORY(null, Items.FLINT_AND_STEEL, 0, 13),
-    RING(null, Items.FLINT_AND_STEEL, 2, 5),
-    BRACELET(null, Items.FLINT_AND_STEEL, 19, 6),
-    NECKLACE(null, Items.FLINT_AND_STEEL, 36, 7),
+    WEAPON(null, Items.IRON_HORSE_ARMOR, 0, 0, 12),
+    // Note: This fallback should basically be never be matched, but we use it in item encoding
+    //       (as it's the same as WEAPON, and we have no other info)
+    ACCESSORY(null, Items.IRON_HORSE_ARMOR, 0, 0, 13),
+    RING(null, Items.IRON_HORSE_ARMOR, 134, 150, 5),
+    BRACELET(null, Items.IRON_HORSE_ARMOR, 151, 164, 6),
+    NECKLACE(null, Items.IRON_HORSE_ARMOR, 165, 181, 7),
     HELMET(
             null,
-            Items.LEATHER_HELMET,
-            0,
-            List.of(Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.GOLDEN_HELMET, Items.DIAMOND_HELMET),
+            Items.IRON_HORSE_ARMOR,
+            498,
+            629,
+            List.of(
+                    Items.LEATHER_HELMET,
+                    Items.CHAINMAIL_HELMET,
+                    Items.IRON_HELMET,
+                    Items.GOLDEN_HELMET,
+                    Items.DIAMOND_HELMET),
             8),
     CHESTPLATE(
             null,
             Items.LEATHER_CHESTPLATE,
+            0,
             0,
             List.of(
                     Items.CHAINMAIL_CHESTPLATE,
@@ -45,33 +55,41 @@ public enum GearType {
             null,
             Items.LEATHER_LEGGINGS,
             0,
+            0,
             List.of(Items.CHAINMAIL_LEGGINGS, Items.IRON_LEGGINGS, Items.GOLDEN_LEGGINGS, Items.DIAMOND_LEGGINGS),
             10),
     BOOTS(
             null,
             Items.LEATHER_BOOTS,
             0,
+            0,
             List.of(Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.GOLDEN_BOOTS, Items.DIAMOND_BOOTS),
             11),
-    MASTERY_TOME(null, Items.ENCHANTED_BOOK, 0, -1),
-    CHARM(null, Items.CLAY_BALL, 0, -1);
+    MASTERY_TOME(null, Items.IRON_HORSE_ARMOR, 76, 82, -1),
+    CHARM(null, Items.CLAY_BALL, 0, 0, -1);
 
     private final ClassType classReq;
     private final Item defaultItem;
-    private final int defaultDamage;
+    private final List<Integer> models;
     private final List<Item> otherItems;
     private final int encodingId;
 
-    GearType(ClassType classReq, Item defaultItem, int defaultDamage, List<Item> otherItems, int encodingId) {
+    GearType(
+            ClassType classReq,
+            Item defaultItem,
+            int firstModel,
+            int lastModel,
+            List<Item> otherItems,
+            int encodingId) {
         this.classReq = classReq;
         this.defaultItem = defaultItem;
-        this.defaultDamage = defaultDamage;
+        this.models = IntStream.rangeClosed(firstModel, lastModel).boxed().toList();
         this.otherItems = otherItems;
         this.encodingId = encodingId;
     }
 
-    GearType(ClassType classReq, Item defaultItem, int defaultDamage, int encodingId) {
-        this(classReq, defaultItem, defaultDamage, List.of(), encodingId);
+    GearType(ClassType classReq, Item defaultItem, int firstModel, int lastModel, int encodingId) {
+        this(classReq, defaultItem, firstModel, lastModel, List.of(), encodingId);
     }
 
     public static GearType fromString(String typeStr) {
@@ -88,8 +106,13 @@ public enum GearType {
             // We only want to match for proper gear, not rewards
             if (gearType.isReward()) continue;
 
-            if (gearType.defaultItem.equals(item)) return gearType;
-            if (gearType.otherItems.contains(item)) return gearType;
+            boolean itemMatches = gearType.defaultItem.equals(item) || gearType.otherItems.contains(item);
+            if (!itemMatches) continue;
+
+            CustomModelData customModelData = itemStack.get(DataComponents.CUSTOM_MODEL_DATA);
+            if (customModelData != null && gearType.models.contains(customModelData.value())) {
+                return gearType;
+            }
         }
         return null;
     }
@@ -116,8 +139,8 @@ public enum GearType {
         return defaultItem;
     }
 
-    public int getDefaultDamage() {
-        return defaultDamage;
+    public int getDefaultModel() {
+        return models.getFirst();
     }
 
     public int getEncodingId() {

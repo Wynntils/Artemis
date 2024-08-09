@@ -12,7 +12,7 @@ import com.wynntils.core.components.Models;
 import com.wynntils.core.net.Download;
 import com.wynntils.core.net.UrlId;
 import com.wynntils.core.text.StyledText;
-import com.wynntils.mc.event.ContainerSetSlotEvent;
+import com.wynntils.mc.event.ContainerSetContentEvent;
 import com.wynntils.mc.event.ScreenInitEvent;
 import com.wynntils.models.containers.containers.SeaskipperContainer;
 import com.wynntils.models.items.items.gui.SeaskipperDestinationItem;
@@ -26,7 +26,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 public final class SeaskipperModel extends Model {
@@ -35,7 +36,7 @@ public final class SeaskipperModel extends Model {
     private List<SeaskipperDestination> allDestinations = new ArrayList<>();
     private List<SeaskipperDestination> availableDestinations = new ArrayList<>();
 
-    private int boatSlot;
+    private int boatSlot = -1;
     private int containerId = -2;
 
     public SeaskipperModel() {
@@ -58,36 +59,39 @@ public final class SeaskipperModel extends Model {
     }
 
     @SubscribeEvent
-    public void onSetSlot(ContainerSetSlotEvent.Post event) {
+    public void onContainerSetContent(ContainerSetContentEvent.Post event) {
         if (event.getContainerId() != containerId) return;
 
-        if (StyledText.fromComponent(event.getItemStack().getHoverName()).equals(OAK_BOAT_NAME)) {
-            boatSlot = event.getSlot();
-            return;
+        for (int i = 0; i < event.getItems().size(); i++) {
+            ItemStack item = event.getItems().get(i);
+
+            if (boatSlot == -1 && StyledText.fromComponent(item.getHoverName()).equals(OAK_BOAT_NAME)) {
+                boatSlot = i;
+                continue;
+            }
+
+            Optional<SeaskipperDestinationItem> optionalItem =
+                    Models.Item.asWynnItem(item, SeaskipperDestinationItem.class);
+
+            if (optionalItem.isEmpty()) continue;
+
+            SeaskipperDestinationItem destinationItem = optionalItem.get();
+
+            Optional<SeaskipperDestination> destinationOptional = allDestinations.stream()
+                    .filter(profile -> profile.profile().destination().equals(destinationItem.getDestination()))
+                    .findFirst();
+
+            if (destinationOptional.isEmpty()) {
+                WynntilsMod.warn("Could not find profile for destination: " + destinationItem.getDestination());
+                continue;
+            }
+
+            SeaskipperDestinationProfile profile = destinationOptional.get().profile();
+
+            availableDestinations.add(new SeaskipperDestination(profile, destinationItem, i));
         }
 
-        Optional<SeaskipperDestinationItem> optionalItem =
-                Models.Item.asWynnItem(event.getItemStack(), SeaskipperDestinationItem.class);
-
-        if (optionalItem.isEmpty()) return;
-
-        SeaskipperDestinationItem item = optionalItem.get();
-
-        Optional<SeaskipperDestination> destinationOptional = allDestinations.stream()
-                .filter(profile -> profile.profile().destination().equals(item.getDestination()))
-                .findFirst();
-
-        if (destinationOptional.isEmpty()) {
-            WynntilsMod.warn("Could not find profile for destination: " + item.getDestination());
-            return;
-        }
-
-        SeaskipperDestinationProfile profile = destinationOptional.get().profile();
-
-        availableDestinations.add(new SeaskipperDestination(profile, item, event.getSlot()));
-
-        // We added a new destination, reload the map
-        // (This reloads the pois for every item parsed, but performance is not an issue here)
+        // Reload the map
         if (McUtils.mc().screen instanceof CustomSeaskipperScreen customSeaskipperScreen) {
             customSeaskipperScreen.reloadDestinationPois();
         }

@@ -5,7 +5,7 @@
 package com.wynntils.models.territories.event;
 
 import com.wynntils.models.territories.TerritoryAttackTimer;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class GuildWarQueuedEvent extends Event {
     private final TerritoryAttackTimer attackTimer;

@@ -1,15 +1,14 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public class PlayerAttackEvent extends PlayerEvent {
+public class PlayerAttackEvent extends PlayerEvent implements ICancellableEvent {
     private final Entity target;
 
     public PlayerAttackEvent(Player player, Entity target) {

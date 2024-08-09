@@ -7,7 +7,7 @@ package com.wynntils.functions;
 import com.wynntils.core.components.Models;
 import com.wynntils.core.consumers.functions.Function;
 import com.wynntils.core.consumers.functions.arguments.FunctionArguments;
-import com.wynntils.models.beacons.type.BeaconColor;
+import com.wynntils.models.beacons.type.LootrunBeaconKind;
 import com.wynntils.models.containers.type.MythicFind;
 import com.wynntils.models.lootrun.type.TaskLocation;
 import com.wynntils.utils.EnumUtils;
@@ -70,7 +70,7 @@ public class LootrunFunctions {
 
             if (mythicFinds.isEmpty()) return 0;
 
-            return mythicFinds.get(mythicFinds.size() - 1).dryCount();
+            return mythicFinds.getLast().dryCount();
         }
     }
 
@@ -81,7 +81,7 @@ public class LootrunFunctions {
 
             if (mythicFinds.isEmpty()) return "";
 
-            return mythicFinds.get(mythicFinds.size() - 1).itemName();
+            return mythicFinds.getLast().itemName();
         }
     }
 
@@ -109,10 +109,10 @@ public class LootrunFunctions {
         public Integer getValue(FunctionArguments arguments) {
             String color = arguments.getArgument("color").getStringValue();
 
-            BeaconColor beaconColor = BeaconColor.fromName(color);
-            if (beaconColor == null) return -1;
+            LootrunBeaconKind lootrunBeaconKind = LootrunBeaconKind.fromName(color);
+            if (lootrunBeaconKind == null) return -1;
 
-            return Models.Lootrun.getBeaconCount(beaconColor);
+            return Models.Lootrun.getBeaconCount(lootrunBeaconKind);
         }
 
         @Override
@@ -144,10 +144,10 @@ public class LootrunFunctions {
         public String getValue(FunctionArguments arguments) {
             String color = arguments.getArgument("color").getStringValue();
 
-            BeaconColor beaconColor = BeaconColor.fromName(color);
-            if (beaconColor == null) return "";
+            LootrunBeaconKind lootrunBeaconKind = LootrunBeaconKind.fromName(color);
+            if (lootrunBeaconKind == null) return "";
 
-            TaskLocation taskLocation = Models.Lootrun.getTaskForColor(beaconColor);
+            TaskLocation taskLocation = Models.Lootrun.getTaskForColor(lootrunBeaconKind);
             if (taskLocation == null) return "";
 
             return taskLocation.name();
@@ -165,10 +165,10 @@ public class LootrunFunctions {
         public Location getValue(FunctionArguments arguments) {
             String color = arguments.getArgument("color").getStringValue();
 
-            BeaconColor beaconColor = BeaconColor.fromName(color);
-            if (beaconColor == null) return new Location(0, 0, 0);
+            LootrunBeaconKind lootrunBeaconKind = LootrunBeaconKind.fromName(color);
+            if (lootrunBeaconKind == null) return new Location(0, 0, 0);
 
-            TaskLocation taskLocation = Models.Lootrun.getTaskForColor(beaconColor);
+            TaskLocation taskLocation = Models.Lootrun.getTaskForColor(lootrunBeaconKind);
             if (taskLocation == null) return new Location(0, 0, 0);
 
             return taskLocation.location();
@@ -186,10 +186,10 @@ public class LootrunFunctions {
         public String getValue(FunctionArguments arguments) {
             String color = arguments.getArgument("color").getStringValue();
 
-            BeaconColor beaconColor = BeaconColor.fromName(color);
-            if (beaconColor == null) return "";
+            LootrunBeaconKind lootrunBeaconKind = LootrunBeaconKind.fromName(color);
+            if (lootrunBeaconKind == null) return "";
 
-            TaskLocation taskLocation = Models.Lootrun.getTaskForColor(beaconColor);
+            TaskLocation taskLocation = Models.Lootrun.getTaskForColor(lootrunBeaconKind);
             if (taskLocation == null) return "";
 
             return EnumUtils.toNiceString(taskLocation.taskType());
@@ -219,10 +219,10 @@ public class LootrunFunctions {
     public static class LootrunLastSelectedBeaconColorFunction extends Function<String> {
         @Override
         public String getValue(FunctionArguments arguments) {
-            BeaconColor beaconColor = Models.Lootrun.getLastTaskBeaconColor();
-            if (beaconColor == null) return "";
+            LootrunBeaconKind lootrunBeaconKind = Models.Lootrun.getLastTaskBeaconColor();
+            if (lootrunBeaconKind == null) return "";
 
-            return EnumUtils.toNiceString(beaconColor);
+            return EnumUtils.toNiceString(lootrunBeaconKind);
         }
     }
 

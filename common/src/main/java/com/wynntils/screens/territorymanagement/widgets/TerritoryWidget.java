@@ -27,6 +27,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -194,6 +195,7 @@ public class TerritoryWidget extends AbstractWidget implements TooltipProvider {
 
     @Override
     public List<Component> getTooltipLines() {
-        return itemStack.getTooltipLines(McUtils.player(), TooltipFlag.NORMAL);
+        return itemStack.getTooltipLines(
+                Item.TooltipContext.of(McUtils.mc().level), McUtils.player(), TooltipFlag.NORMAL);
     }
 }

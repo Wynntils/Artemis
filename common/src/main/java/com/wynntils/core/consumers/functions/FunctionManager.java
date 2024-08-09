@@ -433,7 +433,6 @@ public final class FunctionManager extends Manager {
         registerFunction(new CharacterFunctions.BpsXzFunction());
         registerFunction(new CharacterFunctions.CappedHealthFunction());
         registerFunction(new CharacterFunctions.CappedManaFunction());
-        registerFunction(new CharacterFunctions.CappedSoulPointsFunction());
         registerFunction(new CharacterFunctions.ClassFunction());
         registerFunction(new CharacterFunctions.HealthFunction());
         registerFunction(new CharacterFunctions.HealthMaxFunction());
@@ -442,11 +441,6 @@ public final class FunctionManager extends Manager {
         registerFunction(new CharacterFunctions.ManaFunction());
         registerFunction(new CharacterFunctions.ManaMaxFunction());
         registerFunction(new CharacterFunctions.ManaPctFunction());
-        registerFunction(new CharacterFunctions.SoulpointFunction());
-        registerFunction(new CharacterFunctions.SoulpointMaxFunction());
-        registerFunction(new CharacterFunctions.SoulpointTimerFunction());
-        registerFunction(new CharacterFunctions.SoulpointTimerMFunction());
-        registerFunction(new CharacterFunctions.SoulpointTimerSFunction());
         registerFunction(new CharacterFunctions.SprintFunction());
         registerFunction(new CharacterFunctions.StatusEffectActiveFunction());
         registerFunction(new CharacterFunctions.StatusEffectsFunction());
@@ -559,9 +553,11 @@ public final class FunctionManager extends Manager {
         registerFunction(new RaidFunctions.CurrentRaidRoomFunction());
         registerFunction(new RaidFunctions.CurrentRaidRoomTimeFunction());
         registerFunction(new RaidFunctions.CurrentRaidTimeFunction());
+        registerFunction(new RaidFunctions.RaidChallengesFunction());
         registerFunction(new RaidFunctions.RaidIntermissionTimeFunction());
         registerFunction(new RaidFunctions.RaidRoomTimeFunction());
         registerFunction(new RaidFunctions.RaidPersonalBestTimeFunction());
+        registerFunction(new RaidFunctions.RaidTimeRemainingFunction());
 
         registerFunction(new RangedFunctions.RangeHighFunction());
         registerFunction(new RangedFunctions.RangeLowFunction());

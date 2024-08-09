@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.guides;
@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 public abstract class GuideItemStack extends ItemStack {
     protected GuideItemStack(ItemStack itemStack, ItemAnnotation annotation, String baseName) {
         super(itemStack.getItem(), 1);
-        this.setTag(itemStack.getTag());
+        this.applyComponents(itemStack.getComponentsPatch());
         Handlers.Item.updateItem(this, annotation, StyledText.fromString(baseName));
     }
 

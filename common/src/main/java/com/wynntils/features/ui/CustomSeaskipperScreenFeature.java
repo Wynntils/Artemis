@@ -17,7 +17,7 @@ import com.wynntils.utils.colors.CustomColor;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.render.type.PointerType;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.UI)
 public class CustomSeaskipperScreenFeature extends Feature {

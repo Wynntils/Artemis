@@ -19,7 +19,7 @@ import net.minecraft.world.item.Items;
 public final class EmeraldPouchAnnotator implements GameItemAnnotator {
     private static final Pattern EMERALD_POUCH_PATTERN = Pattern.compile("^§aEmerald Pouch§2 \\[Tier ([IVX]{1,4})\\]$");
     private static final Pattern EMERALD_POUCH_LORE_PATTERN =
-            Pattern.compile("§6§l([\\d\\s]+)" + EmeraldUnits.EMERALD.getSymbol() + ".*");
+            Pattern.compile("§6§l([\\d\\s,]+)" + EmeraldUnits.EMERALD.getSymbol() + ".*");
 
     @Override
     public ItemAnnotation getAnnotation(ItemStack itemStack, StyledText name) {
@@ -35,7 +35,7 @@ public final class EmeraldPouchAnnotator implements GameItemAnnotator {
         // This can be an emerald pouch on the trade market, it has no amount line
         if (!amountMatcher.matches()) return new EmeraldPouchItem(tier, 0);
 
-        int amount = Integer.parseInt(amountMatcher.group(1).replaceAll("\\s", ""));
+        int amount = Integer.parseInt(amountMatcher.group(1).replaceAll("[\\s,]", ""));
 
         return new EmeraldPouchItem(tier, amount);
     }

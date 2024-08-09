@@ -4,7 +4,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
 
     // This dependency is provided by forge naturally and by fabric in its build.gradle
-    compileOnly "net.minecraftforge:eventbus:${forge_eventbus_version}"
+    compileOnly "net.neoforged:bus:${neoforge_eventbus_version}"
 
     implementation("com.github.wynntils:hades:v${hades_version}")
     implementation("com.github.wynntils:antiope:v${antiope_version}")

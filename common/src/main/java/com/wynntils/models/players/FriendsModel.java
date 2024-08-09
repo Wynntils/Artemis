@@ -27,10 +27,15 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class FriendsModel extends Model {
+    // 󏿼󏿿󏿾 is for the first line
+    // 󏿼󐀆  is for the other lines
+    private static final String FRIEND_PREFIX_REGEX =
+            "(?:(?:§a)?(?:\uDAFF\uDFFC\uE008\uDAFF\uDFFF\uE002\uDAFF\uDFFE|\uDAFF\uDFFC\uE001\uDB00\uDC06)\\s)?";
+
     // region Friend Regexes
     /*
     Regexes should be named with this format:
@@ -40,23 +45,31 @@ public final class FriendsModel extends Model {
     ACTION should be something like ADD, LIST, etc.
     DETAIL (optional) should be a descriptor if necessary
      */
-    private static final Pattern FRIEND_LIST = Pattern.compile(".+'s? friends \\(.+\\): (.*)");
-    private static final Pattern FRIEND_LIST_FAIL_1 = Pattern.compile("§eWe couldn't find any friends\\.");
-    private static final Pattern FRIEND_LIST_FAIL_2 = Pattern.compile("§eTry typing §6/friend add Username§e!");
+
+    private static final Pattern FRIEND_LIST =
+            Pattern.compile(FRIEND_PREFIX_REGEX + ".+'s? friends \\(.+\\): (.*)", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern FRIEND_LIST_FAIL_1 =
+            Pattern.compile(FRIEND_PREFIX_REGEX + "We couldn't find any friends\\.");
+    private static final Pattern FRIEND_LIST_FAIL_2 =
+            Pattern.compile(FRIEND_PREFIX_REGEX + "Try typing §6/friend add Username§e!");
     private static final Pattern FRIEND_REMOVE_MESSAGE_PATTERN =
-            Pattern.compile("§e(.+) has been removed from your friends!");
-    private static final Pattern FRIEND_ADD_MESSAGE_PATTERN = Pattern.compile("§e(.+) has been added to your friends!");
+            Pattern.compile(FRIEND_PREFIX_REGEX + "(.+) has been removed from your friends!");
+    private static final Pattern FRIEND_ADD_MESSAGE_PATTERN =
+            Pattern.compile(FRIEND_PREFIX_REGEX + "(.+) has been added to your friends!");
 
     // Test in FriendsModel_ONLINE_FRIENDS_HEADER
-    private static final Pattern ONLINE_FRIENDS_HEADER = Pattern.compile("§2Online §aFriends:");
+    private static final Pattern ONLINE_FRIENDS_HEADER = Pattern.compile(FRIEND_PREFIX_REGEX + "Online Friends:");
     // Test in FriendsModel_ONLINE_FRIEND
-    private static final Pattern ONLINE_FRIEND = Pattern.compile("§2 - §a(\\w{1,16})§2 \\[Server: §aWC(\\d{1,3})§2]");
+    private static final Pattern ONLINE_FRIEND =
+            Pattern.compile(FRIEND_PREFIX_REGEX + "§2 - §a(\\w{1,16})§2 \\[Server: §aWC(\\d{1,3})§2]");
 
     // Test in FriendsModel_JOIN_PATTERN
     private static final Pattern JOIN_PATTERN = Pattern.compile(
-            "§a(?<username>\\w{1,16})§2 has logged into server §aWC(?<server>\\d{1,3})§2 as §aan? (?<class>[A-Z][a-z]+)");
+            FRIEND_PREFIX_REGEX
+                    + "(?<username>\\w{1,16})§2 has logged into server §aWC(?<server>\\d{1,3})§2 as §aan? (?<class>[A-Z][a-z]+)");
     // Test in FriendsModel_LEAVE_PATTERN
-    private static final Pattern LEAVE_PATTERN = Pattern.compile("§a(?<username>\\w{1,16}) left the game\\.");
+    private static final Pattern LEAVE_PATTERN =
+            Pattern.compile(FRIEND_PREFIX_REGEX + "(?<username>\\w{1,16}) left the game\\.");
     // endregion
 
     private static final int REQUEST_RATELIMIT = 250;
@@ -205,7 +218,10 @@ public final class FriendsModel extends Model {
         Matcher matcher = FRIEND_LIST.matcher(unformatted);
         if (!matcher.matches()) return false;
 
-        String[] friendList = matcher.group(1).split(", ");
+        String[] friendList = matcher.group(1)
+                .replaceAll(FRIEND_PREFIX_REGEX, "")
+                .replaceAll("\\n", "")
+                .split(", ");
 
         friends = Arrays.stream(friendList).collect(Collectors.toSet());
         WynntilsMod.postEvent(

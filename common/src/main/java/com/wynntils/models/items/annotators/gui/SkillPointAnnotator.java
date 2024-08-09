@@ -18,7 +18,7 @@ public final class SkillPointAnnotator implements GuiItemAnnotator {
     // Test in SkillPointAnnotator_SKILL_POINT_PATTERN
     private static final Pattern SKILL_POINT_PATTERN = Pattern.compile("^§dUpgrade your §[2ebcf][✤✦❉✹❋] (.*)§d skill$");
     // Test in SkillPointAnnotator_LORE_PATTERN
-    private static final Pattern LORE_PATTERN = Pattern.compile("^[ À]+§7(-?\\d+) points?§r[ À]+§6-?\\d+ points?$");
+    private static final Pattern LORE_PATTERN = Pattern.compile("^.*§7(-?\\d+) points§r.*§6-?\\d+ points$");
 
     @Override
     public ItemAnnotation getAnnotation(ItemStack itemStack, StyledText name) {

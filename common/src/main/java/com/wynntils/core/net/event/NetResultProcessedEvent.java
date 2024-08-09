@@ -1,11 +1,11 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.core.net.event;
 
 import com.wynntils.core.net.UrlId;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class NetResultProcessedEvent extends Event {
     public static final class ForUrlId extends NetResultProcessedEvent {

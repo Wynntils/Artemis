@@ -22,7 +22,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
 public abstract class WynntilsMenuScreenBase extends WynntilsScreen {
-    private static final ResourceLocation BOOK_OPEN_ID = new ResourceLocation("wynntils:ui.book.open");
+    private static final ResourceLocation BOOK_OPEN_ID =
+            ResourceLocation.fromNamespaceAndPath("wynntils", "ui.book.open");
     private static final SoundEvent BOOK_OPEN_SOUND = SoundEvent.createVariableRangeEvent(BOOK_OPEN_ID);
 
     protected WynntilsMenuScreenBase(Component component) {

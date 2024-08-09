@@ -28,8 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class StatusEffectsOverlay extends Overlay {
     @Persisted
@@ -86,7 +87,7 @@ public class StatusEffectsOverlay extends Overlay {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         BufferedFontRenderer.getInstance()
                 .renderTextsWithAlignment(
                         poseStack,
@@ -102,7 +103,8 @@ public class StatusEffectsOverlay extends Overlay {
     }
 
     @Override
-    public void renderPreview(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void renderPreview(
+            PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         BufferedFontRenderer.getInstance()
                 .renderTextsWithAlignment(
                         poseStack,

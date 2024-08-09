@@ -59,8 +59,6 @@ public class StatisticButton extends WynntilsButton implements TooltipProvider {
                         this.getX() + 2,
                         this.getY() + 1,
                         this.width - 3,
-                        screen.getTranslationX(),
-                        screen.getTranslationY(),
                         CommonColors.BLACK,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.TOP,

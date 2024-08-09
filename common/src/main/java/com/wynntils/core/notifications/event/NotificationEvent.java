@@ -5,7 +5,7 @@
 package com.wynntils.core.notifications.event;
 
 import com.wynntils.core.notifications.MessageContainer;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class NotificationEvent extends Event {
     private final MessageContainer messageContainer;

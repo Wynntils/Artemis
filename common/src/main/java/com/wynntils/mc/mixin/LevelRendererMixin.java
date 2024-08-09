@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.mixin;
@@ -13,10 +13,12 @@ import com.wynntils.mc.event.RenderTileLevelLastEvent;
 import com.wynntils.mc.extension.EntityExtension;
 import com.wynntils.utils.colors.CustomColor;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
@@ -35,42 +37,41 @@ public abstract class LevelRendererMixin {
     @Inject(
             at = @At("TAIL"),
             method =
-                    "renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V")
+                    "renderLevel(Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V")
     private void renderLevelPost(
-            PoseStack poseStack,
-            float partialTick,
-            long finishNanoTime,
+            DeltaTracker deltaTracker,
             boolean renderBlockOutline,
             Camera camera,
             GameRenderer gameRenderer,
             LightTexture lightTexture,
+            Matrix4f viewMatrix,
             Matrix4f projectionMatrix,
             CallbackInfo ci) {
-        MixinHelper.post(new RenderLevelEvent.Post(
-                this.minecraft.levelRenderer, poseStack, partialTick, projectionMatrix, finishNanoTime, camera));
+        // No PoseStack is provided here, as it'd be just an empty stack.
+        MixinHelper.post(
+                new RenderLevelEvent.Post(this.minecraft.levelRenderer, deltaTracker, projectionMatrix, camera));
     }
 
     @Inject(
             at = @At("HEAD"),
             method =
-                    "renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V")
+                    "renderLevel(Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V")
     private void renderLevelPre(
-            PoseStack poseStack,
-            float partialTick,
-            long finishNanoTime,
+            DeltaTracker deltaTracker,
             boolean renderBlockOutline,
             Camera camera,
             GameRenderer gameRenderer,
             LightTexture lightTexture,
+            Matrix4f viewMatrix,
             Matrix4f projectionMatrix,
             CallbackInfo ci) {
-        MixinHelper.post(new RenderLevelEvent.Pre(
-                this.minecraft.levelRenderer, poseStack, partialTick, projectionMatrix, finishNanoTime, camera));
+        MixinHelper.post(
+                new RenderLevelEvent.Pre(this.minecraft.levelRenderer, deltaTracker, projectionMatrix, camera));
     }
 
     @ModifyExpressionValue(
             method =
-                    "renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V",
+                    "renderLevel(Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getTeamColor()I"))
     private int modifyOutlineColor(int original, @Local Entity entity) {
         EntityExtension entityExt = (EntityExtension) entity;
@@ -90,18 +91,37 @@ public abstract class LevelRendererMixin {
                                     "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V",
                             ordinal = 2),
             method =
-                    "renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;)V")
+                    "renderLevel(Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V")
     private void renderTilePost(
-            PoseStack poseStack,
-            float partialTick,
-            long finishNanoTime,
+            DeltaTracker deltaTracker,
             boolean renderBlockOutline,
             Camera camera,
             GameRenderer gameRenderer,
             LightTexture lightTexture,
+            Matrix4f viewMatrix,
             Matrix4f projectionMatrix,
-            CallbackInfo ci) {
+            CallbackInfo ci,
+            @Local PoseStack poseStack) {
         MixinHelper.post(new RenderTileLevelLastEvent(
-                this.minecraft.levelRenderer, poseStack, partialTick, projectionMatrix, finishNanoTime, camera));
+                this.minecraft.levelRenderer, poseStack, deltaTracker, projectionMatrix, camera));
+    }
+
+    @Inject(
+            at = @At("HEAD"),
+            method =
+                    "renderEntity(Lnet/minecraft/world/entity/Entity;DDDFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V",
+            cancellable = true)
+    public void renderEntity(
+            Entity entity,
+            double camX,
+            double camY,
+            double camZ,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            CallbackInfo ci) {
+        if (!((EntityExtension) entity).isRendered()) {
+            ci.cancel();
+        }
     }
 }

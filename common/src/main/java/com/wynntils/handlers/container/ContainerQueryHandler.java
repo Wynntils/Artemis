@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.handlers.container;
@@ -14,6 +14,8 @@ import com.wynntils.mc.event.ContainerSetSlotEvent;
 import com.wynntils.mc.event.LocalSoundEvent;
 import com.wynntils.mc.event.MenuEvent;
 import com.wynntils.mc.event.TickEvent;
+import com.wynntils.models.worlds.event.WorldStateEvent;
+import com.wynntils.models.worlds.type.WorldState;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.wynn.ItemUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -27,7 +29,7 @@ import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public final class ContainerQueryHandler extends Handler {
     private static final int NO_CONTAINER = -2;
@@ -102,6 +104,17 @@ public final class ContainerQueryHandler extends Handler {
     }
 
     @SubscribeEvent
+    public void onWorldStateChange(WorldStateEvent event) {
+        if (event.getNewState() == WorldState.WORLD) return;
+
+        // Cancel all queued queries when world state changes
+        for (ContainerQueryStep queuedQuery : queuedQueries) {
+            queuedQuery.onError("Container query interrupted by world state change");
+        }
+        queuedQueries.clear();
+    }
+
+    @SubscribeEvent
     public void onSound(LocalSoundEvent.Client e) {
         // Silence the menu click sound when we are processing query
         if (currentStep == null) return;
@@ -126,6 +139,7 @@ public final class ContainerQueryHandler extends Handler {
                     // Return true iff taking the next step succeeded
                     if (currentStep.startStep(currentContent)) return;
                 } catch (Throwable t) {
+                    McUtils.sendPacket(new ServerboundContainerClosePacket(containerId));
                     raiseError("Error while processing content for " + firstStepName + ": " + t.getMessage());
                     return;
                 }
@@ -145,6 +159,7 @@ public final class ContainerQueryHandler extends Handler {
         ticksRemaining--;
 
         if (ticksRemaining <= 0) {
+            McUtils.sendPacket(new ServerboundContainerClosePacket(containerId));
             raiseError("Container reply timed out");
         }
     }
@@ -161,6 +176,7 @@ public final class ContainerQueryHandler extends Handler {
             resetTimer();
             e.setCanceled(true);
         } else {
+            McUtils.sendPacket(new ServerboundContainerClosePacket(containerId));
             raiseError("Unexpected container opened: '" + e.getTitle().getString() + "'");
         }
     }
@@ -224,6 +240,7 @@ public final class ContainerQueryHandler extends Handler {
                 processContainer(currentContent);
             }
         } catch (Throwable t) {
+            McUtils.sendPacket(new ServerboundContainerClosePacket(containerId));
             raiseError("Error while processing content for " + firstStepName + ": " + t.getMessage());
         } finally {
             e.setCanceled(true);
@@ -273,6 +290,7 @@ public final class ContainerQueryHandler extends Handler {
                 processContainer(currentContent);
             }
         } catch (Throwable t) {
+            McUtils.sendPacket(new ServerboundContainerClosePacket(containerId));
             raiseError("Error while processing set slot for " + firstStepName + ": " + t.getMessage());
         } finally {
             e.setCanceled(true);
@@ -306,6 +324,12 @@ public final class ContainerQueryHandler extends Handler {
         }
         currentStep.onError(errorMsg);
         endQuery();
+
+        // Try to start next query in queue, if any
+        // This may very well fail, but we can't do much about it, we trust error handling in the queries
+        if (!queuedQueries.isEmpty()) {
+            runQuery(queuedQueries.pop());
+        }
     }
 
     private void endQuery() {

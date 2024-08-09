@@ -30,16 +30,16 @@ public class WarBattleInfo {
     }
 
     public WarTowerState getInitialState() {
-        return states.get(0);
+        return states.getFirst();
     }
 
     public WarTowerState getCurrentState() {
-        return states.get(states.size() - 1);
+        return states.getLast();
     }
 
     public long getTotalLengthSeconds() {
-        return (long) Math.ceil(
-                (states.get(states.size() - 1).timestamp() - states.get(0).timestamp()) / 1000d);
+        return (long)
+                Math.ceil((states.getLast().timestamp() - states.getFirst().timestamp()) / 1000d);
     }
 
     public long getDps(long seconds) {

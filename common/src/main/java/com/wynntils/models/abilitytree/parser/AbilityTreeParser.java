@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.abilitytree.parser;
@@ -130,10 +130,7 @@ public final class AbilityTreeParser {
             includedLines = tempList.subList(0, tempList.size() - 1);
         } else if (state == AbilityTreeNodeState.LOCKED) {
             // Skip empty line + "requirement not met"
-            if (includedLines
-                    .get(includedLines.size() - 1)
-                    .getMatcher(NODE_REQUIREMENT_NOT_MET)
-                    .matches()) {
+            if (includedLines.getLast().getMatcher(NODE_REQUIREMENT_NOT_MET).matches()) {
                 includedLines = includedLines.subList(0, includedLines.size() - 2);
             }
         }
@@ -148,11 +145,8 @@ public final class AbilityTreeParser {
                 });
 
         // Remove empty lines from the end of the description
-        while (includedLines
-                .get(includedLines.size() - 1)
-                .getString(PartStyle.StyleType.NONE)
-                .isBlank()) {
-            includedLines.remove(includedLines.size() - 1);
+        while (includedLines.getLast().getString(PartStyle.StyleType.NONE).isBlank()) {
+            includedLines.removeLast();
         }
 
         AbilityTreeSkillNode node = new AbilityTreeSkillNode(

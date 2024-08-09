@@ -35,6 +35,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 
 public final class StyledText implements Iterable<StyledTextPart> {
+    // High surrogate characters for the positive and negative space characters
+    // These can be used to trim unicode spacers from StyledTexts
+    private static final char POSITIVE_SPACE_HIGH_SURROGATE = '\uDB00';
+    private static final char NEGATIVE_SPACE_HIGH_SURROGATE = '\uDAFF';
+
     public static final StyledText EMPTY = new StyledText(List.of(), List.of(), List.of());
 
     private final List<StyledTextPart> parts;
@@ -139,11 +144,6 @@ public final class StyledText implements Iterable<StyledTextPart> {
         return new StyledText(parts, clickEvents, hoverEvents);
     }
 
-    public static StyledText fromJson(String json) {
-        MutableComponent component = Component.Serializer.fromJson(json);
-        return component == null ? StyledText.EMPTY : StyledText.fromComponent(component);
-    }
-
     // We don't want to expose the actual string to the outside world
     // If you need to do an operation with this string, implement it as a method
     public String getString(PartStyle.StyleType type) {
@@ -234,13 +234,51 @@ public final class StyledText implements Iterable<StyledTextPart> {
         return fromParts(parts.stream().map(StyledTextPart::asNormalized).collect(Collectors.toList()));
     }
 
+    /**
+     * Strips all of Wynncraft's unicode alignment characters from this {@link StyledText}.
+     * @return the stripped {@link StyledText}
+     */
+    public StyledText stripAlignment() {
+        return iterate((part, functionParts) -> {
+            String text = part.getString(null, PartStyle.StyleType.NONE);
+
+            // If the text contains the positive or negative space characters,
+            // then we need to strip them, and the following character
+            if (text.contains(String.valueOf(POSITIVE_SPACE_HIGH_SURROGATE))
+                    || text.contains(String.valueOf(NEGATIVE_SPACE_HIGH_SURROGATE))) {
+                StringBuilder builder = new StringBuilder();
+
+                for (int i = 0; i < text.length(); i++) {
+                    char ch = text.charAt(i);
+
+                    if (Character.isHighSurrogate(ch)
+                            && (ch == POSITIVE_SPACE_HIGH_SURROGATE || ch == NEGATIVE_SPACE_HIGH_SURROGATE)) {
+                        // Skip the surrogate pair (high and low surrogate)
+                        if (i + 1 < text.length() && Character.isLowSurrogate(text.charAt(i + 1))) {
+                            i++; // Skip the low surrogate
+                        }
+                    } else {
+                        builder.append(ch);
+                    }
+                }
+
+                functionParts.set(
+                        0,
+                        new StyledTextPart(
+                                builder.toString(), part.getPartStyle().getStyle(), null, Style.EMPTY));
+            }
+
+            return IterationDecision.CONTINUE;
+        });
+    }
+
     public StyledText trim() {
         if (parts.isEmpty()) {
             return this;
         }
 
         List<StyledTextPart> newParts = new ArrayList<>(parts);
-        newParts.set(0, newParts.get(0).stripLeading());
+        newParts.set(0, newParts.getFirst().stripLeading());
 
         int lastIndex = newParts.size() - 1;
         newParts.set(lastIndex, newParts.get(lastIndex).stripTrailing());
@@ -352,7 +390,7 @@ public final class StyledText implements Iterable<StyledTextPart> {
 
     public StyledText prependPart(StyledTextPart part) {
         List<StyledTextPart> newParts = new ArrayList<>(parts);
-        newParts.add(0, part);
+        newParts.addFirst(part);
         return fromParts(newParts);
     }
 
@@ -659,7 +697,7 @@ public final class StyledText implements Iterable<StyledTextPart> {
             return null;
         }
 
-        return parts.get(0);
+        return parts.getFirst();
     }
 
     public StyledTextPart getLastPart() {
@@ -667,7 +705,7 @@ public final class StyledText implements Iterable<StyledTextPart> {
             return null;
         }
 
-        return parts.get(parts.size() - 1);
+        return parts.getLast();
     }
 
     public int getPartCount() {

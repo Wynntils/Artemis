@@ -24,12 +24,12 @@ import net.minecraft.resources.ResourceLocation;
 
 public class WynntilsCheckbox extends AbstractButton {
     public static final ResourceLocation CHECKBOX_SELECTED_HIGHLIGHTED_SPRITE =
-            new ResourceLocation("minecraft:widget/checkbox_selected_highlighted");
+            ResourceLocation.withDefaultNamespace("widget/checkbox_selected_highlighted");
     public static final ResourceLocation CHECKBOX_SELECTED_SPRITE =
-            new ResourceLocation("minecraft:widget/checkbox_selected");
+            ResourceLocation.withDefaultNamespace("widget/checkbox_selected");
     public static final ResourceLocation CHECKBOX_HIGHLIGHTED_SPRITE =
-            new ResourceLocation("minecraft:widget/checkbox_highlighted");
-    public static final ResourceLocation CHECKBOX_SPRITE = new ResourceLocation("minecraft:widget/checkbox");
+            ResourceLocation.withDefaultNamespace("widget/checkbox_highlighted");
+    public static final ResourceLocation CHECKBOX_SPRITE = ResourceLocation.withDefaultNamespace("widget/checkbox");
 
     public boolean selected;
     private final int maxTextWidth;

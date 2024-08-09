@@ -28,7 +28,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.INVENTORY)
 public class HightlightDuplicateCosmeticsFeature extends Feature {
@@ -133,7 +133,7 @@ public class HightlightDuplicateCosmeticsFeature extends Feature {
 
             if (selectedCosmetic.equals(ADD_REWARD_TEXT)) {
                 // If the first slot does not have a cosmetic then none are selected
-                if (slot == selectedSlots.get(0)) {
+                if (slot == selectedSlots.getFirst()) {
                     selectedCosmetics = new HashSet<>();
                 }
 

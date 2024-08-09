@@ -1,65 +1,40 @@
 /*
- * Copyright © Wynntils 2021-2023.
+ * Copyright © Wynntils 2021-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.utils.mc;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.utils.StringUtils;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemLore;
 
 public final class LoreUtils {
     /**
-     * Get the lore from an item, note that it may not be fully parsed. To do so, check out {@link
-     * ComponentUtils}
+     * Returns the lore for the given itemStack as a list of {@link StyledText}.
      *
-     * @return an {@link List} containing all item lore
+     * @return A list of {@link StyledText} representing the lore of the itemStack.
      */
     public static LinkedList<StyledText> getLore(ItemStack itemStack) {
-        ListTag loreTag = getLoreTag(itemStack);
-
-        LinkedList<StyledText> lore = new LinkedList<>();
-        if (loreTag == null) return lore;
-
-        for (int i = 0; i < loreTag.size(); ++i) {
-            lore.add(StyledText.fromJson(loreTag.getString(i)));
-        }
-
-        return lore;
-    }
-
-    /**
-     * Returns the lore for the given line, or the empty string if there is no
-     * such line.
-     */
-    public static StyledText getLoreLine(ItemStack itemStack, int line) {
-        ListTag loreTag = getLoreTag(itemStack);
-
-        if (loreTag == null) return StyledText.EMPTY;
-        if (loreTag.size() <= line) return StyledText.EMPTY;
-
-        return StyledText.fromJson(loreTag.getString(line));
+        List<Component> lines =
+                itemStack.getOrDefault(DataComponents.LORE, ItemLore.EMPTY).lines();
+        return lines.stream()
+                .map(StyledText::fromComponent)
+                .collect(LinkedList::new, LinkedList::add, LinkedList::addAll);
     }
 
     /**
@@ -68,11 +43,15 @@ public final class LoreUtils {
      * inserts additional lines at the top of the lore.)
      */
     public static Matcher matchLoreLine(ItemStack itemStack, int startLineNum, Pattern pattern) {
-        Matcher matcher = null;
-        for (int i = startLineNum; i <= startLineNum + 5; i++) {
-            StyledText line = getLoreLine(itemStack, i);
-            matcher = line.getMatcher(pattern);
-            if (matcher.matches()) return matcher;
+        LinkedList<StyledText> lore = getLore(itemStack);
+
+        Matcher matcher = StyledText.EMPTY.getMatcher(pattern);
+        for (int i = startLineNum; i < Math.min(startLineNum + 6, lore.size()); i++) {
+            StyledText line = lore.get(i);
+            matcher = pattern.matcher(line.getString());
+            if (matcher.matches()) {
+                break;
+            }
         }
 
         // Return the last non-matching matcher
@@ -80,105 +59,16 @@ public final class LoreUtils {
     }
 
     /**
-     * Concatinates the lore of the given itemStack into a single StyledText.
+     * Concatenates the lore of the given itemStack into a single StyledText.
      * To get the raw string, use {@link StyledText#getString()}.
      */
     public static StyledText getStringLore(ItemStack itemStack) {
         return StyledText.concat(getLore(itemStack));
     }
 
-    /** Get the lore NBT tag from an item, else return empty */
-    public static ListTag getLoreTagElseEmpty(ItemStack itemStack) {
-        if (itemStack.isEmpty()) return new ListTag();
-        CompoundTag display = itemStack.getTagElement("display");
-
-        if (display == null || display.getType() != CompoundTag.TYPE || !display.contains("Lore")) return new ListTag();
-        Tag loreBase = display.get("Lore");
-
-        if (loreBase.getType() != ListTag.TYPE) return new ListTag();
-        return (ListTag) loreBase;
-    }
-
-    /** Get the lore NBT tag from an item, else return null */
-    public static ListTag getLoreTag(ItemStack itemStack) {
-        if (itemStack.isEmpty()) return null;
-        CompoundTag display = itemStack.getTagElement("display");
-
-        if (display == null || display.getType() != CompoundTag.TYPE || !display.contains("Lore")) return null;
-        Tag loreBase = display.get("Lore");
-
-        if (loreBase.getType() != ListTag.TYPE) return null;
-        return (ListTag) loreBase;
-    }
-
-    /** Get the lore NBT tag from an item, else return null */
-    public static ListTag getOrCreateLoreTag(ItemStack itemStack) {
-        if (itemStack.isEmpty()) return null;
-
-        Tag display = getOrCreateTag(itemStack.getOrCreateTag(), "display", CompoundTag::new);
-        if (display.getType() != CompoundTag.TYPE) return null;
-
-        Tag lore = getOrCreateTag((CompoundTag) display, "lore", ListTag::new);
-        if (lore.getType() != ListTag.TYPE) return null;
-        return (ListTag) lore;
-    }
-
-    /** Get the lore NBT tag from an item, else return null */
-    public static Tag getOrCreateTag(CompoundTag tag, String key, Supplier<Tag> create) {
-        return tag.contains(key) ? tag.get(key) : tag.put(key, create.get());
-    }
-
-    /**
-     * Replace the lore on an item's NBT tag.
-     *
-     * @param itemStack The {@link ItemStack} to have its
-     * @param tag The {@link ListTag} to replace with
-     */
-    public static void replaceLore(ItemStack itemStack, ListTag tag) {
-        CompoundTag nbt = itemStack.getOrCreateTag();
-        CompoundTag display = (CompoundTag) getOrCreateTag(nbt, "display", CompoundTag::new);
-        display.put("Lore", tag);
-        nbt.put("display", display);
-        itemStack.setTag(nbt);
-    }
-
-    /** Converts a string to a usable lore tag */
-    public static StringTag toLoreStringTag(String toConvert) {
-        return StringTag.valueOf(toLoreString(toConvert));
-    }
-
-    /**
-     * Converts a string to a usable lore string
-     *
-     * <p>See {@link net.minecraft.network.chat.Component.Serializer#deserialize(JsonElement, Type,
-     * JsonDeserializationContext)}
-     */
-    public static String toLoreString(String toConvert) {
-        return "\"" + (toConvert).replace("\"", "\\\"") + "\"";
-    }
-
-    /**
-     * Converts a component to a mutable component form by making it a json string
-     *
-     * <p>See {@link net.minecraft.network.chat.Component.Serializer#deserialize(JsonElement, Type,
-     * JsonDeserializationContext)}
-     */
-    public static StringTag toLoreStringTag(Component toConvert) {
-        // When italic is not set manually, it is null, but Minecraft still makes the text italic.
-        // To prevent setting it to false manually every time, we can do this to force it being
-        // non-italic by default.
-        if (!toConvert.getStyle().isItalic()) {
-            MutableComponent mutableComponent = (MutableComponent) toConvert;
-            mutableComponent.setStyle(mutableComponent.getStyle().withItalic(false));
-            return StringTag.valueOf(Component.Serializer.toJson(mutableComponent));
-        }
-
-        return StringTag.valueOf(Component.Serializer.toJson(toConvert));
-    }
-
     public static List<Component> getTooltipLines(ItemStack itemStack) {
         TooltipFlag flag = McUtils.options().advancedItemTooltips ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL;
-        return itemStack.getTooltipLines(McUtils.player(), flag);
+        return itemStack.getTooltipLines(Item.TooltipContext.of(McUtils.mc().level), McUtils.player(), flag);
     }
 
     public static List<Component> appendTooltip(
@@ -233,17 +123,6 @@ public final class LoreUtils {
             }
         }
         return advancedStartLine;
-    }
-
-    public static boolean isLoreEquals(ListTag existingLore, ListTag newLore) {
-        if (existingLore == null && newLore == null) return true;
-        if (existingLore == null || newLore == null) return false;
-
-        // Both are non-null, compare content
-        String existingLoreString = existingLore.getAsString();
-        String newLoreString = newLore.getAsString();
-
-        return existingLoreString.equals(newLoreString);
     }
 
     /**

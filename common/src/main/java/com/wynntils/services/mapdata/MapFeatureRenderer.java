@@ -20,7 +20,7 @@ import com.wynntils.utils.render.type.VerticalAlignment;
 import java.util.Optional;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class MapFeatureRenderer {
+public final class MapFeatureRenderer {
     private static final int SPACING = 2;
     private static final float TEXT_SCALE = 1f;
 

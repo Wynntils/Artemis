@@ -17,7 +17,7 @@ import net.minecraft.ChatFormatting;
 public class OphanimBar extends TrackedBar {
     // Test in OphanimBar_OPHANIM_PATTERN
     private static final Pattern OPHANIM_PATTERN =
-            Pattern.compile("^§710s Healed: §f(?<healed>\\d+)% §[3468]\\[(?<orbs>((§[bce7])?⏺){0,6})(§[3468])?\\]$");
+            Pattern.compile("^§710s Healed: §f(?<healed>\\d+)% §[3468]\\[(?<orbs>((§[bce7])?⏺){0,7})(§[3468])?\\]$");
 
     private static final Pattern ORB_PATTERN = Pattern.compile("(?<color>§[bce7])?⏺");
 

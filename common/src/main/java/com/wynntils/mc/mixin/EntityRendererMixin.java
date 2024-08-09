@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.mixin;
@@ -33,7 +33,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
 
     @Inject(
             method =
-                    "renderNameTag(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/network/chat/Component;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+                    "renderNameTag(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/network/chat/Component;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IF)V",
             at =
                     @At(
                             value = "INVOKE_ASSIGN",
@@ -43,16 +43,17 @@ public abstract class EntityRendererMixin<T extends Entity> {
     private void onNameTagRenderPre(
             T entity,
             Component displayName,
-            PoseStack matrixStack,
-            MultiBufferSource buffer,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
             int packedLight,
+            float partialTick,
             CallbackInfo ci,
             @Local(ordinal = 1) LocalFloatRef backgroundOpacity) {
         EntityNameTagRenderEvent event = new EntityNameTagRenderEvent(
                 entity,
                 displayName,
-                matrixStack,
-                buffer,
+                poseStack,
+                bufferSource,
                 packedLight,
                 this.entityRenderDispatcher,
                 this.getFont(),
@@ -60,7 +61,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
         MixinHelper.post(event);
         if (event.isCanceled()) {
             // We inject in the middle of the method, to have locals, but we need to manually pop the matrix stack now
-            matrixStack.popPose();
+            poseStack.popPose();
             ci.cancel();
             return;
         }

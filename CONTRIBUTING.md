@@ -1,18 +1,18 @@
 # Introduction
 
-### Welcome to the Artemis Contribution Guide!
+### Welcome to the Wynntils Contribution Guide!
 
-First off, thank you for considering contributing to Wynntils Artemis. We've written this page to help new contributors start off.
+First off, thank you for considering contributing to Wynntils. We've written this page to help new contributors start off.
 
 Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue, assessing changes, and helping you finalize your pull requests.
 
 ### What kinds of contributions do we look for?
 
-We generally welcome almost any kind of contribution. New features and bugfixes are generally accepted. If you are looking for something to work on, but you don't have an idea, feel free to look at [our issues page](https://github.com/Wynntils/Artemis/issues) or ask in [our discord.](https://discord.gg/wynntils). However, before attempting to fix any of the issues, please make a comment on the issue. There are some really complicated issues listed, and we wouldn't want you to get caught up in them.
+We generally welcome almost any kind of contribution. New features and bugfixes are generally accepted. If you are looking for something to work on, but you don't have an idea, feel free to look at [our issues page](https://github.com/Wynntils/Wynntils/issues) or ask in [our discord.](https://discord.gg/wynntils). However, before attempting to fix any of the issues, please make a comment on the issue. There are some really complicated issues listed, and we wouldn't want you to get caught up in them.
 
 ### What kinds of contributions do we NOT look for?
 
-Please, don't use the issue tracker for support questions. [Our discord](https://discord.gg/wynntils) should be used for getting support.
+Please, don't use the issue tracker for support questions. [Our discord](https://discord.gg/wynntils-mod) should be used for getting support.
 
 # Ground Rules
 
@@ -62,4 +62,4 @@ When filing an issue, make sure to answer these seven questions. We should be ab
 
 # Code review process
 
-Your code will get reviewed by the Artemis Development Team. Multiple people may comment on your pull request. Your code will be merged after at least one team members that interacted with your pull request have approved your code.
+Your code will get reviewed by the Wynntils Development Team. Multiple people may comment on your pull request. Your code will be merged after at least one team members that interacted with your pull request have approved your code.

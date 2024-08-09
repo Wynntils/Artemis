@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.features.combat;
@@ -14,7 +14,7 @@ import com.wynntils.models.abilities.event.TotemEvent;
 import com.wynntils.utils.colors.CommonColors;
 import com.wynntils.utils.colors.CustomColor;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.COMBAT)
 public class ShamanTotemTrackingFeature extends Feature {
@@ -32,6 +32,9 @@ public class ShamanTotemTrackingFeature extends Feature {
     @Persisted
     public final Config<CustomColor> thirdTotemColor = new Config<>(CommonColors.RED);
 
+    @Persisted
+    public final Config<CustomColor> fourthTotemColor = new Config<>(CommonColors.GREEN);
+
     @SubscribeEvent
     public void onTotemSummoned(TotemEvent.Summoned e) {
         if (!highlightShamanTotems.get()) return;
@@ -44,8 +47,9 @@ public class ShamanTotemTrackingFeature extends Feature {
                     case 1 -> firstTotemColor.get();
                     case 2 -> secondTotemColor.get();
                     case 3 -> thirdTotemColor.get();
+                    case 4 -> fourthTotemColor.get();
                     default -> throw new IllegalArgumentException(
-                            "totemNumber should be 1, 2, or 3! (color switch in #onTotemSummoned in ShamanTotemTrackingFeature");
+                            "totemNumber should be 1, 2, 3 or 4! (color switch in #onTotemSummoned in ShamanTotemTrackingFeature");
                 };
 
         ((EntityExtension) totemAS).setGlowColor(color);

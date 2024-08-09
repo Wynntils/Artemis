@@ -24,7 +24,7 @@ public class JsonIcon implements MapIcon {
         this.nativeImage = NativeImage.read(texture);
         this.width = nativeImage.getWidth();
         this.height = nativeImage.getHeight();
-        this.resource = new ResourceLocation("wynntils", "icons/" + iconId.replace(":", "."));
+        this.resource = ResourceLocation.fromNamespaceAndPath("wynntils", "icons/" + iconId.replace(":", "."));
     }
 
     @Override

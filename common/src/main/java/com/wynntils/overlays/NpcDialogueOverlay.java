@@ -36,10 +36,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class NpcDialogueOverlay extends Overlay {
     private static final StyledText PRESS_SNEAK_TO_CONTINUE = StyledText.fromString("§cPress SNEAK to continue");
@@ -105,7 +106,7 @@ public class NpcDialogueOverlay extends Overlay {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         NpcDialogue currentDialogue = Models.NpcDialogue.getCurrentDialogue();
         List<NpcDialogue> confirmationlessDialogues = Models.NpcDialogue.getConfirmationlessDialogues();
 
@@ -136,7 +137,8 @@ public class NpcDialogueOverlay extends Overlay {
     }
 
     @Override
-    public void renderPreview(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void renderPreview(
+            PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         List<StyledText> fakeDialogue = List.of(
                 StyledText.fromString(
                         "§7[1/2] §2Random Citizen: §aDid you know that Wynntils is the best Wynncraft mod you'll probably find?"),

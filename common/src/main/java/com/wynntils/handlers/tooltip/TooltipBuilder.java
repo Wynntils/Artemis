@@ -128,7 +128,7 @@ public abstract class TooltipBuilder {
         if (foundSkills && !foundIdentifications) {
             // If there were skills but no identifications,
             // then the footer is missing a blank line
-            footer.add(0, Component.literal(""));
+            footer.addFirst(Component.literal(""));
         }
 
         return Pair.of(header, footer);

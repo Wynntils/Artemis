@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.items.annotators.game;
@@ -9,8 +9,7 @@ import com.wynntils.handlers.item.ItemAnnotation;
 import com.wynntils.handlers.item.ItemAnnotator;
 import com.wynntils.models.items.items.game.MiscItem;
 import com.wynntils.utils.mc.LoreUtils;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import java.util.List;
 import net.minecraft.world.item.ItemStack;
 
 public final class MiscAnnotator implements ItemAnnotator {
@@ -19,18 +18,17 @@ public final class MiscAnnotator implements ItemAnnotator {
 
     @Override
     public ItemAnnotation getAnnotation(ItemStack itemStack, StyledText name) {
-        ListTag loreTag = LoreUtils.getLoreTag(itemStack);
-        if (loreTag == null) return null;
+        List<StyledText> lore = LoreUtils.getLore(itemStack);
+        if (lore.isEmpty()) return null;
 
         boolean untradable = false;
         boolean questItem = false;
 
-        for (Tag line : loreTag) {
-            StyledText coded = StyledText.fromString(line.getAsString());
-            if (coded.equals(UNTRADABLE)) {
+        for (StyledText line : lore) {
+            if (line.equals(UNTRADABLE)) {
                 untradable = true;
             }
-            if (coded.equals(QUEST_ITEM)) {
+            if (line.equals(QUEST_ITEM)) {
                 questItem = true;
             }
         }

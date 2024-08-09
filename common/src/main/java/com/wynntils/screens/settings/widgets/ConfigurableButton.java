@@ -110,8 +110,6 @@ public class ConfigurableButton extends WynntilsButton {
                         (isOverlay ? this.getX() + 12 : this.getX()),
                         this.getY(),
                         (isOverlay ? this.width - 12 : this.width) - 11,
-                        settingsScreen.getTranslationX(),
-                        settingsScreen.getTranslationY(),
                         color,
                         HorizontalAlignment.LEFT,
                         VerticalAlignment.TOP,

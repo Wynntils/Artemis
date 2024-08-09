@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.screens.gearviewer;
@@ -25,6 +25,7 @@ import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
@@ -84,7 +85,7 @@ public final class GearViewerScreen extends WynntilsContainerScreen<GearViewerMe
         String gearName = StyledText.fromComponent(itemStack.getHoverName()).getStringWithoutFormatting();
         MutableComponent description = ItemUtils.getNonGearDescription(itemStack, gearName);
         if (description != null) {
-            itemStack.setHoverName(description);
+            itemStack.set(DataComponents.CUSTOM_NAME, description);
             return itemStack;
         }
 

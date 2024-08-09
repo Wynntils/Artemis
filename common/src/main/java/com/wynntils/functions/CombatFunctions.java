@@ -10,9 +10,9 @@ import com.wynntils.core.consumers.functions.arguments.FunctionArguments;
 import java.util.List;
 
 public class CombatFunctions {
-    public static class AreaDamagePerSecondFunction extends Function<Integer> {
+    public static class AreaDamagePerSecondFunction extends Function<Long> {
         @Override
-        public Integer getValue(FunctionArguments arguments) {
+        public Long getValue(FunctionArguments arguments) {
             return Models.Damage.getAreaDamagePerSecond();
         }
 

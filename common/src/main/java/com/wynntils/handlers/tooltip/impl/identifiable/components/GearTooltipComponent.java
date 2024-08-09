@@ -116,7 +116,7 @@ public final class GearTooltipComponent extends IdentifiableTooltipComponent<Gea
         if (requirements.quest().isPresent()) {
             String questName = requirements.quest().get();
             Optional<QuestInfo> quest = Models.Quest.getQuestFromName(questName);
-            boolean fulfilled = quest.isPresent() && quest.get().getStatus() == ActivityStatus.COMPLETED;
+            boolean fulfilled = quest.isPresent() && quest.get().status() == ActivityStatus.COMPLETED;
             header.add(buildRequirementLine("Quest Req: " + questName, fulfilled));
             requirementsCount++;
         }

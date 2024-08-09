@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.abilitytree.type;
@@ -12,9 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.Unbreakable;
 
 public enum AbilityTreeConnectionType {
     VERTICAL(
@@ -248,8 +249,7 @@ public enum AbilityTreeConnectionType {
 
         itemStack.setDamageValue(damage);
 
-        CompoundTag tag = itemStack.getOrCreateTag();
-        tag.putBoolean("Unbreakable", true);
+        itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
 
         return itemStack;
     }

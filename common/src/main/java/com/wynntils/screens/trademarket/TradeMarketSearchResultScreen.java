@@ -39,7 +39,7 @@ public class TradeMarketSearchResultScreen extends WynntilsContainerScreen<Chest
     // Constants
     private static final int FAKE_CONTAINER_ID = 454545;
     private static final ResourceLocation CONTAINER_BACKGROUND =
-            new ResourceLocation("textures/gui/container/generic_54.png");
+            ResourceLocation.withDefaultNamespace("textures/gui/container/generic_54.png");
     private static final int SCROLL_AREA_HEIGHT = 110;
     private static final int ITEMS_PER_PAGE = 54;
 

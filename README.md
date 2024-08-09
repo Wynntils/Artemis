@@ -1,24 +1,24 @@
-Artemis
+Wynntils
 ========
 [![Discord](https://discordapp.com/api/guilds/394189072635133952/widget.png)](https://discord.gg/ve49m9J)
 [![CurseForge](https://cf.way2muchnoise.eu/short_wynntils.svg)](https://www.curseforge.com/minecraft/mc-mods/wynntils)
 [![Modrinth](https://img.shields.io/modrinth/dt/Wynntils?label=modrinth)](https://modrinth.com/mod/wynntils)
 [![GitHub](https://img.shields.io/github/downloads/Wynntils/Artemis/total?logo=github)](https://github.com/Wynntils/Artemis/releases)
-[![License](https://img.shields.io/badge/license-LGPL%203.0-green.svg)](https://github.com/Wynntils/Artemis/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-LGPL%203.0-green.svg)](https://github.com/Wynntils/Wynntils/blob/main/LICENSE)
 
 <div align="center">
-<img src="https://upload.wikimedia.org/wikipedia/commons/d/d2/Artemis.png" width=20%>
 
-*(Image in public domain)*
+<img src="http://cdn.wynntils.com/wynntils%20logo%20-%20w%20paintstroke.png" width=15% alt="Wynntils Logo">
+
 </div>
 
-> Artemis is the greek goddess of hunting and the moon, born of Zeus and Leto, twin of Apollo.
+Wynntils is a Wynncraft mod that seeks to enhance the user's gameplay with a variety of customizable options and additions.
 
-Artemis is a rewrite of **[Wynntils](https://github.com/Wynntils/Wynntils)** (informally referred to as "Legacy") in 1.20.2 using Architectury, to support **Fabric** and **Forge**.
+Wynntils is based on Minecraft 1.21 using Architectury, and supports **Fabric** and **NeoForge**. This repository contains a rewrite (originally codenamed Artemis) of the original Wynntils mod, now known as [Wynntils Legacy](https://github.com/Wynntils/Wynntils-Legacy) .
 
 Downloading a release
 ========
-You can download the latest build from our [releases page](https://github.com/Wynntils/Artemis/releases). You can also download the latest build from our [Modrinth Page](https://modrinth.com/mod/wynntils) and [CurseForge](https://www.curseforge.com/minecraft/mc-mods/wynntils).
+You can download the latest build from our [releases page](https://github.com/Wynntils/Wynntils/releases). You can also download the latest build from our [Modrinth Page](https://modrinth.com/mod/wynntils) and [CurseForge](https://www.curseforge.com/minecraft/mc-mods/wynntils).
 
 Pull Requests
 ========
@@ -35,7 +35,7 @@ Workspace Setup
 To set up the workspace, just import the project as a gradle project into your IDE. You might have to run `./gradlew --refresh-dependencies` if your IDE does not automatically do it.
 
 ### Building
-To build the mod just run `./gradlew buildDependents` and the artifacts should be generated in `fabric/build/libs` and `forge/build/libs`. There are a lot of jars there, use the jar which has the respective loader at the end (eg. `wynntils-VERSION-fabric.jar`).
+To build the mod just run `./gradlew buildDependents` and the artifacts should be generated in `fabric/build/libs` and `neoforge/build/libs`. There are a lot of jars there, use the jar which has the respective loader at the end (eg. `wynntils-VERSION-fabric.jar`).
 
 ### Code Formatting
 The code format is checked by Spotless using the Palantir engine. When opening a PR, Spotless checks will be run automatically by GitHub Actions. This bot runs the `spotlessApply` which fixes all formatting errors that it can find. If such errors are found, the bot will then push a commit to your branch with these fixes.
@@ -70,6 +70,6 @@ The project has [Vineflower for Loom](https://github.com/Juuxel/loom-vineflower)
 License
 ========
 
-Artemis is licensed under the license [GNU Lesser General Public License v3.0](https://github.com/Wynntils/Artemis/blob/main/LICENSE)
+Wynntils is licensed under the license [GNU Lesser General Public License v3.0](https://github.com/Wynntils/Wynntils/blob/main/LICENSE)
 
 Unless specified otherwise, All the assets **are over Wynntils domain © Wynntils**.

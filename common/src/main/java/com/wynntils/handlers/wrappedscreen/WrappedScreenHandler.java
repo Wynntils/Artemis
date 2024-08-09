@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.handlers.wrappedscreen;
@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class WrappedScreenHandler extends Handler {
     private final Set<WrappedScreenHolder> wrappedScreenHolders = new HashSet<>();

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.utils.render.buffered;
@@ -12,6 +12,7 @@ import com.wynntils.utils.render.Texture;
 import java.util.OptionalDouble;
 import java.util.function.Function;
 import net.minecraft.Util;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -40,13 +41,13 @@ public class CustomRenderType extends RenderType {
 
     public static final RenderType LOOTRUN_QUAD = RenderType.create(
             "wynntils_lootrun_quad",
-            DefaultVertexFormat.POSITION_COLOR_TEX,
+            DefaultVertexFormat.POSITION_TEX_COLOR,
             Mode.QUADS,
             256,
             false,
             false,
             CompositeState.builder()
-                    .setShaderState(POSITION_COLOR_TEX_SHADER)
+                    .setShaderState(new ShaderStateShard(GameRenderer::getPositionTexColorShader))
                     .setCullState(NO_CULL)
                     .setTextureState(new TextureStateShard(Texture.LOOTRUN_LINE.resource(), false, false))
                     .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
@@ -127,13 +128,13 @@ public class CustomRenderType extends RenderType {
     private static final Function<ResourceLocation, RenderType> POSITION_COLOR_TEXTURE_QUAD =
             Util.memoize(resource -> RenderType.create(
                     "wynntils_position_color_texture_quad",
-                    DefaultVertexFormat.POSITION_COLOR_TEX,
+                    DefaultVertexFormat.POSITION_TEX_COLOR,
                     Mode.QUADS,
                     256,
                     false,
                     false,
                     CompositeState.builder()
-                            .setShaderState(POSITION_COLOR_TEX_SHADER)
+                            .setShaderState(new ShaderStateShard(GameRenderer::getPositionTexColorShader))
                             .setTextureState(new TextureStateShard(resource, false, false))
                             .setTransparencyState(CustomRenderStateShard.SEMI_TRANSPARENT_TRANSPARENCY)
                             .setWriteMaskState(COLOR_WRITE)

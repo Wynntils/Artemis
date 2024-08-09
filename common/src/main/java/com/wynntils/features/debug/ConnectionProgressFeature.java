@@ -13,7 +13,7 @@ import com.wynntils.core.persisted.config.ConfigCategory;
 import com.wynntils.mc.event.ServerResourcePackEvent;
 import com.wynntils.models.worlds.event.WorldStateEvent;
 import com.wynntils.models.worlds.type.WorldState;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @StartDisabled
 @ConfigCategory(Category.DEBUG)

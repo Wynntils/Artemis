@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.services.cosmetics;
@@ -116,14 +116,14 @@ public class CosmeticsService extends Service {
             String baseLocation = "wynntils:capes/" + uuid.toString().replace("-", "");
 
             if (frames == 1) { // not animated
-                locations[0] = new ResourceLocation(baseLocation);
+                locations[0] = ResourceLocation.parse(baseLocation);
                 McUtils.mc().getTextureManager().register(locations[0], new DynamicTexture(image));
             } else { // animated
                 for (int i = 0; i < frames; i++) {
                     NativeImage frame = new NativeImage(frameHeight * 2, frameHeight, false);
                     image.copyRect(frame, 0, frameHeight * i, 0, 0, frameHeight * 2, frameHeight, false, false);
 
-                    locations[i] = new ResourceLocation(baseLocation + "/" + i);
+                    locations[i] = ResourceLocation.parse(baseLocation + "/" + i);
                     McUtils.mc().getTextureManager().register(locations[i], new DynamicTexture(frame));
                 }
             }

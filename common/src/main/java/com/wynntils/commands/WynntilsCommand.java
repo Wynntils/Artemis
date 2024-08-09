@@ -30,6 +30,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ClickEvent;
@@ -42,15 +43,17 @@ public class WynntilsCommand extends Command {
     private static final Pattern STATUS_HEADING = Pattern.compile("<h1 class='status-page__title'>(.*)</h1>");
 
     public void registerWithCommands(
-            Consumer<LiteralArgumentBuilder<CommandSourceStack>> consumer, List<Command> commands) {
-        List<LiteralArgumentBuilder<CommandSourceStack>> commandBuilders = getCommandBuilders();
+            Consumer<LiteralArgumentBuilder<CommandSourceStack>> consumer,
+            CommandBuildContext context,
+            List<Command> commands) {
+        List<LiteralArgumentBuilder<CommandSourceStack>> commandBuilders = getCommandBuilders(context);
 
         // Also register all our commands as subcommands under the wynntils command and it's aliases
         for (LiteralArgumentBuilder<CommandSourceStack> builder : commandBuilders) {
             for (Command commandInstance : commands) {
                 if (commandInstance == this) continue;
 
-                commandInstance.getCommandBuilders().forEach(builder::then);
+                commandInstance.getCommandBuilders(context).forEach(builder::then);
             }
 
             consumer.accept(builder);
@@ -64,7 +67,7 @@ public class WynntilsCommand extends Command {
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> getCommandBuilder(
-            LiteralArgumentBuilder<CommandSourceStack> base) {
+            LiteralArgumentBuilder<CommandSourceStack> base, CommandBuildContext context) {
         return base.then(Commands.literal("clearcaches")
                         .then(Commands.literal("run").executes(this::doClearCaches))
                         .executes(this::clearCaches))

@@ -14,7 +14,7 @@ import com.wynntils.core.persisted.config.ConfigCategory;
 import com.wynntils.mc.event.PlayerInfoEvent;
 import com.wynntils.utils.mc.McUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.WYNNTILS)
 public class BetaWarningFeature extends Feature {

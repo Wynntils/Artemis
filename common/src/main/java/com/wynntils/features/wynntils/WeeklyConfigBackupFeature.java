@@ -15,7 +15,7 @@ import com.wynntils.mc.event.TitleScreenInitEvent;
 import com.wynntils.utils.FileUtils;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.WYNNTILS)
 public class WeeklyConfigBackupFeature extends Feature {

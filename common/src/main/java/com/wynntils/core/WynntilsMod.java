@@ -27,14 +27,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
 import net.minecraft.SharedConstants;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.bus.api.IEventBus;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** The common implementation of Wynntils */
+/**
+ * The common implementation of Wynntils
+ */
 public final class WynntilsMod {
     public static final String MOD_ID = "wynntils";
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -63,9 +67,14 @@ public final class WynntilsMod {
         eventBus.register(object);
     }
 
-    public static boolean postEvent(Event event) {
+    public static <T extends Event> void registerListener(Consumer<T> eventConsumer) {
+        eventBus.addListener(eventConsumer);
+    }
+
+    public static <T extends Event> boolean postEvent(T event) {
         try {
-            return eventBus.post(event);
+            eventBus.post(event);
+            return event instanceof ICancellableEvent cancellableEvent && cancellableEvent.isCanceled();
         } catch (Throwable t) {
             handleExceptionInEventListener(t, event);
             return false;

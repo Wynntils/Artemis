@@ -53,8 +53,8 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 @ConfigCategory(Category.CHAT)
@@ -97,23 +97,10 @@ public class ChatItemFeature extends Feature {
 
         // replace encoded strings with placeholders for less confusion
 
-        // check for old chat item encoding
-        Matcher m = Models.Gear.gearChatEncodingMatcher(chatInput.getValue());
-        while (m.find()) {
-            String encodedItem = m.group();
-            StringBuilder name = new StringBuilder(m.group("Name"));
-            while (chatItems.containsKey(name.toString())) { // avoid overwriting entries
-                name.append("_");
-            }
-
-            chatInput.setValue(chatInput.getValue().replace(encodedItem, "<" + name + ">"));
-            chatItems.put(name.toString(), encodedItem);
-        }
-
         // check for new chat item encoding
-        m = Models.ItemEncoding.getEncodedDataPattern().matcher(chatInput.getValue());
-        while (m.find()) {
-            EncodedByteBuffer encodedByteBuffer = EncodedByteBuffer.fromUtf16String(m.group());
+        Matcher matcher = Models.ItemEncoding.getEncodedDataPattern().matcher(chatInput.getValue());
+        while (matcher.find()) {
+            EncodedByteBuffer encodedByteBuffer = EncodedByteBuffer.fromUtf16String(matcher.group());
             ErrorOr<WynnItem> errorOrDecodedItem = Models.ItemEncoding.decodeItem(encodedByteBuffer);
 
             String name;
@@ -133,8 +120,8 @@ public class ChatItemFeature extends Feature {
                 name += "_";
             }
 
-            chatInput.setValue(chatInput.getValue().replace(m.group(), "<" + name + ">"));
-            chatItems.put(name, m.group());
+            chatInput.setValue(chatInput.getValue().replace(matcher.group(), "<" + name + ">"));
+            chatItems.put(name, matcher.group());
         }
     }
 
@@ -146,19 +133,7 @@ public class ChatItemFeature extends Feature {
 
         // Decode old chat item encoding
         StyledText modified = styledText.iterate((part, changes) -> {
-            StyledTextPart partToReplace = part;
-
-            decodeDeprecatedChatEncoding(changes, partToReplace);
-
-            return IterationDecision.CONTINUE;
-        });
-
-        // Decode new chat item encoding
-        modified = modified.iterate((part, changes) -> {
-            StyledTextPart partToReplace = part;
-
-            decodeChatEncoding(changes, partToReplace);
-
+            decodeChatEncoding(changes, part);
             return IterationDecision.CONTINUE;
         });
 
@@ -235,34 +210,6 @@ public class ChatItemFeature extends Feature {
 
             partToReplace = last;
             matcher = Models.ItemEncoding.getEncodedDataPattern().matcher(lastPart);
-        }
-    }
-
-    private void decodeDeprecatedChatEncoding(List<StyledTextPart> changes, StyledTextPart partToReplace) {
-        Matcher matcher = Models.Gear.gearChatEncodingMatcher(partToReplace.getString(null, PartStyle.StyleType.NONE));
-
-        while (matcher.find()) {
-            GearItem decodedItem = Models.Gear.fromEncodedString(matcher.group());
-            if (decodedItem == null) continue;
-
-            String unformattedString = partToReplace.getString(null, PartStyle.StyleType.NONE);
-
-            String firstPart = unformattedString.substring(0, matcher.start());
-            String lastPart = unformattedString.substring(matcher.end());
-
-            PartStyle partStyle = partToReplace.getPartStyle();
-
-            StyledTextPart first = new StyledTextPart(firstPart, partStyle.getStyle(), null, Style.EMPTY);
-            List<StyledTextPart> itemParts = createItemPart(decodedItem);
-            StyledTextPart last = new StyledTextPart(lastPart, partStyle.getStyle(), null, Style.EMPTY);
-
-            changes.remove(partToReplace);
-            changes.add(first);
-            changes.addAll(itemParts);
-            changes.add(last);
-
-            partToReplace = last;
-            matcher = Models.Gear.gearChatEncodingMatcher(lastPart);
         }
     }
 
@@ -353,18 +300,5 @@ public class ChatItemFeature extends Feature {
                         HoverEvent.Action.SHOW_TEXT,
                         Component.translatable("feature.wynntils.chatItem.chatItemTooltip")
                                 .withStyle(ChatFormatting.DARK_AQUA)))));
-
-        if (WynntilsMod.isDevelopmentEnvironment() && wynnItem instanceof GearItem gearItem) {
-            // Also encode the item using the old method for comparison
-            String encoded = Models.Gear.toEncodedString(gearItem);
-            McUtils.sendMessageToClient(Component.literal("[DEBUG] Click here to copy the old encoded item for chat!")
-                    .withStyle(ChatFormatting.DARK_GREEN)
-                    .withStyle(ChatFormatting.UNDERLINE)
-                    .withStyle(s -> s.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, encoded)))
-                    .withStyle(s -> s.withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
-                            Component.translatable("feature.wynntils.chatItem.chatItemTooltip")
-                                    .withStyle(ChatFormatting.DARK_AQUA)))));
-        }
     }
 }

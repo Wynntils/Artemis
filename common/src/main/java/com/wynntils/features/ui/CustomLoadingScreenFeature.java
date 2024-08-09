@@ -21,14 +21,14 @@ import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
 import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.UI)
 public class CustomLoadingScreenFeature extends Feature {
     private LoadingScreen loadingScreen;
     private ConnectScreen baseConnectScreen;
-    // Minecraft does some of it's connection logic in ConnectScreen which is strange
+    // Minecraft does some of its connection logic in ConnectScreen which is strange
     // We need to be able to tell our custom loading screen to work with it in the background
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -86,7 +86,23 @@ public class CustomLoadingScreenFeature extends Feature {
     }
 
     @SubscribeEvent
-    public void onPlayerSound(LocalSoundEvent event) {
+    public void onPlayerSound(LocalSoundEvent.Client event) {
+        if (loadingScreen == null) return;
+
+        // Silence all player sounds while loading (falling and equip sounds)
+        event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public void onPlayerSound(LocalSoundEvent.Player event) {
+        if (loadingScreen == null) return;
+
+        // Silence all player sounds while loading (falling and equip sounds)
+        event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public void onPlayerSound(LocalSoundEvent.LocalEntity event) {
         if (loadingScreen == null) return;
 
         // Silence all player sounds while loading (falling and equip sounds)

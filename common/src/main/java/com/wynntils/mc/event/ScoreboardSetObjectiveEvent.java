@@ -1,12 +1,12 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 public class ScoreboardSetObjectiveEvent extends Event {
     public static final int METHOD_ADD = 0;

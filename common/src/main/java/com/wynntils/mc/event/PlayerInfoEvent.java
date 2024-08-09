@@ -1,12 +1,12 @@
 /*
- * Copyright © Wynntils 2021-2023.
+ * Copyright © Wynntils 2021-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import java.util.UUID;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 /** Fires for changes in player info in scoreboard */
 public abstract class PlayerInfoEvent extends Event {

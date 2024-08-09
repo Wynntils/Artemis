@@ -54,10 +54,9 @@ public final class CraftedTooltipIdentifications {
             delimiterNeeded = true;
         }
 
-        if (!identifications.isEmpty()
-                && identifications.get(identifications.size() - 1).getString().isEmpty()) {
+        if (!identifications.isEmpty() && identifications.getLast().getString().isEmpty()) {
             // Remove last line if it is a delimiter line
-            identifications.remove(identifications.size() - 1);
+            identifications.removeLast();
         }
 
         return identifications;

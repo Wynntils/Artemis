@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.mixin;
@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ChatScreen.class)
@@ -26,19 +27,18 @@ public abstract class ChatScreenMixin {
     }
 
     @Inject(
-            method = "Lnet/minecraft/client/gui/screens/ChatScreen;handleChatInput(Ljava/lang/String;Z)Z",
+            method = "handleChatInput(Ljava/lang/String;Z)V",
             at =
                     @At(
                             value = "INVOKE",
                             target =
                                     "Lnet/minecraft/client/multiplayer/ClientPacketListener;sendChat(Ljava/lang/String;)V"),
             cancellable = true)
-    private void onPlayerChatSend(String input, boolean addToRecentChat, CallbackInfoReturnable<Boolean> cir) {
-        ChatScreenSendEvent event = new ChatScreenSendEvent(input, addToRecentChat);
+    private void onPlayerChatSend(String message, boolean addToRecentChat, CallbackInfo ci) {
+        ChatScreenSendEvent event = new ChatScreenSendEvent(message, addToRecentChat);
         MixinHelper.post(event);
         if (event.isCanceled()) {
-            cir.setReturnValue(true);
-            cir.cancel();
+            ci.cancel();
         }
     }
 }

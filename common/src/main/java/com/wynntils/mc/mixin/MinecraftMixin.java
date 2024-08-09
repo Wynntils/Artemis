@@ -61,8 +61,28 @@ public abstract class MinecraftMixin {
     }
 
     @Inject(
-            method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/GameNarrator;clear()V", shift = At.Shift.AFTER))
+            method = "<init>(Lnet/minecraft/client/main/GameConfig;)V",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/Options;loadSelectedResourcePacks(Lnet/minecraft/server/packs/repository/PackRepository;)V",
+                            shift = At.Shift.AFTER))
+    private void onInitialResourcePackLoad(CallbackInfo ci) {
+        // Too early to post events here, but Service components are initialized (and their storages loaded)
+        // We add the resource pack to the selected list here
+        Services.ResourcePack.preloadResourcePack();
+        // Explicitly do not trigger a reload here, as it's too early, and the game will do it later
+    }
+
+    @Inject(
+            method = "clearDownloadedResourcePacks()V",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/client/resources/server/DownloadedPackSource;cleanupAfterDisconnect()V",
+                            shift = At.Shift.AFTER))
     private void handleResourcePackPopPre(CallbackInfo ci) {
         ServerResourcePackEvent.Clear event = new ServerResourcePackEvent.Clear();
         MixinHelper.postAlways(event);

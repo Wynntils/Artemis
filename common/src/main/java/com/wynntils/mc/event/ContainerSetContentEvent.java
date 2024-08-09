@@ -1,13 +1,13 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import java.util.List;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
 public abstract class ContainerSetContentEvent extends Event {
     private final List<ItemStack> items;
@@ -38,8 +38,7 @@ public abstract class ContainerSetContentEvent extends Event {
         return stateId;
     }
 
-    @Cancelable
-    public static class Pre extends ContainerSetContentEvent {
+    public static class Pre extends ContainerSetContentEvent implements ICancellableEvent {
         public Pre(List<ItemStack> items, ItemStack carriedItem, int containerId, int stateId) {
             super(items, carriedItem, containerId, stateId);
         }

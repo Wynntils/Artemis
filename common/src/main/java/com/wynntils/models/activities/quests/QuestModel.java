@@ -52,7 +52,7 @@ public final class QuestModel extends Model {
 
     public Optional<QuestInfo> getQuestFromName(String name) {
         return questStorage.getOrDefault(Models.Character.getId(), QuestStorage.EMPTY).quests().stream()
-                .filter(quest -> quest.getName().equals(name))
+                .filter(quest -> quest.name().equals(name))
                 .findFirst();
     }
 
@@ -90,34 +90,34 @@ public final class QuestModel extends Model {
         // the given sort order, and finally a third way if the given sort order is equal.
 
         QuestInfo trackedQuestInfo = Models.Activity.getTrackedQuestInfo();
-        String trackedQuestName = trackedQuestInfo != null ? trackedQuestInfo.getName() : "";
+        String trackedQuestName = trackedQuestInfo != null ? trackedQuestInfo.name() : "";
         Comparator<QuestInfo> baseComparator =
-                Comparator.comparing(questInfo -> !questInfo.getName().equals(trackedQuestName));
+                Comparator.comparing(questInfo -> !questInfo.name().equals(trackedQuestName));
         return switch (sortOrder) {
             case LEVEL -> questList.stream()
                     .sorted(baseComparator
-                            .thenComparing(QuestInfo::getStatus)
-                            .thenComparing(QuestInfo::getSortLevel)
-                            .thenComparing(QuestInfo::getName))
+                            .thenComparing(QuestInfo::status)
+                            .thenComparing(QuestInfo::sortLevel)
+                            .thenComparing(QuestInfo::name))
                     .toList();
             case DISTANCE -> questList.stream()
                     .sorted(baseComparator
-                            .thenComparing(QuestInfo::getStatus)
+                            .thenComparing(QuestInfo::status)
                             .thenComparing(new LocationComparator())
-                            .thenComparing(QuestInfo::getName))
+                            .thenComparing(QuestInfo::name))
                     .toList();
             case ALPHABETIC -> questList.stream()
                     .sorted(baseComparator
-                            .thenComparing(QuestInfo::getStatus)
-                            .thenComparing(QuestInfo::getName)
-                            .thenComparing(QuestInfo::getSortLevel))
+                            .thenComparing(QuestInfo::status)
+                            .thenComparing(QuestInfo::name)
+                            .thenComparing(QuestInfo::sortLevel))
                     .toList();
         };
     }
 
     public void startTracking(QuestInfo questInfo) {
         Models.Activity.startTracking(
-                questInfo.getName(), questInfo.isMiniQuest() ? ActivityType.MINI_QUEST : ActivityType.QUEST);
+                questInfo.name(), questInfo.isMiniQuest() ? ActivityType.MINI_QUEST : ActivityType.QUEST);
     }
 
     public void stopTracking() {
@@ -126,14 +126,14 @@ public final class QuestModel extends Model {
 
     public void openQuestOnWiki(QuestInfo questInfo) {
         if (questInfo.isMiniQuest()) {
-            String type = questInfo.getName().split(" ")[0];
+            String type = questInfo.name().split(" ")[0];
 
             String wikiName = "Quests#" + type + "ing_Posts";
 
             Managers.Net.openLink(UrlId.LINK_WIKI_LOOKUP, Map.of("title", wikiName));
         } else {
             ApiResponse apiResponse =
-                    Managers.Net.callApi(UrlId.API_WIKI_QUEST_PAGE_QUERY, Map.of("name", questInfo.getName()));
+                    Managers.Net.callApi(UrlId.API_WIKI_QUEST_PAGE_QUERY, Map.of("name", questInfo.name()));
             apiResponse.handleJsonArray(json -> {
                 String pageTitle = json.get(0)
                         .getAsJsonObject()
@@ -147,7 +147,7 @@ public final class QuestModel extends Model {
 
     public Optional<QuestInfo> getQuestInfoFromName(String name) {
         return Stream.concat(getQuestsRaw().stream(), getMiniQuestsRaw().stream())
-                .filter(quest -> quest.getName().equals(stripPrefix(name)))
+                .filter(quest -> quest.name().equals(stripPrefix(name)))
                 .findFirst();
     }
 
@@ -160,7 +160,7 @@ public final class QuestModel extends Model {
 
         for (ActivityInfo activity : newActivities) {
             if (activity.type() != ActivityType.QUEST && activity.type() != ActivityType.STORYLINE_QUEST) {
-                WynntilsMod.warn("Incorrect quest activity type recieved: " + activity);
+                WynntilsMod.warn("Incorrect quest activity type received: " + activity);
                 continue;
             }
             QuestInfo questInfo = getQuestInfoFromActivity(activity);
@@ -178,7 +178,7 @@ public final class QuestModel extends Model {
 
         for (ActivityInfo activity : newActivities) {
             if (activity.type() != ActivityType.MINI_QUEST) {
-                WynntilsMod.warn("Incorrect mini-quest activity type recieved: " + activity);
+                WynntilsMod.warn("Incorrect mini-quest activity type received: " + activity);
                 continue;
             }
             QuestInfo questInfo = getQuestInfoFromActivity(activity);
@@ -225,8 +225,8 @@ public final class QuestModel extends Model {
 
         @Override
         public int compare(QuestInfo quest1, QuestInfo quest2) {
-            Optional<Location> loc1 = quest1.getNextLocation();
-            Optional<Location> loc2 = quest2.getNextLocation();
+            Optional<Location> loc1 = quest1.nextLocation();
+            Optional<Location> loc2 = quest2.nextLocation();
             return (int) (getDistance(loc1) - getDistance(loc2));
         }
     }

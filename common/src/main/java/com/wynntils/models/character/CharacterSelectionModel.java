@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.models.character;
@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 public final class CharacterSelectionModel extends Model {
@@ -31,7 +31,6 @@ public final class CharacterSelectionModel extends Model {
             "§e- §7Class: (§r)?(§c(?:§l)?)?(§r)?(§6(?:§l)?)?(§r)?(§b(?:§l)?)?(§r)?(§3(?:§l)?)?(§r)?(§5(?:§l)?)?(§r)?(\\s)?(§r)?§f(?<name>.+)");
     private static final Pattern CLASS_ITEM_LEVEL_PATTERN = Pattern.compile("§e- §7Level: §f(\\d+)");
     private static final Pattern CLASS_ITEM_XP_PATTERN = Pattern.compile("§e- §7XP: §f(\\d+)%");
-    private static final Pattern CLASS_ITEM_SOUL_POINTS_PATTERN = Pattern.compile("§e- §7Soul Points: §f(\\d+)");
     private static final Pattern CLASS_ITEM_FINISHED_QUESTS_PATTERN =
             Pattern.compile("§e- §7Finished Quests: §f(\\d+)/\\d+");
 
@@ -103,7 +102,6 @@ public final class CharacterSelectionModel extends Model {
         ClassType classType = null;
         int level = 0;
         int xp = 0;
-        int soulPoints = 0;
         int finishedQuests = 0;
         for (StyledText line : LoreUtils.getLore(itemStack)) {
             Matcher classMatcher = line.getMatcher(CLASS_ITEM_CLASS_PATTERN);
@@ -128,19 +126,13 @@ public final class CharacterSelectionModel extends Model {
                 continue;
             }
 
-            Matcher soulPointsMatcher = line.getMatcher(CLASS_ITEM_SOUL_POINTS_PATTERN);
-            if (soulPointsMatcher.matches()) {
-                soulPoints = Integer.parseInt(soulPointsMatcher.group(1));
-                continue;
-            }
-
             Matcher questsMatcher = line.getMatcher(CLASS_ITEM_FINISHED_QUESTS_PATTERN);
             if (questsMatcher.matches()) {
                 finishedQuests = Integer.parseInt(questsMatcher.group(1));
             }
         }
 
-        return new ClassInfo(className, itemStack, slot, classType, level, xp, soulPoints, finishedQuests);
+        return new ClassInfo(className, itemStack, slot, classType, level, xp, finishedQuests);
     }
 
     public void playWithCharacter(int slot) {

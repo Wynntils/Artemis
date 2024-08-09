@@ -117,9 +117,9 @@ public abstract class InequalityNumericFilterWidget<T> extends GeneralFilterWidg
         List<InequalityType> types = new ArrayList<>(List.of(InequalityType.values()));
 
         if (types.indexOf(inequalityType) + direction < 0) {
-            inequalityType = types.get(types.size() - 1);
+            inequalityType = types.getLast();
         } else if (types.indexOf(inequalityType) + direction == types.size()) {
-            inequalityType = types.get(0);
+            inequalityType = types.getFirst();
         } else {
             inequalityType = types.get(types.indexOf(inequalityType) + direction);
         }

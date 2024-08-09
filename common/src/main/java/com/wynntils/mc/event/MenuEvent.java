@@ -1,13 +1,13 @@
 /*
- * Copyright © Wynntils 2021-2023.
+ * Copyright © Wynntils 2021-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
 /** Fired for Menu events */
 public abstract class MenuEvent extends Event {
@@ -35,8 +35,7 @@ public abstract class MenuEvent extends Event {
             return containerId;
         }
 
-        @Cancelable
-        public static final class Pre extends MenuOpenedEvent {
+        public static final class Pre extends MenuOpenedEvent implements ICancellableEvent {
             public Pre(MenuType<?> menuType, Component title, int containerId) {
                 super(menuType, title, containerId);
             }
@@ -50,8 +49,7 @@ public abstract class MenuEvent extends Event {
     }
 
     /** Fired for Menu closed events */
-    @Cancelable
-    public static class MenuClosedEvent extends MenuEvent {
+    public static class MenuClosedEvent extends MenuEvent implements ICancellableEvent {
         private final int containerId;
 
         public MenuClosedEvent(int containerId) {

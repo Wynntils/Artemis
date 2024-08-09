@@ -15,8 +15,8 @@ import com.wynntils.handlers.chat.type.MessageType;
 import com.wynntils.utils.type.Pair;
 import java.util.List;
 import java.util.regex.Pattern;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 @ConfigCategory(Category.CHAT)
 public class MessageFilterFeature extends Feature {
